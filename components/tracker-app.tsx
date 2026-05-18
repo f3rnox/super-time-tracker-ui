@@ -137,9 +137,31 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           )}
 
           <EntryList
+            title="Today"
             entries={state.todayEntries}
             total_ms={state.todayTotalMs}
+            empty_message="No entries yet today."
             is_pending={is_pending}
+            on_delete={(entry) =>
+              run_action(() =>
+                post_tracker_action('/api/entry', {
+                  sheetName: entry.sheetName,
+                  entryId: entry.id,
+                }),
+              )
+            }
+            on_edit={(entry, values) =>
+              run_action(() => edit_entry(entry.sheetName, entry.id, values))
+            }
+          />
+
+          <EntryList
+            title={`${active_sheet} — all entries`}
+            entries={state.activeSheetEntries}
+            total_ms={state.activeSheetTotalMs}
+            empty_message={`No entries on sheet "${active_sheet}".`}
+            is_pending={is_pending}
+            show_sheet_name={false}
             on_delete={(entry) =>
               run_action(() =>
                 post_tracker_action('/api/entry', {
