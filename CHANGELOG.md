@@ -1,0 +1,21 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### 0.1.1 (2026-05-18)
+
+
+### Features
+
+* add move to sheet option to active entry ([ef1fe83](https://github.com/f3rnox/super-time-tracker-ui/commit/ef1fe8357b05a255e3e107ae67d6c75bd9845276))
+* initial commit ([15a8998](https://github.com/f3rnox/super-time-tracker-ui/commit/15a8998c1ac09fa5392635a92b93d0a9d8412f53))
+* minor updates, multi-select functionality ([69ccbd0](https://github.com/f3rnox/super-time-tracker-ui/commit/69ccbd01c8ac04dfebbdbad40bd648f95d5d55dc))
+* show sheet entry list, minor changes ([8d918f7](https://github.com/f3rnox/super-time-tracker-ui/commit/8d918f71070bf537daa203e4483525109f90b949))
+* update ([ed0d7e6](https://github.com/f3rnox/super-time-tracker-ui/commit/ed0d7e614ab7ee73ef1d5f7c8f5bf2ca8b7f66e0))
+* update ([b272c68](https://github.com/f3rnox/super-time-tracker-ui/commit/b272c68b16a1ee0b70384c328cbcbcc42a2b290d))
+* update ([c9a138d](https://github.com/f3rnox/super-time-tracker-ui/commit/c9a138d5019f6aa488acb74eb8fbf0eabe3ea8e8))
+* update ([f49cc33](https://github.com/f3rnox/super-time-tracker-ui/commit/f49cc33227666f59b8db55517d98352515a88dd1))
+* update ([4efa65f](https://github.com/f3rnox/super-time-tracker-ui/commit/4efa65f63cee5e0bf829b209170c8b8a383d749e))
+* update ([913173d](https://github.com/f3rnox/super-time-tracker-ui/commit/913173dc8dfec47e181c5e839fa6d6bfa0e0cd96))
+* update with many new settings and features ([198f093](https://github.com/f3rnox/super-time-tracker-ui/commit/198f093c1f515380a8885bdb5119efdc7aabb07f))
+* update, add entry editing and --at support ([bc51980](https://github.com/f3rnox/super-time-tracker-ui/commit/bc51980436e12f907fe13e810586ea7b7ff59e08))
