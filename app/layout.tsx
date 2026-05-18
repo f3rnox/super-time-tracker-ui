@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Script from 'next/script'
 import { theme_init_script } from '@/lib/theme_init_script'
+import { ui_settings_init_script } from '@/lib/ui_settings_init_script'
 
 import './globals.css'
 
@@ -36,6 +37,11 @@ export default function RootLayout({
           id="theme-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: theme_init_script }}
+        />
+        <Script
+          id="ui-settings-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: ui_settings_init_script }}
         />
         {children}
       </body>

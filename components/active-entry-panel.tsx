@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import { CheckoutButtonGroup } from '@/components/checkout-button-group'
 import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { EntryNotesList } from '@/components/entry-notes-list'
@@ -17,7 +18,8 @@ import {
 interface ActiveEntryPanelProps {
   entry: SerializedEntry
   sheets: SerializedSheet[]
-  on_check_out: () => void
+  in_bar?: boolean
+  on_check_out: (at?: string) => void
   on_delete: () => void
   on_edit: (values: EntryEditFormValues) => void
   on_move: (target_sheet_name: string) => void
@@ -32,6 +34,7 @@ interface ActiveEntryPanelProps {
 export function ActiveEntryPanel({
   entry,
   sheets,
+  in_bar = false,
   on_check_out,
   on_delete,
   on_edit,
@@ -53,9 +56,13 @@ export function ActiveEntryPanel({
     return () => window.clearInterval(interval)
   }, [entry.durationMs, entry.start])
 
+  const panel_class = in_bar
+    ? 'active-panel active-panel--in-bar'
+    : 'active-panel'
+
   if (is_editing) {
     return (
-      <section className="active-panel">
+      <section className={panel_class}>
         <EntryEditForm
           entry={entry}
           is_pending={is_pending}
@@ -70,7 +77,7 @@ export function ActiveEntryPanel({
   }
 
   return (
-    <section className="active-panel">
+    <section className={panel_class}>
       <div className="active-panel__header">
         <div className="active-panel__heading">
           <span className="active-panel__badge">Tracking</span>
@@ -106,14 +113,10 @@ export function ActiveEntryPanel({
             </ul>
           ) : null}
         </div>
-        <button
-          type="button"
-          className="button button--danger active-panel__checkout"
-          disabled={is_pending}
-          onClick={on_check_out}
-        >
-          Check out
-        </button>
+        <CheckoutButtonGroup
+          is_pending={is_pending}
+          on_check_out={on_check_out}
+        />
       </div>
       <EntryNotesList
         notes={entry.notes}

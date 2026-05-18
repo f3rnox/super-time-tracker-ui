@@ -37,6 +37,8 @@ interface EntryListProps {
     timestamp: string,
     text: string,
   ) => void
+  on_add_note: (entry: SerializedEntry, text: string) => void
+  on_resume: (entry: SerializedEntry) => void
 }
 
 /**
@@ -55,6 +57,8 @@ export function EntryList({
   on_move,
   on_move_many,
   on_edit_note,
+  on_add_note,
+  on_resume,
 }: EntryListProps) {
   const [editing_key, set_editing_key] = useState<string | null>(null)
   const [selected_keys, set_selected_keys] = useState<Set<string>>(() => new Set())
@@ -232,6 +236,9 @@ export function EntryList({
                       sheets={sheets}
                       is_pending={is_pending}
                       on_edit={() => set_editing_key(row_key)}
+                      on_add_note={(text) => on_add_note(entry, text)}
+                      on_resume={() => on_resume(entry)}
+                      entry_is_active={entry.isActive}
                       on_move={(target_sheet_name) =>
                         on_move(entry, target_sheet_name)
                       }

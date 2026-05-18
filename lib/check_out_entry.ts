@@ -1,11 +1,14 @@
 import { get_sheet } from "@/lib/get_sheet";
+import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
 import { read_db } from "@/lib/read_db";
+import { validate_entry_times } from "@/lib/validate_entry_times";
 import { write_db } from "@/lib/write_db";
 import { type TimeSheetEntry } from "@/lib/types";
 
 export interface CheckOutEntryArgs {
   sheet_name?: string;
   note?: string;
+  at?: string;
 }
 
 /**
@@ -14,7 +17,7 @@ export interface CheckOutEntryArgs {
 export async function check_out_entry(
   args: CheckOutEntryArgs = {},
 ): Promise<TimeSheetEntry> {
-  const { note, sheet_name: input_sheet_name } = args;
+  const { at, note, sheet_name: input_sheet_name } = args;
   const db = await read_db();
   const sheet =
     input_sheet_name === undefined || input_sheet_name.length === 0
@@ -32,8 +35,14 @@ export async function check_out_entry(
     throw new Error(`No entry found with ID ${activeEntryID}`);
   }
 
-  entry.end = new Date();
+  const end_date =
+    at === undefined || at.trim().length === 0
+      ? new Date()
+      : parse_natural_language_date(at);
+
+  entry.end = end_date;
   sheet.activeEntryID = null;
+  validate_entry_times(entry.start, entry.end);
 
   if (note !== undefined && note.length > 0) {
     entry.notes.push({ timestamp: new Date(), text: note });

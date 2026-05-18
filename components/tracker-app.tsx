@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 
-import { ActiveEntryPanel } from '@/components/active-entry-panel'
 import { CheckInForm } from '@/components/check-in-form'
 import { EntryList } from '@/components/entry-list'
 import { SheetSidebar } from '@/components/sheet-sidebar'
 import { TrackerActiveBar } from '@/components/tracker-active-bar'
 import { TrackerTopbar } from '@/components/tracker-topbar'
+import { build_resume_description } from '@/lib/build_resume_description'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
@@ -66,6 +66,54 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
         <TrackerActiveBar
           active_sheet_name={active_sheet}
           active_entry={state.activeEntry}
+          sheets={state.sheets}
+          is_pending={is_pending}
+          on_check_out={(at) =>
+            run_action(() =>
+              post_tracker_action('/api/out', {
+                ...(at !== undefined ? { at } : {}),
+              }),
+            )
+          }
+          on_delete={() =>
+            run_action(() =>
+              post_tracker_action('/api/entry', {
+                sheetName: state.activeEntry?.sheetName,
+                entryId: state.activeEntry?.id,
+              }),
+            )
+          }
+          on_edit={(values) =>
+            run_action(() =>
+              edit_entry(
+                state.activeEntry?.sheetName ?? active_sheet,
+                state.activeEntry?.id ?? 0,
+                values,
+              ),
+            )
+          }
+          on_move={(target_sheet_name) =>
+            run_action(() =>
+              post_tracker_action('/api/entry/move', {
+                sheetName: state.activeEntry?.sheetName,
+                entryId: state.activeEntry?.id,
+                targetSheetName: target_sheet_name,
+              }),
+            )
+          }
+          on_add_note={(text) =>
+            run_action(() => post_tracker_action('/api/note', { text }))
+          }
+          on_edit_note={(timestamp, text) =>
+            run_action(() =>
+              patch_tracker_action('/api/note', {
+                sheetName: state.activeEntry?.sheetName,
+                entryId: state.activeEntry?.id,
+                timestamp,
+                text,
+              }),
+            )
+          }
         />
       </div>
       <div className="tracker-layout">
@@ -90,63 +138,14 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
         />
 
         <main className="tracker-main">
-          {state.activeEntry !== null ? (
-            <ActiveEntryPanel
-              key={`${state.activeEntry.sheetName}-${state.activeEntry.id}`}
-              entry={state.activeEntry}
-              sheets={state.sheets}
-              is_pending={is_pending}
-              on_check_out={() =>
-                run_action(() => post_tracker_action('/api/out', {}))
-              }
-              on_delete={() =>
-                run_action(() =>
-                  post_tracker_action('/api/entry', {
-                    sheetName: state.activeEntry?.sheetName,
-                    entryId: state.activeEntry?.id,
-                  }),
-                )
-              }
-              on_edit={(values) =>
-                run_action(() =>
-                  edit_entry(
-                    state.activeEntry?.sheetName ?? active_sheet,
-                    state.activeEntry?.id ?? 0,
-                    values,
-                  ),
-                )
-              }
-              on_move={(target_sheet_name) =>
-                run_action(() =>
-                  post_tracker_action('/api/entry/move', {
-                    sheetName: state.activeEntry?.sheetName,
-                    entryId: state.activeEntry?.id,
-                    targetSheetName: target_sheet_name,
-                  }),
-                )
-              }
-              on_add_note={(text) =>
-                run_action(() => post_tracker_action('/api/note', { text }))
-              }
-              on_edit_note={(timestamp, text) =>
-                run_action(() =>
-                  patch_tracker_action('/api/note', {
-                    sheetName: state.activeEntry?.sheetName,
-                    entryId: state.activeEntry?.id,
-                    timestamp,
-                    text,
-                  }),
-                )
-              }
-            />
-          ) : (
+          {state.activeEntry === null ? (
             <CheckInForm
               is_pending={is_pending}
               on_submit={(values) =>
                 run_action(() => post_tracker_action('/api/in', values))
               }
             />
-          )}
+          ) : null}
 
           <EntryList
             title="Entries"
@@ -194,6 +193,26 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                   entryId: entry.id,
                   timestamp,
                   text,
+                }),
+              )
+            }
+            on_add_note={(entry, text) =>
+              run_action(() =>
+                post_tracker_action('/api/note', {
+                  sheetName: entry.sheetName,
+                  entryId: entry.id,
+                  text,
+                }),
+              )
+            }
+            on_resume={(entry) =>
+              run_action(() =>
+                post_tracker_action('/api/in', {
+                  description: build_resume_description(
+                    entry.description,
+                    entry.tags,
+                  ),
+                  sheetName: entry.sheetName,
                 }),
               )
             }

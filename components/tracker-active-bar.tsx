@@ -1,66 +1,63 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
-import { format_duration } from '@/lib/format_duration'
-import { type SerializedEntry } from '@/lib/types/tracker_state'
+import { ActiveEntryPanel } from '@/components/active-entry-panel'
+import { type EntryEditFormValues } from '@/components/entry-edit-form'
+import {
+  type SerializedEntry,
+  type SerializedSheet,
+} from '@/lib/types/tracker_state'
 
 interface TrackerActiveBarProps {
   active_sheet_name: string
   active_entry: SerializedEntry | null
+  sheets: SerializedSheet[]
+  is_pending: boolean
+  on_check_out: (at?: string) => void
+  on_delete: () => void
+  on_edit: (values: EntryEditFormValues) => void
+  on_move: (target_sheet_name: string) => void
+  on_add_note: (text: string) => void
+  on_edit_note: (timestamp: string, text: string) => void
 }
 
 /**
- * Full-width bar showing the active sheet and running entry below the navbar.
+ * Full-width header region for the active sheet and running entry controls.
  */
 export function TrackerActiveBar({
   active_sheet_name,
   active_entry,
+  sheets,
+  is_pending,
+  on_check_out,
+  on_delete,
+  on_edit,
+  on_move,
+  on_add_note,
+  on_edit_note,
 }: TrackerActiveBarProps) {
-  const [duration_ms, set_duration_ms] = useState(
-    active_entry?.durationMs ?? 0,
-  )
-
-  useEffect(() => {
-    if (active_entry === null) {
-      return
-    }
-
-    set_duration_ms(active_entry.durationMs)
-
-    const interval = window.setInterval(() => {
-      set_duration_ms(Date.now() - new Date(active_entry.start).getTime())
-    }, 1000)
-
-    return () => window.clearInterval(interval)
-  }, [active_entry])
-
-  const entry_label =
-    active_entry === null
-      ? null
-      : active_entry.description.trim().length > 0
-        ? active_entry.description
-        : 'Untitled entry'
-
   return (
     <div className="tracker-active-bar">
       <div className="tracker-active-bar__inner">
-        <div className="tracker-active-bar__sheet-group">
+        <div className="tracker-active-bar__sheet-row">
           <span className="tracker-active-bar__label">Sheet</span>
           <span className="tracker-active-bar__sheet">{active_sheet_name}</span>
         </div>
         {active_entry !== null ? (
-          <div className="tracker-active-bar__entry-group">
-            <span className="tracker-active-bar__badge">Live</span>
-            <span className="tracker-active-bar__entry-title">
-              {entry_label}
-            </span>
-            <span className="tracker-active-bar__duration">
-              {format_duration(duration_ms)}
-            </span>
-          </div>
+          <ActiveEntryPanel
+            key={`${active_entry.sheetName}-${active_entry.id}`}
+            entry={active_entry}
+            sheets={sheets}
+            in_bar
+            is_pending={is_pending}
+            on_check_out={on_check_out}
+            on_delete={on_delete}
+            on_edit={on_edit}
+            on_move={on_move}
+            on_add_note={on_add_note}
+            on_edit_note={on_edit_note}
+          />
         ) : (
-          <span className="tracker-active-bar__idle">Not tracking</span>
+          <p className="tracker-active-bar__idle">Not tracking</p>
         )}
       </div>
     </div>

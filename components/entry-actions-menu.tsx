@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { HamburgerIcon } from '@/components/hamburger-icon'
+import { prompt_entry_note } from '@/lib/prompt_entry_note'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
 interface EntryActionsMenuProps {
@@ -10,6 +11,9 @@ interface EntryActionsMenuProps {
   sheets: SerializedSheet[]
   is_pending: boolean
   on_edit: () => void
+  on_add_note?: (text: string) => void
+  on_resume?: () => void
+  entry_is_active?: boolean
   on_delete: () => void
   on_move: (target_sheet_name: string) => void
 }
@@ -22,9 +26,19 @@ export function EntryActionsMenu({
   sheets,
   is_pending,
   on_edit,
+  on_add_note,
+  on_resume,
+  entry_is_active = false,
   on_delete,
   on_move,
 }: EntryActionsMenuProps) {
+  const current_sheet = sheets.find((sheet) => sheet.name === current_sheet_name)
+  const resume_blocked =
+    entry_is_active ||
+    (current_sheet?.hasActiveEntry === true && !entry_is_active)
+  const resume_blocked_reason = entry_is_active
+    ? 'This entry is already active'
+    : 'Another entry is active on this sheet'
   const other_sheets = sheets.filter(
     (sheet) => sheet.name !== current_sheet_name,
   )
@@ -85,6 +99,43 @@ export function EntryActionsMenu({
               Edit times
             </button>
           </li>
+          {on_add_note !== undefined ? (
+            <li role="none">
+              <button
+                type="button"
+                className="entry-actions-menu__item"
+                role="menuitem"
+                disabled={is_pending}
+                onClick={() => {
+                  close_menu()
+                  const text = prompt_entry_note()
+
+                  if (text !== null) {
+                    on_add_note(text)
+                  }
+                }}
+              >
+                Add note
+              </button>
+            </li>
+          ) : null}
+          {on_resume !== undefined ? (
+            <li role="none">
+              <button
+                type="button"
+                className="entry-actions-menu__item"
+                role="menuitem"
+                disabled={is_pending || resume_blocked}
+                title={resume_blocked ? resume_blocked_reason : undefined}
+                onClick={() => {
+                  close_menu()
+                  on_resume()
+                }}
+              >
+                Resume
+              </button>
+            </li>
+          ) : null}
           <li
             className="entry-actions-menu__separator"
             role="separator"

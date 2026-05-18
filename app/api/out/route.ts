@@ -7,6 +7,7 @@ import { get_tracker_state } from "@/lib/get_tracker_state";
 interface CheckOutBody {
   sheetName?: string;
   note?: string;
+  at?: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     await check_out_entry({
       sheet_name: body.sheetName,
       note: body.note,
+      at: body.at,
     });
 
     const state = await get_tracker_state();
