@@ -28,8 +28,6 @@ export interface TrackerState {
   activeSheetName: string | null
   sheets: SerializedSheet[]
   activeEntry: SerializedEntry | null
-  todayEntries: SerializedEntry[]
-  todayTotalMs: number
   activeSheetEntries: SerializedEntry[]
   activeSheetTotalMs: number
 }

@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { ActiveEntryPanel } from '@/components/active-entry-panel'
 import { CheckInForm } from '@/components/check-in-form'
 import { EntryList } from '@/components/entry-list'
-import { NoteForm } from '@/components/note-form'
 import { SheetSidebar } from '@/components/sheet-sidebar'
 import { ThemeSwitcher } from '@/components/theme_switcher'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
@@ -86,6 +85,11 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           on_create={(name) =>
             run_action(() => post_tracker_action('/api/sheet', { name }))
           }
+          on_rename={(name, new_name) =>
+            run_action(() =>
+              patch_tracker_action('/api/sheet', { name, newName: new_name }),
+            )
+          }
         />
 
         <main className="tracker-main">
@@ -94,49 +98,44 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           </p>
 
           {state.activeEntry !== null ? (
-            <>
-              <ActiveEntryPanel
-                key={`${state.activeEntry.sheetName}-${state.activeEntry.id}`}
-                entry={state.activeEntry}
-                sheets={state.sheets}
-                is_pending={is_pending}
-                on_check_out={() =>
-                  run_action(() => post_tracker_action('/api/out', {}))
-                }
-                on_delete={() =>
-                  run_action(() =>
-                    post_tracker_action('/api/entry', {
-                      sheetName: state.activeEntry?.sheetName,
-                      entryId: state.activeEntry?.id,
-                    }),
-                  )
-                }
-                on_edit={(values) =>
-                  run_action(() =>
-                    edit_entry(
-                      state.activeEntry?.sheetName ?? active_sheet,
-                      state.activeEntry?.id ?? 0,
-                      values,
-                    ),
-                  )
-                }
-                on_move={(target_sheet_name) =>
-                  run_action(() =>
-                    post_tracker_action('/api/entry/move', {
-                      sheetName: state.activeEntry?.sheetName,
-                      entryId: state.activeEntry?.id,
-                      targetSheetName: target_sheet_name,
-                    }),
-                  )
-                }
-              />
-              <NoteForm
-                is_pending={is_pending}
-                on_submit={(text) =>
-                  run_action(() => post_tracker_action('/api/note', { text }))
-                }
-              />
-            </>
+            <ActiveEntryPanel
+              key={`${state.activeEntry.sheetName}-${state.activeEntry.id}`}
+              entry={state.activeEntry}
+              sheets={state.sheets}
+              is_pending={is_pending}
+              on_check_out={() =>
+                run_action(() => post_tracker_action('/api/out', {}))
+              }
+              on_delete={() =>
+                run_action(() =>
+                  post_tracker_action('/api/entry', {
+                    sheetName: state.activeEntry?.sheetName,
+                    entryId: state.activeEntry?.id,
+                  }),
+                )
+              }
+              on_edit={(values) =>
+                run_action(() =>
+                  edit_entry(
+                    state.activeEntry?.sheetName ?? active_sheet,
+                    state.activeEntry?.id ?? 0,
+                    values,
+                  ),
+                )
+              }
+              on_move={(target_sheet_name) =>
+                run_action(() =>
+                  post_tracker_action('/api/entry/move', {
+                    sheetName: state.activeEntry?.sheetName,
+                    entryId: state.activeEntry?.id,
+                    targetSheetName: target_sheet_name,
+                  }),
+                )
+              }
+              on_add_note={(text) =>
+                run_action(() => post_tracker_action('/api/note', { text }))
+              }
+            />
           ) : (
             <CheckInForm
               is_pending={is_pending}
@@ -147,27 +146,9 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           )}
 
           <EntryList
-            title="Today"
-            entries={state.todayEntries}
-            total_ms={state.todayTotalMs}
-            empty_message="No entries yet today."
-            is_pending={is_pending}
-            on_delete={(entry) =>
-              run_action(() =>
-                post_tracker_action('/api/entry', {
-                  sheetName: entry.sheetName,
-                  entryId: entry.id,
-                }),
-              )
-            }
-            on_edit={(entry, values) =>
-              run_action(() => edit_entry(entry.sheetName, entry.id, values))
-            }
-          />
-
-          <EntryList
-            title={`${active_sheet} — all entries`}
+            title="Entries"
             entries={state.activeSheetEntries}
+            sheets={state.sheets}
             total_ms={state.activeSheetTotalMs}
             empty_message={`No entries on sheet "${active_sheet}".`}
             is_pending={is_pending}
@@ -182,6 +163,26 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
             }
             on_edit={(entry, values) =>
               run_action(() => edit_entry(entry.sheetName, entry.id, values))
+            }
+            on_move={(entry, target_sheet_name) =>
+              run_action(() =>
+                post_tracker_action('/api/entry/move', {
+                  sheetName: entry.sheetName,
+                  entryId: entry.id,
+                  targetSheetName: target_sheet_name,
+                }),
+              )
+            }
+            on_move_many={(entries, target_sheet_name) =>
+              run_action(() =>
+                post_tracker_action('/api/entry/move-bulk', {
+                  entries: entries.map((entry) => ({
+                    sheetName: entry.sheetName,
+                    entryId: entry.id,
+                  })),
+                  targetSheetName: target_sheet_name,
+                }),
+              )
             }
           />
         </main>

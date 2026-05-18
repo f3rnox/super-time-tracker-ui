@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
-interface ActiveEntryActionsMenuProps {
+interface EntryActionsMenuProps {
   current_sheet_name: string
   sheets: SerializedSheet[]
   is_pending: boolean
@@ -14,16 +14,16 @@ interface ActiveEntryActionsMenuProps {
 }
 
 /**
- * Hamburger menu for active entry edit, move, and delete actions.
+ * Hamburger menu for entry edit, move, and delete actions.
  */
-export function ActiveEntryActionsMenu({
+export function EntryActionsMenu({
   current_sheet_name,
   sheets,
   is_pending,
   on_edit,
   on_delete,
   on_move,
-}: ActiveEntryActionsMenuProps) {
+}: EntryActionsMenuProps) {
   const other_sheets = sheets.filter(
     (sheet) => sheet.name !== current_sheet_name,
   )
@@ -56,24 +56,24 @@ export function ActiveEntryActionsMenu({
   }
 
   return (
-    <div className="active-panel__menu" ref={menu_ref}>
+    <div className="entry-actions-menu" ref={menu_ref}>
       <button
         type="button"
-        className="active-panel__menu-button"
+        className="entry-actions-menu__button"
         aria-label="Entry actions"
         aria-expanded={is_open}
         aria-haspopup="menu"
         disabled={is_pending}
         onClick={() => set_is_open((open) => !open)}
       >
-        <span className="active-panel__menu-icon" aria-hidden="true" />
+        <span className="entry-actions-menu__icon" aria-hidden="true" />
       </button>
       {is_open ? (
-        <ul className="active-panel__menu-dropdown" role="menu">
+        <ul className="entry-actions-menu__dropdown" role="menu">
           <li role="none">
             <button
               type="button"
-              className="active-panel__menu-item"
+              className="entry-actions-menu__item"
               role="menuitem"
               disabled={is_pending}
               onClick={() => {
@@ -85,18 +85,18 @@ export function ActiveEntryActionsMenu({
             </button>
           </li>
           <li
-            className="active-panel__menu-separator"
+            className="entry-actions-menu__separator"
             role="separator"
             aria-hidden="true"
           />
           <li role="none">
-            <p className="active-panel__menu-heading">Move to sheet</p>
+            <p className="entry-actions-menu__heading">Move to sheet</p>
           </li>
           {other_sheets.length === 0 ? (
             <li role="none">
               <button
                 type="button"
-                className="active-panel__menu-item"
+                className="entry-actions-menu__item"
                 role="menuitem"
                 disabled
               >
@@ -108,7 +108,7 @@ export function ActiveEntryActionsMenu({
               <li key={sheet.name} role="none">
                 <button
                   type="button"
-                  className="active-panel__menu-item active-panel__menu-item--nested"
+                  className="entry-actions-menu__item entry-actions-menu__item--nested"
                   role="menuitem"
                   disabled={is_pending || sheet.hasActiveEntry}
                   title={
@@ -127,14 +127,14 @@ export function ActiveEntryActionsMenu({
             ))
           )}
           <li
-            className="active-panel__menu-separator"
+            className="entry-actions-menu__separator"
             role="separator"
             aria-hidden="true"
           />
           <li role="none">
             <button
               type="button"
-              className="active-panel__menu-item active-panel__menu-item--danger"
+              className="entry-actions-menu__item entry-actions-menu__item--danger"
               role="menuitem"
               disabled={is_pending}
               onClick={() => {

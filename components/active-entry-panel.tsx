@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
-import { ActiveEntryActionsMenu } from '@/components/active-entry-actions-menu'
+import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
+import { NoteForm } from '@/components/note-form'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { confirm_delete_entry } from '@/lib/confirm_delete_entry'
@@ -19,6 +20,7 @@ interface ActiveEntryPanelProps {
   on_delete: () => void
   on_edit: (values: EntryEditFormValues) => void
   on_move: (target_sheet_name: string) => void
+  on_add_note: (text: string) => void
   is_pending: boolean
 }
 
@@ -32,6 +34,7 @@ export function ActiveEntryPanel({
   on_delete,
   on_edit,
   on_move,
+  on_add_note,
   is_pending,
 }: ActiveEntryPanelProps) {
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
@@ -72,7 +75,7 @@ export function ActiveEntryPanel({
         </div>
 
         <div className="active-panel__menu-slot">
-          <ActiveEntryActionsMenu
+          <EntryActionsMenu
             current_sheet_name={entry.sheetName}
             sheets={sheets}
             is_pending={is_pending}
@@ -116,6 +119,7 @@ export function ActiveEntryPanel({
           </button>
         </div>
       </div>
+      <NoteForm is_pending={is_pending} on_submit={on_add_note} />
     </section>
   )
 }

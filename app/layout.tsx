@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import Script from 'next/script'
 import { theme_init_script } from '@/lib/theme_init_script'
 
 import './globals.css'
@@ -30,10 +31,14 @@ export default function RootLayout({
       className={`${geist_sans.variable} ${geist_mono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: theme_init_script }} />
-      </head>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: theme_init_script }}
+        />
+        {children}
+      </body>
     </html>
   )
 }
