@@ -6,7 +6,7 @@ import { ActiveEntryPanel } from '@/components/active-entry-panel'
 import { CheckInForm } from '@/components/check-in-form'
 import { EntryList } from '@/components/entry-list'
 import { SheetSidebar } from '@/components/sheet-sidebar'
-import { ThemeSwitcher } from '@/components/theme_switcher'
+import { TrackerTopbar } from '@/components/tracker-topbar'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
@@ -59,18 +59,17 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
     })
 
   return (
-    <div className="tracker-layout">
+    <>
+      <TrackerTopbar
+        active_sheet_name={active_sheet}
+        active_entry={state.activeEntry}
+      />
+      <div className="tracker-layout">
       <header className="tracker-header">
-        <div>
-          <p className="tracker-header__eyebrow">super-time-tracker</p>
-          <h1 className="tracker-header__title">Time sheets</h1>
-        </div>
-        <div className="tracker-header__actions">
-          <p className="tracker-header__path" title={state.dbPath}>
-            {state.dbPath}
-          </p>
-          <ThemeSwitcher />
-        </div>
+        <h1 className="tracker-header__title">Time sheets</h1>
+        <p className="tracker-header__path" title={state.dbPath}>
+          {state.dbPath}
+        </p>
       </header>
 
       {error !== null ? <p className="banner banner--error">{error}</p> : null}
@@ -93,10 +92,6 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
         />
 
         <main className="tracker-main">
-          <p className="tracker-main__sheet-label">
-            Active sheet: <strong>{active_sheet}</strong>
-          </p>
-
           {state.activeEntry !== null ? (
             <ActiveEntryPanel
               key={`${state.activeEntry.sheetName}-${state.activeEntry.id}`}
@@ -188,5 +183,6 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
         </main>
       </div>
     </div>
+    </>
   )
 }
