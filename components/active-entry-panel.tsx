@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { ActiveEntryActionsMenu } from '@/components/active-entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
+import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { confirm_delete_entry } from '@/lib/confirm_delete_entry'
 import {
@@ -97,7 +98,7 @@ export function ActiveEntryPanel({
             <ul className="tag-list">
               {entry.tags.map((tag) => (
                 <li key={tag} className="tag-list__item">
-                  {tag}
+                  {format_display_tag(tag)}
                 </li>
               ))}
             </ul>
