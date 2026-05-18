@@ -12,6 +12,7 @@ interface EntryActionsMenuProps {
   is_pending: boolean
   on_edit: () => void
   on_add_note?: (text: string) => void
+  on_show_add_note_form?: () => void
   on_resume?: () => void
   entry_is_active?: boolean
   on_delete: () => void
@@ -30,6 +31,7 @@ export function EntryActionsMenu({
   is_pending,
   on_edit,
   on_add_note,
+  on_show_add_note_form,
   on_resume,
   entry_is_active = false,
   on_delete,
@@ -105,7 +107,7 @@ export function EntryActionsMenu({
               Edit times
             </button>
           </li>
-          {on_add_note !== undefined ? (
+          {on_show_add_note_form !== undefined || on_add_note !== undefined ? (
             <li role="none">
               <button
                 type="button"
@@ -114,9 +116,15 @@ export function EntryActionsMenu({
                 disabled={is_pending}
                 onClick={() => {
                   close_menu()
+
+                  if (on_show_add_note_form !== undefined) {
+                    on_show_add_note_form()
+                    return
+                  }
+
                   const text = prompt_entry_note()
 
-                  if (text !== null) {
+                  if (text !== null && on_add_note !== undefined) {
                     on_add_note(text)
                   }
                 }}

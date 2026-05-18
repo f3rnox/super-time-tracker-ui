@@ -1,3 +1,5 @@
+import { ConfirmBeforeCheckoutSetting } from '@/components/confirm-before-checkout-setting'
+import { ConfirmDestructiveActionsSetting } from '@/components/confirm-destructive-actions-setting'
 import { DefaultSheetSessionSetting } from '@/components/default-sheet-session-setting'
 import { SettingsPageLayout } from '@/components/settings-page-layout'
 
@@ -13,7 +15,7 @@ export function GeneralSettingsView({ sheet_names }: GeneralSettingsViewProps) {
     <SettingsPageLayout
       breadcrumb={{ current: 'General', parent: { label: 'Settings' } }}
       title="General"
-      description="Tracker startup and session behavior."
+      description="Tracker startup, confirmations, and session behavior."
     >
       <ul
         className="m-0 flex w-full list-none flex-col gap-2 p-0"
@@ -21,6 +23,12 @@ export function GeneralSettingsView({ sheet_names }: GeneralSettingsViewProps) {
       >
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <DefaultSheetSessionSetting sheet_names={sheet_names} />
+        </li>
+        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+          <ConfirmBeforeCheckoutSetting />
+        </li>
+        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+          <ConfirmDestructiveActionsSetting />
         </li>
       </ul>
     </SettingsPageLayout>

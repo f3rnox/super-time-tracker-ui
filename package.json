@@ -1,12 +1,56 @@
 {
   "name": "super-time-tracker-ui",
   "version": "0.1.0",
+  "description": "Web UI for the super-time-tracker CLI time sheets",
+  "keywords": [
+    "nextjs",
+    "react",
+    "time-tracking",
+    "timesheet",
+    "super-time-tracker",
+    "ui"
+  ],
+  "homepage": "https://github.com/f3rnox/super-time-tracker-ui",
+  "bugs": {
+    "url": "https://github.com/f3rnox/super-time-tracker-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/f3rnox/super-time-tracker-ui.git"
+  },
+  "license": "MIT",
+  "author": "Cris Mihalache",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "bin": {
+    "stt-ui": "./bin/stt-ui.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "stt-ui": "node bin/stt-ui.js",
+    "format": "pnpm format:prettier",
+    "format:check": "pnpm format:prettier:check",
+    "format:prettier": "prettier --write .",
+    "format:prettier:check": "prettier --check .",
+    "lint": "pnpm lint:markdownlint && pnpm lint:eslint",
+    "lint:eslint": "eslint package.json src/**/*",
+    "lint:eslint:fix": "eslint package.json src/**/*",
+    "lint:fix": "pnpm lint:markdownlint:fix && pnpm lint:eslint:fix",
+    "lint:markdownlint": "markdownlint README.md",
+    "lint:markdownlint:fix": "markdownlint --fix README.md",
+    "prepare": "husky",
+    "prepare-release": "pnpm build && git add docs",
+    "prepublish": "pnpm build",
+    "release": "pnpm prepare-release && pnpm update-version && git push --follow-tags origin main",
+    "serve:coverage": "http-server ./coverage",
+    "serve:docs": "http-server ./docs",
+    "test": "NODE_PATH=./src NODE_ENV=test vitest run",
+    "update-deps": "updates -u -g -c",
+    "update-version": "standard-version -a"
   },
   "dependencies": {
     "date-fns": "^4.2.1",
@@ -25,6 +69,29 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@commitlint/format": "^20.5.0",
+    "@commitlint/types": "^20.5.0",
+    "@eslint/js": "^10.0.1",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "globals": "^17.4.0",
+    "http-server": "^14.1.1",
+    "husky": "^9.1.7",
+    "jiti": "^2.6.1",
+    "lint-staged": "^16.4.0",
+    "markdownlint-cli": "^0.48.0",
+    "nyc": "^18.0.0",
+    "prettier": "^3.8.1",
+    "remark": "^15.0.1",
+    "standard-version": "^9.5.0",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "tsx": "^4.21.0",
+    "typedoc": "^0.28.18",
+    "typescript-eslint": "^8.58.0",
+    "updates": "^17.13.5",
+    "vitest": "^4.1.2"
   }
 }

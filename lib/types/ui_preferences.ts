@@ -28,6 +28,17 @@ export const CHECK_IN_FORM_COLLAPSED_STORAGE_KEY =
   'super-time-tracker-check-in-form-collapsed'
 export const CHECK_IN_FORM_COLLAPSED_DEFAULT: CheckInFormCollapsed = 'false'
 
+export type ConfirmBeforeCheckout = 'true' | 'false'
+export const CONFIRM_BEFORE_CHECKOUT_STORAGE_KEY =
+  'super-time-tracker-confirm-before-checkout'
+export const CONFIRM_BEFORE_CHECKOUT_DEFAULT: ConfirmBeforeCheckout = 'false'
+
+export type ConfirmDestructiveActions = 'true' | 'false'
+export const CONFIRM_DESTRUCTIVE_ACTIONS_STORAGE_KEY =
+  'super-time-tracker-confirm-destructive-actions'
+export const CONFIRM_DESTRUCTIVE_ACTIONS_DEFAULT: ConfirmDestructiveActions =
+  'true'
+
 export type AccentColor =
   | 'teal'
   | 'blue'

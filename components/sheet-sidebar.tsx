@@ -5,6 +5,7 @@ import { type FormEvent, useState } from 'react'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { SheetActionsMenu } from '@/components/sheet-actions-menu'
 import { get_delete_sheet_confirm_dialog } from '@/lib/get_delete_sheet_confirm_dialog'
+import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
@@ -32,6 +33,7 @@ export function SheetSidebar({
   is_pending,
 }: SheetSidebarProps) {
   const { confirm } = use_confirm_dialog()
+  const confirm_destructive_actions = use_confirm_destructive_actions()
   const can_delete_sheet = sheets.length > 1
   const [new_sheet_name, set_new_sheet_name] = useState('')
   const [editing_sheet_name, set_editing_sheet_name] = useState<string | null>(
@@ -143,13 +145,15 @@ export function SheetSidebar({
                   can_delete={can_delete_sheet}
                   on_rename={() => start_rename(sheet.name)}
                   on_delete={async () => {
-                    const confirmed = await confirm(
-                      get_delete_sheet_confirm_dialog(
-                        sheet.name,
-                        sheet.entryCount,
-                        sheet.hasActiveEntry,
-                      ),
-                    )
+                    const confirmed = confirm_destructive_actions
+                      ? await confirm(
+                          get_delete_sheet_confirm_dialog(
+                            sheet.name,
+                            sheet.entryCount,
+                            sheet.hasActiveEntry,
+                          ),
+                        )
+                      : true
 
                     if (confirmed) {
                       on_delete(sheet.name)

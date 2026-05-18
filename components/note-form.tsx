@@ -7,6 +7,7 @@ import { get_input_class_name } from '@/lib/get_input_class_name'
 
 interface NoteFormProps {
   on_submit: (text: string) => void
+  on_cancel?: () => void
   is_pending: boolean
   in_active_panel?: boolean
   in_bar?: boolean
@@ -17,6 +18,7 @@ interface NoteFormProps {
  */
 export function NoteForm({
   on_submit,
+  on_cancel,
   is_pending,
   in_active_panel = false,
   in_bar = false,
@@ -58,14 +60,27 @@ export function NoteForm({
           onChange={(event) => set_text(event.target.value)}
           placeholder="Pair with alice on the widget"
           disabled={is_pending}
+          autoFocus
         />
-        <button
-          type="submit"
-          className={get_button_class_name('ghost')}
-          disabled={is_pending || text.trim().length === 0}
-        >
-          Save note
-        </button>
+        <div className="flex flex-wrap items-center gap-2 max-[860px]:w-full">
+          <button
+            type="submit"
+            className={get_button_class_name('ghost')}
+            disabled={is_pending || text.trim().length === 0}
+          >
+            Save note
+          </button>
+          {on_cancel !== undefined ? (
+            <button
+              type="button"
+              className={get_button_class_name('ghost')}
+              disabled={is_pending}
+              onClick={on_cancel}
+            >
+              Cancel
+            </button>
+          ) : null}
+        </div>
       </div>
     </form>
   )

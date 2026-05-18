@@ -10,7 +10,9 @@ import { EntryNotesList } from '@/components/entry-notes-list'
 import { NoteForm } from '@/components/note-form'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
+import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import { use_duration_format } from '@/lib/use_duration_format'
+import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
 import { get_active_panel_class_name } from '@/lib/get_active_panel_class_name'
 import {
@@ -50,9 +52,15 @@ export function ActiveEntryPanel({
   is_pending,
 }: ActiveEntryPanelProps) {
   const { confirm } = use_confirm_dialog()
+  const confirm_destructive_actions = use_confirm_destructive_actions()
   const duration_format = use_duration_format()
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
   const [is_editing, set_is_editing] = useState(false)
+  const [is_adding_note, set_is_adding_note] = useState(false)
+
+  useEffect(() => {
+    set_is_adding_note(false)
+  }, [entry.id, entry.sheetName])
 
   useEffect(() => {
     set_duration_ms(entry.durationMs)
@@ -99,9 +107,12 @@ export function ActiveEntryPanel({
           sheets={sheets}
           is_pending={is_pending}
           on_edit={() => set_is_editing(true)}
+          on_show_add_note_form={() => set_is_adding_note(true)}
           on_move={on_move}
           on_delete={async () => {
-            const confirmed = await confirm(get_delete_entry_confirm_dialog(entry))
+            const confirmed = confirm_destructive_actions
+              ? await confirm(get_delete_entry_confirm_dialog(entry))
+              : true
 
             if (confirmed) {
               on_delete()
@@ -133,7 +144,35 @@ export function ActiveEntryPanel({
         is_pending={is_pending}
         on_edit_note={on_edit_note}
       />
-      <NoteForm in_active_panel in_bar={in_bar} is_pending={is_pending} on_submit={on_add_note} />
+      {is_adding_note ? (
+        <NoteForm
+          in_active_panel
+          in_bar={in_bar}
+          is_pending={is_pending}
+          on_cancel={() => set_is_adding_note(false)}
+          on_submit={(text) => {
+            on_add_note(text)
+            set_is_adding_note(false)
+          }}
+        />
+      ) : (
+        <div
+          className={
+            in_bar
+              ? 'border-t border-[color-mix(in_srgb,var(--accent-border)_65%,var(--panel-border))] pt-3.5'
+              : 'border-t border-accent-border pt-4'
+          }
+        >
+          <button
+            type="button"
+            className={`${get_button_class_name('ghost')} self-start`}
+            disabled={is_pending}
+            onClick={() => set_is_adding_note(true)}
+          >
+            Add note
+          </button>
+        </div>
+      )}
     </section>
   )
 }

@@ -14,6 +14,7 @@ import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { get_entry_row_key } from '@/lib/get_entry_row_key'
+import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import { use_duration_format } from '@/lib/use_duration_format'
 import { use_time_format } from '@/lib/use_time_format'
 import {
@@ -70,6 +71,7 @@ export function EntryList({
   on_resume,
 }: EntryListProps) {
   const { confirm } = use_confirm_dialog()
+  const confirm_destructive_actions = use_confirm_destructive_actions()
   const time_format = use_time_format()
   const duration_format = use_duration_format()
   const [editing_key, set_editing_key] = useState<string | null>(null)
@@ -132,9 +134,9 @@ export function EntryList({
       return
     }
 
-    const confirmed = await confirm(
-      get_delete_entries_confirm_dialog(selected_entries),
-    )
+    const confirmed = confirm_destructive_actions
+      ? await confirm(get_delete_entries_confirm_dialog(selected_entries))
+      : true
 
     if (!confirmed) {
       return
@@ -298,9 +300,11 @@ export function EntryList({
                           on_move(entry, target_sheet_name)
                         }
                         on_delete={async () => {
-                          const confirmed = await confirm(
-                            get_delete_entry_confirm_dialog(entry),
-                          )
+                          const confirmed = confirm_destructive_actions
+                            ? await confirm(
+                                get_delete_entry_confirm_dialog(entry),
+                              )
+                            : true
 
                           if (confirmed) {
                             on_delete(entry)

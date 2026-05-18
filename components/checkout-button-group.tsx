@@ -1,7 +1,10 @@
 'use client'
 
+import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { get_button_class_name } from '@/lib/get_button_class_name'
+import { get_check_out_confirm_dialog } from '@/lib/get_check_out_confirm_dialog'
 import { prompt_check_out_at } from '@/lib/prompt_check_out_at'
+import { use_confirm_before_checkout } from '@/lib/use_confirm_before_checkout'
 
 interface CheckoutButtonGroupProps {
   in_bar?: boolean
@@ -19,6 +22,21 @@ export function CheckoutButtonGroup({
   is_pending,
   on_check_out,
 }: CheckoutButtonGroupProps) {
+  const { confirm } = use_confirm_dialog()
+  const confirm_before_checkout = use_confirm_before_checkout()
+
+  const check_out_with_confirm = async (at?: string): Promise<void> => {
+    if (confirm_before_checkout) {
+      const confirmed = await confirm(get_check_out_confirm_dialog(at))
+
+      if (!confirmed) {
+        return
+      }
+    }
+
+    on_check_out(at)
+  }
+
   const handle_at = (): void => {
     const at = prompt_check_out_at()
 
@@ -26,7 +44,7 @@ export function CheckoutButtonGroup({
       return
     }
 
-    on_check_out(at)
+    void check_out_with_confirm(at)
   }
 
   return (
@@ -37,7 +55,7 @@ export function CheckoutButtonGroup({
         type="button"
         className={group_button_class}
         disabled={is_pending}
-        onClick={() => on_check_out()}
+        onClick={() => void check_out_with_confirm()}
       >
         Check out
       </button>
