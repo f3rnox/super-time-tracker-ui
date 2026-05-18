@@ -1,6 +1,6 @@
 {
   "name": "super-time-tracker-ui",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "Web UI for the super-time-tracker CLI time sheets",
   "keywords": [
     "nextjs",
@@ -19,8 +19,7 @@
     "url": "https://github.com/f3rnox/super-time-tracker-ui.git"
   },
   "license": "MIT",
-  "author": "Cris Mihalache",
-  "private": true,
+  "author": "Cris Mihalache <f3rnox42@gmail.com>",
   "engines": {
     "node": ">=20.0.0"
   },
