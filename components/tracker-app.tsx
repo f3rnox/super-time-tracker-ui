@@ -98,6 +98,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
               <ActiveEntryPanel
                 key={`${state.activeEntry.sheetName}-${state.activeEntry.id}`}
                 entry={state.activeEntry}
+                sheets={state.sheets}
                 is_pending={is_pending}
                 on_check_out={() =>
                   run_action(() => post_tracker_action('/api/out', {}))
@@ -117,6 +118,15 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                       state.activeEntry?.id ?? 0,
                       values,
                     ),
+                  )
+                }
+                on_move={(target_sheet_name) =>
+                  run_action(() =>
+                    post_tracker_action('/api/entry/move', {
+                      sheetName: state.activeEntry?.sheetName,
+                      entryId: state.activeEntry?.id,
+                      targetSheetName: target_sheet_name,
+                    }),
                   )
                 }
               />

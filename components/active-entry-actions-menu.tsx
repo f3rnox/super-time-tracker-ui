@@ -2,20 +2,31 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { type SerializedSheet } from '@/lib/types/tracker_state'
+
 interface ActiveEntryActionsMenuProps {
+  current_sheet_name: string
+  sheets: SerializedSheet[]
   is_pending: boolean
   on_edit: () => void
   on_delete: () => void
+  on_move: (target_sheet_name: string) => void
 }
 
 /**
- * Hamburger menu for active entry edit and delete actions.
+ * Hamburger menu for active entry edit, move, and delete actions.
  */
 export function ActiveEntryActionsMenu({
+  current_sheet_name,
+  sheets,
   is_pending,
   on_edit,
   on_delete,
+  on_move,
 }: ActiveEntryActionsMenuProps) {
+  const other_sheets = sheets.filter(
+    (sheet) => sheet.name !== current_sheet_name,
+  )
   const [is_open, set_is_open] = useState(false)
   const menu_ref = useRef<HTMLDivElement>(null)
 
@@ -73,6 +84,53 @@ export function ActiveEntryActionsMenu({
               Edit times
             </button>
           </li>
+          <li
+            className="active-panel__menu-separator"
+            role="separator"
+            aria-hidden="true"
+          />
+          <li role="none">
+            <p className="active-panel__menu-heading">Move to sheet</p>
+          </li>
+          {other_sheets.length === 0 ? (
+            <li role="none">
+              <button
+                type="button"
+                className="active-panel__menu-item"
+                role="menuitem"
+                disabled
+              >
+                No other sheets
+              </button>
+            </li>
+          ) : (
+            other_sheets.map((sheet) => (
+              <li key={sheet.name} role="none">
+                <button
+                  type="button"
+                  className="active-panel__menu-item active-panel__menu-item--nested"
+                  role="menuitem"
+                  disabled={is_pending || sheet.hasActiveEntry}
+                  title={
+                    sheet.hasActiveEntry
+                      ? 'That sheet already has an active entry'
+                      : undefined
+                  }
+                  onClick={() => {
+                    close_menu()
+                    on_move(sheet.name)
+                  }}
+                >
+                  {sheet.name}
+                </button>
+              </li>
+            ))
+          )}
+          <li
+            className="active-panel__menu-separator"
+            role="separator"
+            aria-hidden="true"
+          />
           <li role="none">
             <button
               type="button"

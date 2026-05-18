@@ -6,13 +6,18 @@ import { ActiveEntryActionsMenu } from '@/components/active-entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { format_duration } from '@/lib/format_duration'
 import { confirm_delete_entry } from '@/lib/confirm_delete_entry'
-import { type SerializedEntry } from '@/lib/types/tracker_state'
+import {
+  type SerializedEntry,
+  type SerializedSheet,
+} from '@/lib/types/tracker_state'
 
 interface ActiveEntryPanelProps {
   entry: SerializedEntry
+  sheets: SerializedSheet[]
   on_check_out: () => void
   on_delete: () => void
   on_edit: (values: EntryEditFormValues) => void
+  on_move: (target_sheet_name: string) => void
   is_pending: boolean
 }
 
@@ -21,23 +26,25 @@ interface ActiveEntryPanelProps {
  */
 export function ActiveEntryPanel({
   entry,
+  sheets,
   on_check_out,
   on_delete,
   on_edit,
+  on_move,
   is_pending,
 }: ActiveEntryPanelProps) {
-  const [duration_ms, set_duration_ms] = useState(
-    () => Date.now() - new Date(entry.start).getTime(),
-  )
+  const [duration_ms, set_duration_ms] = useState(entry.durationMs)
   const [is_editing, set_is_editing] = useState(false)
 
   useEffect(() => {
+    set_duration_ms(entry.durationMs)
+
     const interval = window.setInterval(() => {
       set_duration_ms(Date.now() - new Date(entry.start).getTime())
     }, 1000)
 
     return () => window.clearInterval(interval)
-  }, [entry.start])
+  }, [entry.durationMs, entry.start])
 
   if (is_editing) {
     return (
@@ -65,8 +72,11 @@ export function ActiveEntryPanel({
 
         <div className="active-panel__menu-slot">
           <ActiveEntryActionsMenu
+            current_sheet_name={entry.sheetName}
+            sheets={sheets}
             is_pending={is_pending}
             on_edit={() => set_is_editing(true)}
+            on_move={on_move}
             on_delete={() => {
               if (confirm_delete_entry(entry)) {
                 on_delete()
