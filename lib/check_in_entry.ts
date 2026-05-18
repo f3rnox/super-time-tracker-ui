@@ -1,14 +1,16 @@
-import { parse_entry_from_input } from "@/lib/parse_entry_from_input";
-import { read_db } from "@/lib/read_db";
-import { write_db } from "@/lib/write_db";
 import { gen_sheet } from "@/lib/gen_db";
 import { get_sheet } from "@/lib/get_sheet";
+import { parse_entry_from_input } from "@/lib/parse_entry_from_input";
+import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
+import { read_db } from "@/lib/read_db";
+import { write_db } from "@/lib/write_db";
 import { type TimeSheetEntry, type TimeTrackerDB } from "@/lib/types";
 
 export interface CheckInEntryArgs {
   description: string;
   sheet_name?: string;
   note?: string;
+  at?: string;
 }
 
 /**
@@ -17,7 +19,7 @@ export interface CheckInEntryArgs {
 export async function check_in_entry(
   args: CheckInEntryArgs,
 ): Promise<TimeSheetEntry> {
-  const { description, note, sheet_name: input_sheet_name } = args;
+  const { at, description, note, sheet_name: input_sheet_name } = args;
   const db = await read_db();
   const active_sheet_name = db.activeSheetName;
   const sheet_name =
@@ -44,8 +46,13 @@ export async function check_in_entry(
     }
   }
 
+  const start_date =
+    at === undefined || at.trim().length === 0
+      ? new Date()
+      : parse_natural_language_date(at);
+
   const id = sheet.entries.length;
-  const parsed = parse_entry_from_input(id, description);
+  const parsed = parse_entry_from_input(id, description, start_date);
   const entry: TimeSheetEntry = {
     ...parsed,
     description:

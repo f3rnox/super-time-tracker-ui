@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { theme_init_script } from '@/lib/theme_init_script'
 
 import './globals.css'
 
@@ -27,7 +28,11 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geist_sans.variable} ${geist_mono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: theme_init_script }} />
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   )

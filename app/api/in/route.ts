@@ -8,6 +8,7 @@ interface CheckInBody {
   description?: string;
   sheetName?: string;
   note?: string;
+  at?: string;
 }
 
 /**
@@ -26,6 +27,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       description,
       sheet_name: body.sheetName,
       note: body.note,
+      at: body.at,
     });
 
     const state = await get_tracker_state();

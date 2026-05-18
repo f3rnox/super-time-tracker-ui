@@ -2,8 +2,13 @@
 
 import { type FormEvent, useState } from 'react'
 
+export interface CheckInFormValues {
+  description: string
+  at?: string
+}
+
 interface CheckInFormProps {
-  on_submit: (description: string) => void
+  on_submit: (values: CheckInFormValues) => void
   is_pending: boolean
 }
 
@@ -12,17 +17,24 @@ interface CheckInFormProps {
  */
 export function CheckInForm({ on_submit, is_pending }: CheckInFormProps) {
   const [description, set_description] = useState('')
+  const [at, set_at] = useState('')
 
   const handle_submit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    const trimmed = description.trim()
+    const trimmed_description = description.trim()
 
-    if (trimmed.length === 0) {
+    if (trimmed_description.length === 0) {
       return
     }
 
-    on_submit(trimmed)
+    const trimmed_at = at.trim()
+
+    on_submit({
+      description: trimmed_description,
+      ...(trimmed_at.length > 0 ? { at: trimmed_at } : {}),
+    })
     set_description('')
+    set_at('')
   }
 
   return (
@@ -48,6 +60,18 @@ export function CheckInForm({ on_submit, is_pending }: CheckInFormProps) {
           Check in
         </button>
       </div>
+      <label className="check-in-form__label" htmlFor="check-in-at">
+        Start time{' '}
+        <span className="check-in-form__hint">(optional, natural language)</span>
+      </label>
+      <input
+        id="check-in-at"
+        className="input"
+        value={at}
+        onChange={(event) => set_at(event.target.value)}
+        placeholder="e.g. 30 minutes ago"
+        disabled={is_pending}
+      />
     </form>
   )
 }

@@ -2,12 +2,17 @@
 
 import { useEffect, useState } from 'react'
 
+import { ActiveEntryActionsMenu } from '@/components/active-entry-actions-menu'
+import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { format_duration } from '@/lib/format_duration'
+import { confirm_delete_entry } from '@/lib/confirm_delete_entry'
 import { type SerializedEntry } from '@/lib/types/tracker_state'
 
 interface ActiveEntryPanelProps {
   entry: SerializedEntry
   on_check_out: () => void
+  on_delete: () => void
+  on_edit: (values: EntryEditFormValues) => void
   is_pending: boolean
 }
 
@@ -17,11 +22,14 @@ interface ActiveEntryPanelProps {
 export function ActiveEntryPanel({
   entry,
   on_check_out,
+  on_delete,
+  on_edit,
   is_pending,
 }: ActiveEntryPanelProps) {
   const [duration_ms, set_duration_ms] = useState(
     () => Date.now() - new Date(entry.start).getTime(),
   )
+  const [is_editing, set_is_editing] = useState(false)
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -33,29 +41,63 @@ export function ActiveEntryPanel({
 
   return (
     <section className="active-panel">
-      <span className="active-panel__badge">Tracking</span>
-      <p className="active-panel__sheet">{entry.sheetName}</p>
-      <h2 className="active-panel__title">
-        {entry.description || 'Untitled entry'}
-      </h2>
-      <p className="active-panel__duration">{format_duration(duration_ms)}</p>
-      {entry.tags.length > 0 ? (
-        <ul className="tag-list">
-          {entry.tags.map((tag) => (
-            <li key={tag} className="tag-list__item">
-              {tag}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      <button
-        type="button"
-        className="button button--danger"
-        disabled={is_pending}
-        onClick={on_check_out}
-      >
-        Check out
-      </button>
+      <div className="active-panel__top">
+        <div>
+          <span className="active-panel__badge">Tracking</span>
+          <p className="active-panel__sheet">{entry.sheetName}</p>
+        </div>
+        {!is_editing ? (
+          <ActiveEntryActionsMenu
+            is_pending={is_pending}
+            on_edit={() => set_is_editing(true)}
+            on_delete={() => {
+              if (confirm_delete_entry(entry)) {
+                on_delete()
+              }
+            }}
+          />
+        ) : null}
+      </div>
+
+      {is_editing ? (
+        <EntryEditForm
+          entry={entry}
+          is_pending={is_pending}
+          on_cancel={() => set_is_editing(false)}
+          on_save={(values) => {
+            on_edit(values)
+            set_is_editing(false)
+          }}
+        />
+      ) : (
+        <>
+          <div className="active-panel__title-row">
+            <h2 className="active-panel__title">
+              {entry.description || 'Untitled entry'}
+            </h2>
+            <button
+              type="button"
+              className="button button--danger button--small active-panel__checkout"
+              disabled={is_pending}
+              onClick={on_check_out}
+            >
+              Check out
+            </button>
+          </div>
+          <p className="active-panel__duration">
+            {format_duration(duration_ms)}
+          </p>
+          {entry.tags.length > 0 ? (
+            <ul className="tag-list">
+              {entry.tags.map((tag) => (
+                <li key={tag} className="tag-list__item">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </>
+      )}
     </section>
   )
 }

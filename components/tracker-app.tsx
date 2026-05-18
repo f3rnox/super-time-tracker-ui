@@ -7,7 +7,10 @@ import { CheckInForm } from '@/components/check-in-form'
 import { EntryList } from '@/components/entry-list'
 import { NoteForm } from '@/components/note-form'
 import { SheetSidebar } from '@/components/sheet-sidebar'
+import { ThemeSwitcher } from '@/components/theme_switcher'
+import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
+import { type EntryEditFormValues } from '@/components/entry-edit-form'
 import { type TrackerState } from '@/lib/types/tracker_state'
 
 interface TrackerAppProps {
@@ -45,6 +48,17 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   const active_sheet =
     state.sheets.find((sheet) => sheet.isActive)?.name ?? 'main'
 
+  const edit_entry = (
+    sheet_name: string,
+    entry_id: number,
+    values: EntryEditFormValues,
+  ): Promise<TrackerState> =>
+    patch_tracker_action('/api/entry', {
+      sheetName: sheet_name,
+      entryId: entry_id,
+      ...values,
+    })
+
   return (
     <div className="tracker-layout">
       <header className="tracker-header">
@@ -52,9 +66,12 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           <p className="tracker-header__eyebrow">super-time-tracker</p>
           <h1 className="tracker-header__title">Time sheets</h1>
         </div>
-        <p className="tracker-header__path" title={state.dbPath}>
-          {state.dbPath}
-        </p>
+        <div className="tracker-header__actions">
+          <p className="tracker-header__path" title={state.dbPath}>
+            {state.dbPath}
+          </p>
+          <ThemeSwitcher />
+        </div>
       </header>
 
       {error !== null ? <p className="banner banner--error">{error}</p> : null}
@@ -85,6 +102,23 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                 on_check_out={() =>
                   run_action(() => post_tracker_action('/api/out', {}))
                 }
+                on_delete={() =>
+                  run_action(() =>
+                    post_tracker_action('/api/entry', {
+                      sheetName: state.activeEntry?.sheetName,
+                      entryId: state.activeEntry?.id,
+                    }),
+                  )
+                }
+                on_edit={(values) =>
+                  run_action(() =>
+                    edit_entry(
+                      state.activeEntry?.sheetName ?? active_sheet,
+                      state.activeEntry?.id ?? 0,
+                      values,
+                    ),
+                  )
+                }
               />
               <NoteForm
                 is_pending={is_pending}
@@ -96,15 +130,28 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           ) : (
             <CheckInForm
               is_pending={is_pending}
-              on_submit={(description) =>
-                run_action(() =>
-                  post_tracker_action('/api/in', { description }),
-                )
+              on_submit={(values) =>
+                run_action(() => post_tracker_action('/api/in', values))
               }
             />
           )}
 
-          <EntryList entries={state.todayEntries} total_ms={state.todayTotalMs} />
+          <EntryList
+            entries={state.todayEntries}
+            total_ms={state.todayTotalMs}
+            is_pending={is_pending}
+            on_delete={(entry) =>
+              run_action(() =>
+                post_tracker_action('/api/entry', {
+                  sheetName: entry.sheetName,
+                  entryId: entry.id,
+                }),
+              )
+            }
+            on_edit={(entry, values) =>
+              run_action(() => edit_entry(entry.sheetName, entry.id, values))
+            }
+          />
         </main>
       </div>
     </div>
