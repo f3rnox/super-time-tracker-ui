@@ -272,43 +272,69 @@ body {
   text-transform: uppercase;
 }
 
-.active-panel__top {
-  align-items: flex-start;
+.active-panel__layout {
+  display: grid;
+  gap: 0.65rem 1.25rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.active-panel__meta {
   display: flex;
-  gap: 0.75rem;
-  justify-content: space-between;
-  margin-bottom: 0.65rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.active-panel__menu-slot {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.active-panel__title {
+  font-size: 1.35rem;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  line-height: 1.3;
+  margin: 0;
+  width: 100%;
+}
+
+.active-panel__details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  grid-column: 1;
+  grid-row: 3;
+  min-width: 0;
+}
+
+.active-panel__actions {
+  align-self: end;
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: stretch;
+  min-width: 0;
 }
 
 .active-panel__sheet {
   color: var(--muted);
   font-size: 0.85rem;
-  margin: 0.35rem 0 0;
-}
-
-.active-panel__title-row {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
-  justify-content: space-between;
-}
-
-.active-panel__title {
-  flex: 1;
-  font-size: 1.35rem;
   margin: 0;
-  min-width: 0;
 }
 
 .active-panel__checkout {
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .active-panel__duration {
   color: var(--accent);
   font-family: var(--font-geist-mono), monospace;
   font-size: 1.75rem;
-  margin: 0.35rem 0 0.85rem;
+  line-height: 1.2;
+  margin: 0.25rem 0 0;
 }
 
 .active-panel__menu {
@@ -681,5 +707,37 @@ body {
 
   .entry-edit-form__fields {
     grid-template-columns: 1fr;
+  }
+
+  .active-panel__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .active-panel__meta,
+  .active-panel__menu-slot,
+  .active-panel__details,
+  .active-panel__actions {
+    grid-column: 1;
+  }
+
+  .active-panel__menu-slot {
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .active-panel__title {
+    grid-row: 3;
+  }
+
+  .active-panel__details {
+    grid-row: 4;
+  }
+
+  .active-panel__actions {
+    grid-row: 5;
+  }
+
+  .active-panel__checkout {
+    width: 100%;
   }
 }

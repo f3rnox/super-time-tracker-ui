@@ -39,27 +39,9 @@ export function ActiveEntryPanel({
     return () => window.clearInterval(interval)
   }, [entry.start])
 
-  return (
-    <section className="active-panel">
-      <div className="active-panel__top">
-        <div>
-          <span className="active-panel__badge">Tracking</span>
-          <p className="active-panel__sheet">{entry.sheetName}</p>
-        </div>
-        {!is_editing ? (
-          <ActiveEntryActionsMenu
-            is_pending={is_pending}
-            on_edit={() => set_is_editing(true)}
-            on_delete={() => {
-              if (confirm_delete_entry(entry)) {
-                on_delete()
-              }
-            }}
-          />
-        ) : null}
-      </div>
-
-      {is_editing ? (
+  if (is_editing) {
+    return (
+      <section className="active-panel">
         <EntryEditForm
           entry={entry}
           is_pending={is_pending}
@@ -69,21 +51,35 @@ export function ActiveEntryPanel({
             set_is_editing(false)
           }}
         />
-      ) : (
-        <>
-          <div className="active-panel__title-row">
-            <h2 className="active-panel__title">
-              {entry.description || 'Untitled entry'}
-            </h2>
-            <button
-              type="button"
-              className="button button--danger button--small active-panel__checkout"
-              disabled={is_pending}
-              onClick={on_check_out}
-            >
-              Check out
-            </button>
-          </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="active-panel">
+      <div className="active-panel__layout">
+        <div className="active-panel__meta">
+          <span className="active-panel__badge">Tracking</span>
+          <p className="active-panel__sheet">{entry.sheetName}</p>
+        </div>
+
+        <div className="active-panel__menu-slot">
+          <ActiveEntryActionsMenu
+            is_pending={is_pending}
+            on_edit={() => set_is_editing(true)}
+            on_delete={() => {
+              if (confirm_delete_entry(entry)) {
+                on_delete()
+              }
+            }}
+          />
+        </div>
+
+        <h2 className="active-panel__title">
+          {entry.description || 'Untitled entry'}
+        </h2>
+
+        <div className="active-panel__details">
           <p className="active-panel__duration">
             {format_duration(duration_ms)}
           </p>
@@ -96,8 +92,19 @@ export function ActiveEntryPanel({
               ))}
             </ul>
           ) : null}
-        </>
-      )}
+        </div>
+
+        <div className="active-panel__actions">
+          <button
+            type="button"
+            className="button button--danger active-panel__checkout"
+            disabled={is_pending}
+            onClick={on_check_out}
+          >
+            Check out
+          </button>
+        </div>
+      </div>
     </section>
   )
 }
