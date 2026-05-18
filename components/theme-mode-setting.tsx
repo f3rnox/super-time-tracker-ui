@@ -31,8 +31,8 @@ export function ThemeModeSetting() {
   return (
     <SettingRadioGroup<ThemeMode>
       name="theme-mode"
-      legend="Theme"
-      description="The topbar toggle still flips between light and dark as a shortcut."
+      legend="Light / dark mode"
+      description="Choose light, dark, or match the system. The topbar toggle flips light and dark."
       value={mode}
       options={options}
       on_change={(mode) => {

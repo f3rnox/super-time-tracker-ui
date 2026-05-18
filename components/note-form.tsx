@@ -6,11 +6,12 @@ import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
 
 interface NoteFormProps {
-  on_submit: (text: string) => void
+  on_submit: (text: string, at?: string) => void
   on_cancel?: () => void
   is_pending: boolean
   in_active_panel?: boolean
   in_bar?: boolean
+  allow_at?: boolean
 }
 
 /**
@@ -22,8 +23,10 @@ export function NoteForm({
   is_pending,
   in_active_panel = false,
   in_bar = false,
+  allow_at = false,
 }: NoteFormProps) {
   const [text, set_text] = useState('')
+  const [at, set_at] = useState('')
 
   const handle_submit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -33,8 +36,11 @@ export function NoteForm({
       return
     }
 
-    on_submit(trimmed)
+    const trimmed_at = at.trim()
+
+    on_submit(trimmed, trimmed_at.length > 0 ? trimmed_at : undefined)
     set_text('')
+    set_at('')
   }
 
   const border_class =
@@ -82,6 +88,22 @@ export function NoteForm({
           ) : null}
         </div>
       </div>
+      {allow_at ? (
+        <>
+          <label className="text-[0.85rem] text-muted" htmlFor="note-at">
+            Note time{' '}
+            <span className="font-normal opacity-85">(optional, natural language)</span>
+          </label>
+          <input
+            id="note-at"
+            className={get_input_class_name()}
+            value={at}
+            onChange={(event) => set_at(event.target.value)}
+            placeholder="e.g. 30 minutes ago"
+            disabled={is_pending}
+          />
+        </>
+      ) : null}
     </form>
   )
 }

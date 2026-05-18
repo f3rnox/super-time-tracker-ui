@@ -30,7 +30,7 @@ interface ActiveEntryPanelProps {
   on_delete: () => void
   on_edit: (values: EntryEditFormValues) => void
   on_move: (target_sheet_name: string) => void
-  on_add_note: (text: string) => void
+  on_add_note: (text: string, at?: string) => void
   on_edit_note: (timestamp: string, text: string) => void
   on_delete_note: (timestamp: string) => void
   is_pending: boolean
@@ -185,10 +185,11 @@ export function ActiveEntryPanel({
         <NoteForm
           in_active_panel
           in_bar={in_bar}
+          allow_at
           is_pending={is_pending}
           on_cancel={() => set_is_adding_note(false)}
-          on_submit={(text) => {
-            on_add_note(text)
+          on_submit={(text, at) => {
+            on_add_note(text, at)
             set_is_adding_note(false)
           }}
         />

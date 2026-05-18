@@ -1,4 +1,4 @@
-import { AccentColorSetting } from '@/components/accent-color-setting'
+import { ColorPaletteSetting } from '@/components/color-palette-setting'
 import { CheckInFormCollapsedSetting } from '@/components/check-in-form-collapsed-setting'
 import { CompactListsSetting } from '@/components/compact-lists-setting'
 import { DefaultReportingRangeSetting } from '@/components/default-reporting-range-setting'
@@ -34,7 +34,7 @@ export function DisplaySettingsView() {
           <ThemeModeSetting />
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <AccentColorSetting />
+          <ColorPaletteSetting />
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <CompactListsSetting />

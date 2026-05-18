@@ -8,6 +8,7 @@ import { get_tracker_state } from "@/lib/get_tracker_state";
 
 interface NoteBody {
   text?: string;
+  at?: string;
   sheetName?: string;
   entryId?: number;
 }
@@ -30,6 +31,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     await add_note_to_entry({
       text,
+      at: body.at,
       sheet_name: body.sheetName,
       entry_id: body.entryId,
     });

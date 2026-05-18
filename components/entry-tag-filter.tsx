@@ -47,37 +47,43 @@ export function EntryTagFilter({ sheet_name, sheet_tags }: EntryTagFilterProps) 
 
   return (
     <fieldset className="m-0 rounded-lg border border-panel-border bg-panel p-3.5 shadow-sm compact:p-3">
-      <legend className="mb-2 px-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
+      <legend className="px-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
         Filter by tag
       </legend>
-      <p className="m-0 mb-2.5 text-[0.8rem] leading-snug text-muted">
-        {tag_filter_mode === 'any'
-          ? 'Show entries that include any selected tag.'
-          : 'Show entries that include every selected tag.'}
-      </p>
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by tag">
-        {sheet_tags.map((tag) => {
-          const is_selected = filter_tags.some((filter_tag) =>
-            tags_are_equal(filter_tag, tag.name),
-          )
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p className="m-0 shrink-0 text-[0.8rem] leading-snug text-muted">
+          {tag_filter_mode === 'any'
+            ? 'Show entries that include any selected tag.'
+            : 'Show entries that include every selected tag.'}
+        </p>
+        <div
+          className="flex min-w-0 flex-1 flex-wrap justify-end gap-1.5"
+          role="group"
+          aria-label="Filter by tag"
+        >
+          {sheet_tags.map((tag) => {
+            const is_selected = filter_tags.some((filter_tag) =>
+              tags_are_equal(filter_tag, tag.name),
+            )
 
-          return (
-            <button
-              key={tag.name}
-              type="button"
-              className={`${get_button_class_name('ghost', 'small')} ${
-                is_selected
-                  ? 'border-accent-border bg-accent-soft text-foreground'
-                  : ''
-              }`}
-              aria-pressed={is_selected}
-              onClick={() => toggle_sheet_tag_filter(sheet_name, tag.name)}
-            >
-              {format_display_tag(tag.name)}
-              <span className="ml-1 font-normal text-muted">({tag.entryCount})</span>
-            </button>
-          )
-        })}
+            return (
+              <button
+                key={tag.name}
+                type="button"
+                className={`${get_button_class_name('ghost', 'small')} ${
+                  is_selected
+                    ? 'border-accent-border bg-accent-soft text-foreground'
+                    : ''
+                }`}
+                aria-pressed={is_selected}
+                onClick={() => toggle_sheet_tag_filter(sheet_name, tag.name)}
+              >
+                {format_display_tag(tag.name)}
+                <span className="ml-1 font-normal text-muted">({tag.entryCount})</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
       {has_filter ? (
         <button

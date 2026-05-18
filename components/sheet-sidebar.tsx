@@ -122,18 +122,22 @@ export function SheetSidebar({
               <div className="flex min-w-0 items-stretch gap-1">
                 <button
                   type="button"
-                  className={`flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-2 rounded-md border px-2.5 py-2 text-left transition-[background-color,border-color] duration-150 ${
-                    sheet.isActive
-                      ? 'border-accent-border bg-accent-soft'
-                      : 'border-transparent bg-transparent hover:bg-surface-hover'
-                  }`}
+                  className="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-2 rounded-md border border-transparent bg-transparent px-2.5 py-2 text-left transition-[background-color,color] duration-150 hover:bg-surface-hover"
                   disabled={is_pending}
                   onClick={() => on_select(sheet.name)}
                 >
-                  <span className="min-w-0 flex-1 truncate font-semibold">
+                  <span
+                    className={`min-w-0 flex-1 truncate font-semibold ${
+                      sheet.isActive || sheet.hasActiveEntry ? 'text-accent' : ''
+                    }`}
+                  >
                     {sheet.name}
                   </span>
-                  <span className="shrink-0 text-xs text-muted whitespace-nowrap">
+                  <span
+                    className={`shrink-0 text-xs whitespace-nowrap ${
+                      sheet.hasActiveEntry ? 'text-accent' : 'text-muted'
+                    }`}
+                  >
                     {sheet.hasActiveEntry
                       ? '● active'
                       : `${sheet.entryCount} entries`}

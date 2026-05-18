@@ -2,6 +2,24 @@ export type ThemeMode = 'light' | 'dark' | 'system'
 export const THEME_MODE_STORAGE_KEY = 'super-time-tracker-theme-mode'
 export const THEME_MODE_DEFAULT: ThemeMode = 'system'
 
+export type ColorPalette =
+  | 'default'
+  | 'midnight'
+  | 'warm'
+  | 'ocean'
+  | 'forest'
+  | 'contrast'
+export const COLOR_PALETTE_STORAGE_KEY = 'super-time-tracker-color-palette'
+export const COLOR_PALETTE_DEFAULT: ColorPalette = 'default'
+export const COLOR_PALETTE_VALUES: ColorPalette[] = [
+  'default',
+  'midnight',
+  'warm',
+  'ocean',
+  'forest',
+  'contrast',
+]
+
 export type TimeFormat = '12h' | '24h'
 export const TIME_FORMAT_STORAGE_KEY = 'super-time-tracker-time-format'
 export const TIME_FORMAT_DEFAULT: TimeFormat = '12h'
