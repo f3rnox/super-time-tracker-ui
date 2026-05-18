@@ -3,10 +3,13 @@
 import { useSyncExternalStore } from 'react'
 
 import { check_in_form_collapsed_preference } from '@/lib/preferences/check_in_form_collapsed_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 
 const set_check_in_form_collapsed = (collapsed: boolean): void => {
-  check_in_form_collapsed_preference.write(collapsed ? 'true' : 'false')
-  check_in_form_collapsed_preference.notify()
+  persist_ui_preference(
+    check_in_form_collapsed_preference,
+    collapsed ? 'true' : 'false',
+  )
 }
 
 /**

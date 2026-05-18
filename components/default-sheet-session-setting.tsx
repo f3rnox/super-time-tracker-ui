@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { get_input_class_name } from '@/lib/get_input_class_name'
 import { read_stored_default_sheet_fixed_name } from '@/lib/read_stored_default_sheet_fixed_name'
 import { read_stored_default_sheet_session_mode } from '@/lib/read_stored_default_sheet_session_mode'
+import { notify_settings_saved } from '@/lib/notify_settings_saved'
 import { set_default_sheet_fixed_name } from '@/lib/set_default_sheet_fixed_name'
 import { set_default_sheet_session_mode } from '@/lib/set_default_sheet_session_mode'
 import { type DefaultSheetSessionMode } from '@/lib/types/ui_settings'
@@ -59,11 +60,14 @@ export function DefaultSheetSessionSetting({
     if (next_mode === 'fixed' && fixed_sheet_name.length > 0) {
       set_default_sheet_fixed_name(fixed_sheet_name)
     }
+
+    notify_settings_saved()
   }
 
   const handle_fixed_sheet_change = (sheet_name: string): void => {
     set_fixed_sheet_name(sheet_name)
     set_default_sheet_fixed_name(sheet_name)
+    notify_settings_saved()
   }
 
   return (

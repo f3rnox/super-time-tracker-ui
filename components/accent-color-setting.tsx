@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from 'react'
 
 import { accent_color_preference } from '@/lib/preferences/accent_color_preference'
+import { notify_settings_saved } from '@/lib/notify_settings_saved'
 import { set_accent_color } from '@/lib/set_accent_color'
 import { type AccentColor } from '@/lib/types/ui_preferences'
 
@@ -72,7 +73,10 @@ export function AccentColorSetting() {
               aria-checked={is_selected}
               aria-label={option.label}
               title={option.label}
-              onClick={() => set_accent_color(option.value)}
+              onClick={() => {
+                set_accent_color(option.value)
+                notify_settings_saved()
+              }}
               className={`relative inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 transition-colors duration-150 ${
                 is_selected
                   ? 'border-foreground'

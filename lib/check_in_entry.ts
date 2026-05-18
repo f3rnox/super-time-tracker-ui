@@ -44,6 +44,8 @@ export async function check_in_entry(
         `An entry is already active (${entry.id}): ${entry.description}`,
       );
     }
+
+    sheet.activeEntryID = null;
   }
 
   const start_date =

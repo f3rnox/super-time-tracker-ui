@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { CheckInFormCollapsible } from '@/components/check-in-form-collapsible'
 import { EntryTagFilter } from '@/components/entry-tag-filter'
 import { EntryList } from '@/components/entry-list'
 import { SheetSidebar } from '@/components/sheet-sidebar'
 import { TrackerActiveBar } from '@/components/tracker-active-bar'
+import { TrackerDocumentTitle } from '@/components/tracker-document-title'
 import { TrackerTopbar } from '@/components/tracker-topbar'
 import { build_resume_description } from '@/lib/build_resume_description'
 import { collect_tags_from_entries } from '@/lib/collect_tags_from_entries'
@@ -16,11 +17,18 @@ import {
   get_sheet_tag_filter_snapshot,
 } from '@/lib/get_sheet_tag_filter_snapshot'
 import { get_serialized_entries_total_ms } from '@/lib/get_serialized_entries_total_ms'
+import { delete_tracker_action } from '@/lib/delete_tracker_action'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
+import { set_sheet_tag_filter } from '@/lib/set_sheet_tag_filter'
+import { sort_serialized_entries } from '@/lib/sort_serialized_entries'
 import { subscribe_sheet_tag_filters } from '@/lib/subscribe_sheet_tag_filters'
 import { sync_active_sheet_preference } from '@/lib/sync_active_sheet_preference'
+import { use_clear_tag_filters_on_sheet_change } from '@/lib/use_clear_tag_filters_on_sheet_change'
+import { use_entry_list_sort } from '@/lib/use_entry_list_sort'
+import { use_tag_filter_mode } from '@/lib/use_tag_filter_mode'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
+import { get_running_entry_key } from '@/lib/get_running_entry_key'
 import { type TrackerState } from '@/lib/types/tracker_state'
 
 interface TrackerAppProps {
@@ -34,6 +42,15 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   const [state, set_state] = useState<TrackerState>(initial_state)
   const [error, set_error] = useState<string | null>(null)
   const [is_pending, set_is_pending] = useState(false)
+  const [focused_running_key, set_focused_running_key] = useState<string | null>(
+    () => {
+      const first_running = initial_state.runningEntries[0]
+
+      return first_running !== undefined
+        ? get_running_entry_key(first_running)
+        : null
+    },
+  )
 
   useEffect(() => {
     sync_active_sheet_preference(initial_state)
@@ -63,6 +80,86 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   const active_sheet =
     state.sheets.find((sheet) => sheet.isActive)?.name ?? 'main'
 
+  useEffect(() => {
+    if (state.runningEntries.length === 0) {
+      set_focused_running_key(null)
+      return
+    }
+
+    const on_active_sheet = state.runningEntries.find(
+      (entry) => entry.sheetName === active_sheet,
+    )
+
+    if (on_active_sheet !== undefined) {
+      const active_key = get_running_entry_key(on_active_sheet)
+      set_focused_running_key((previous) =>
+        previous === active_key ? previous : active_key,
+      )
+      return
+    }
+
+    set_focused_running_key((previous) => {
+      if (
+        previous !== null &&
+        state.runningEntries.some(
+          (entry) => get_running_entry_key(entry) === previous,
+        )
+      ) {
+        return previous
+      }
+
+      return get_running_entry_key(state.runningEntries[0])
+    })
+  }, [state.runningEntries, active_sheet])
+
+  const focused_running_entry = useMemo(() => {
+    if (focused_running_key === null) {
+      return null
+    }
+
+    return (
+      state.runningEntries.find(
+        (entry) => get_running_entry_key(entry) === focused_running_key,
+      ) ?? null
+    )
+  }, [state.runningEntries, focused_running_key])
+
+  const select_adjacent_running_entry = (direction: -1 | 1): void => {
+    const { runningEntries } = state
+
+    if (runningEntries.length <= 1) {
+      return
+    }
+
+    const current_index = runningEntries.findIndex(
+      (entry) => get_running_entry_key(entry) === focused_running_key,
+    )
+    const index = current_index >= 0 ? current_index : 0
+    const next_index =
+      (index + direction + runningEntries.length) % runningEntries.length
+
+    set_focused_running_key(get_running_entry_key(runningEntries[next_index]))
+  }
+
+  const tag_filter_mode = use_tag_filter_mode()
+  const entry_list_sort = use_entry_list_sort()
+  const clear_tag_filters_on_sheet_change = use_clear_tag_filters_on_sheet_change()
+  const previous_active_sheet_ref = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (
+      !clear_tag_filters_on_sheet_change ||
+      previous_active_sheet_ref.current === null ||
+      previous_active_sheet_ref.current === active_sheet
+    ) {
+      previous_active_sheet_ref.current = active_sheet
+      return
+    }
+
+    set_sheet_tag_filter(active_sheet, [])
+    previous_active_sheet_ref.current = active_sheet
+  }, [active_sheet, clear_tag_filters_on_sheet_change])
+
   const filter_tags = useSyncExternalStore(
     subscribe_sheet_tag_filters,
     () => get_sheet_tag_filter_snapshot(active_sheet),
@@ -74,10 +171,15 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
     [state.activeSheetEntries],
   )
 
-  const filtered_entries = useMemo(
-    () => filter_entries_by_tags(state.activeSheetEntries, filter_tags),
-    [state.activeSheetEntries, filter_tags],
-  )
+  const filtered_entries = useMemo(() => {
+    const matching = filter_entries_by_tags(
+      state.activeSheetEntries,
+      filter_tags,
+      tag_filter_mode,
+    )
+
+    return sort_serialized_entries(matching, entry_list_sort)
+  }, [state.activeSheetEntries, filter_tags, tag_filter_mode, entry_list_sort])
 
   const filtered_total_ms = useMemo(
     () => get_serialized_entries_total_ms(filtered_entries),
@@ -86,7 +188,9 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
   const entries_empty_message =
     filter_tags.length > 0
-      ? `No entries on sheet "${active_sheet}" match the selected tags.`
+      ? tag_filter_mode === 'any'
+        ? `No entries on sheet "${active_sheet}" match any selected tag.`
+        : `No entries on sheet "${active_sheet}" match all selected tags.`
       : `No entries on sheet "${active_sheet}".`
 
   const edit_entry = (
@@ -102,17 +206,20 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
   return (
     <>
+      <TrackerDocumentTitle active_entry={focused_running_entry} />
       <div className="relative z-1">
         <TrackerTopbar />
         <TrackerActiveBar
-          active_sheet_name={active_sheet}
-          active_entry={state.activeEntry}
+          active_entry={focused_running_entry}
+          running_entry_count={state.runningEntries.length}
           sheets={state.sheets}
           is_pending={is_pending}
+          on_show_previous_running_entry={() => select_adjacent_running_entry(-1)}
+          on_show_next_running_entry={() => select_adjacent_running_entry(1)}
           on_check_out={(at) =>
             run_action(() =>
               post_tracker_action('/api/out', {
-                sheetName: state.activeEntry?.sheetName,
+                sheetName: focused_running_entry?.sheetName,
                 ...(at !== undefined ? { at } : {}),
               }),
             )
@@ -120,16 +227,16 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           on_delete={() =>
             run_action(() =>
               post_tracker_action('/api/entry', {
-                sheetName: state.activeEntry?.sheetName,
-                entryId: state.activeEntry?.id,
+                sheetName: focused_running_entry?.sheetName,
+                entryId: focused_running_entry?.id,
               }),
             )
           }
           on_edit={(values) =>
             run_action(() =>
               edit_entry(
-                state.activeEntry?.sheetName ?? active_sheet,
-                state.activeEntry?.id ?? 0,
+                focused_running_entry?.sheetName ?? active_sheet,
+                focused_running_entry?.id ?? 0,
                 values,
               ),
             )
@@ -137,8 +244,8 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           on_move={(target_sheet_name) =>
             run_action(() =>
               post_tracker_action('/api/entry/move', {
-                sheetName: state.activeEntry?.sheetName,
-                entryId: state.activeEntry?.id,
+                sheetName: focused_running_entry?.sheetName,
+                entryId: focused_running_entry?.id,
                 targetSheetName: target_sheet_name,
               }),
             )
@@ -147,18 +254,27 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
             run_action(() =>
               post_tracker_action('/api/note', {
                 text,
-                sheetName: state.activeEntry?.sheetName,
-                entryId: state.activeEntry?.id,
+                sheetName: focused_running_entry?.sheetName,
+                entryId: focused_running_entry?.id,
               }),
             )
           }
           on_edit_note={(timestamp, text) =>
             run_action(() =>
               patch_tracker_action('/api/note', {
-                sheetName: state.activeEntry?.sheetName,
-                entryId: state.activeEntry?.id,
+                sheetName: focused_running_entry?.sheetName,
+                entryId: focused_running_entry?.id,
                 timestamp,
                 text,
+              }),
+            )
+          }
+          on_delete_note={(timestamp) =>
+            run_action(() =>
+              delete_tracker_action('/api/note', {
+                sheetName: focused_running_entry?.sheetName,
+                entryId: focused_running_entry?.id,
+                timestamp,
               }),
             )
           }
@@ -200,7 +316,12 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                 known_tags={state.knownTags}
                 is_pending={is_pending}
                 on_submit={(values) =>
-                  run_action(() => post_tracker_action('/api/in', values))
+                  run_action(() =>
+                    post_tracker_action('/api/in', {
+                      ...values,
+                      sheetName: active_sheet,
+                    }),
+                  )
                 }
               />
             ) : null}

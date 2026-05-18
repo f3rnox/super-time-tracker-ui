@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 
 import { SettingRadioGroup } from '@/components/setting-radio-group'
 import { time_format_preference } from '@/lib/preferences/time_format_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 import { type TimeFormat } from '@/lib/types/ui_preferences'
 
 const options: { value: TimeFormat; label: string; description: string }[] = [
@@ -12,8 +13,7 @@ const options: { value: TimeFormat; label: string; description: string }[] = [
 ]
 
 const set_time_format = (value: TimeFormat): void => {
-  time_format_preference.write(value)
-  time_format_preference.notify()
+  persist_ui_preference(time_format_preference, value)
 }
 
 /**

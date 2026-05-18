@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { add_note_to_entry } from "@/lib/add_note_to_entry";
+import { delete_note_on_entry } from "@/lib/delete_note_on_entry";
 import { edit_note_on_entry } from "@/lib/edit_note_on_entry";
 import { api_error_response } from "@/lib/api_error_response";
 import { get_tracker_state } from "@/lib/get_tracker_state";
@@ -72,6 +73,41 @@ export async function PATCH(request: Request): Promise<NextResponse> {
       entry_id,
       note_timestamp: timestamp,
       text,
+    });
+
+    const state = await get_tracker_state();
+    return NextResponse.json(state);
+  } catch (error: unknown) {
+    return api_error_response(error);
+  }
+}
+
+/**
+ * Removes a note from an entry.
+ */
+export async function DELETE(request: Request): Promise<NextResponse> {
+  try {
+    const body = (await request.json()) as EditNoteBody;
+    const sheet_name = body.sheetName?.trim() ?? "";
+    const entry_id = body.entryId;
+    const timestamp = body.timestamp?.trim() ?? "";
+
+    if (sheet_name.length === 0) {
+      return api_error_response(new Error("Sheet name is required"));
+    }
+
+    if (entry_id === undefined || !Number.isFinite(entry_id)) {
+      return api_error_response(new Error("Entry id is required"));
+    }
+
+    if (timestamp.length === 0) {
+      return api_error_response(new Error("Note timestamp is required"));
+    }
+
+    await delete_note_on_entry({
+      sheet_name,
+      entry_id,
+      note_timestamp: timestamp,
     });
 
     const state = await get_tracker_state();

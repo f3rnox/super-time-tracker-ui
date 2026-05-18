@@ -13,6 +13,7 @@ import { set_sheet_tag_filter } from '@/lib/set_sheet_tag_filter'
 import { subscribe_sheet_tag_filters } from '@/lib/subscribe_sheet_tag_filters'
 import { tags_are_equal } from '@/lib/tags_are_equal'
 import { toggle_sheet_tag_filter } from '@/lib/toggle_sheet_tag_filter'
+import { use_tag_filter_mode } from '@/lib/use_tag_filter_mode'
 import { type TagStat } from '@/lib/types/tag_management'
 
 interface EntryTagFilterProps {
@@ -24,6 +25,7 @@ interface EntryTagFilterProps {
  * Toggle filters for showing only entries that match selected tags.
  */
 export function EntryTagFilter({ sheet_name, sheet_tags }: EntryTagFilterProps) {
+  const tag_filter_mode = use_tag_filter_mode()
   const filter_tags = useSyncExternalStore(
     subscribe_sheet_tag_filters,
     () => get_sheet_tag_filter_snapshot(sheet_name),
@@ -49,7 +51,9 @@ export function EntryTagFilter({ sheet_name, sheet_tags }: EntryTagFilterProps) 
         Filter by tag
       </legend>
       <p className="m-0 mb-2.5 text-[0.8rem] leading-snug text-muted">
-        Show entries that include every selected tag.
+        {tag_filter_mode === 'any'
+          ? 'Show entries that include any selected tag.'
+          : 'Show entries that include every selected tag.'}
       </p>
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by tag">
         {sheet_tags.map((tag) => {

@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 
 import { SettingRadioGroup } from '@/components/setting-radio-group'
 import { duration_format_preference } from '@/lib/preferences/duration_format_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 import { type DurationFormat } from '@/lib/types/ui_preferences'
 
 const options: { value: DurationFormat; label: string; description: string }[] = [
@@ -13,8 +14,7 @@ const options: { value: DurationFormat; label: string; description: string }[] =
 ]
 
 const set_duration_format = (value: DurationFormat): void => {
-  duration_format_preference.write(value)
-  duration_format_preference.notify()
+  persist_ui_preference(duration_format_preference, value)
 }
 
 /**

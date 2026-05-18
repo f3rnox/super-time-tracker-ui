@@ -26,6 +26,7 @@ const format_decimal = (duration_ms: number): string => {
 export function format_duration(
   duration_ms: number,
   duration_format: DurationFormat = 'humanized',
+  show_seconds = false,
 ): string {
   if (duration_format === 'clock') {
     return format_clock(duration_ms)
@@ -36,8 +37,8 @@ export function format_duration(
   }
 
   return humanizeDuration(duration_ms, {
-    largest: 2,
-    round: true,
+    largest: show_seconds ? 3 : 2,
+    round: !show_seconds,
     spacer: ' ',
     delimiter: ' ',
   })

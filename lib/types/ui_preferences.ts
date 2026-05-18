@@ -56,3 +56,31 @@ export const ACCENT_COLOR_VALUES: AccentColor[] = [
   'amber',
   'emerald',
 ]
+
+export type TimerShowSeconds = 'true' | 'false'
+export const TIMER_SHOW_SECONDS_STORAGE_KEY =
+  'super-time-tracker-timer-show-seconds'
+export const TIMER_SHOW_SECONDS_DEFAULT: TimerShowSeconds = 'false'
+
+export type TimerInTitle = 'true' | 'false'
+export const TIMER_IN_TITLE_STORAGE_KEY = 'super-time-tracker-timer-in-title'
+export const TIMER_IN_TITLE_DEFAULT: TimerInTitle = 'true'
+
+export type TagFilterMode = 'all' | 'any'
+export const TAG_FILTER_MODE_STORAGE_KEY = 'super-time-tracker-tag-filter-mode'
+export const TAG_FILTER_MODE_DEFAULT: TagFilterMode = 'all'
+
+export type EntryListSort = 'newest' | 'oldest' | 'duration' | 'description'
+export const ENTRY_LIST_SORT_STORAGE_KEY = 'super-time-tracker-entry-list-sort'
+export const ENTRY_LIST_SORT_DEFAULT: EntryListSort = 'newest'
+
+export type DefaultReportingRange = 'none' | 'today' | 'week'
+export const DEFAULT_REPORTING_RANGE_STORAGE_KEY =
+  'super-time-tracker-default-reporting-range'
+export const DEFAULT_REPORTING_RANGE_DEFAULT: DefaultReportingRange = 'none'
+
+export type ClearTagFiltersOnSheetChange = 'true' | 'false'
+export const CLEAR_TAG_FILTERS_ON_SHEET_CHANGE_STORAGE_KEY =
+  'super-time-tracker-clear-tag-filters-on-sheet-change'
+export const CLEAR_TAG_FILTERS_ON_SHEET_CHANGE_DEFAULT: ClearTagFiltersOnSheetChange =
+  'false'

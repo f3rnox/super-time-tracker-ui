@@ -3,10 +3,13 @@
 import { useSyncExternalStore } from 'react'
 
 import { confirm_before_checkout_preference } from '@/lib/preferences/confirm_before_checkout_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 
 const set_confirm_before_checkout = (enabled: boolean): void => {
-  confirm_before_checkout_preference.write(enabled ? 'true' : 'false')
-  confirm_before_checkout_preference.notify()
+  persist_ui_preference(
+    confirm_before_checkout_preference,
+    enabled ? 'true' : 'false',
+  )
 }
 
 /**

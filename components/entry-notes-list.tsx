@@ -1,11 +1,12 @@
 'use client'
 
-import { type MouseEvent, useState } from 'react'
+import { type MouseEvent, type ReactNode, useState } from 'react'
 
 import { ChevronIcon } from '@/components/chevron-icon'
 import { format_time } from '@/components/format_time'
 import { NoteEditForm } from '@/components/note-edit-form'
 import { PencilIcon } from '@/components/pencil-icon'
+import { TrashIcon } from '@/components/trash-icon'
 import { use_time_format } from '@/lib/use_time_format'
 import { type SerializedNote } from '@/lib/types/tracker_state'
 
@@ -17,6 +18,7 @@ interface EntryNotesListProps {
   in_bar?: boolean
   is_pending?: boolean
   on_edit_note?: (timestamp: string, text: string) => void
+  on_delete_note?: (timestamp: string) => void
 }
 
 const edit_button_class =
@@ -31,6 +33,7 @@ export function EntryNotesList({
   in_bar = false,
   is_pending = false,
   on_edit_note,
+  on_delete_note,
 }: EntryNotesListProps) {
   const time_format = use_time_format()
   const [editing_timestamp, set_editing_timestamp] = useState<string | null>(
@@ -84,6 +87,55 @@ export function EntryNotesList({
     set_editing_timestamp(timestamp)
   }
 
+  const handle_delete = (timestamp: string): void => {
+    if (editing_timestamp === timestamp) {
+      set_editing_timestamp(null)
+    }
+
+    on_delete_note?.(timestamp)
+  }
+
+  const render_note_actions = (note: SerializedNote): ReactNode => {
+    if (on_edit_note === undefined && on_delete_note === undefined) {
+      return null
+    }
+
+    return (
+      <div className="flex shrink-0 gap-0.5">
+        {on_edit_note !== undefined ? (
+          <button
+            type="button"
+            className={edit_button_class}
+            aria-label="Edit note"
+            title="Edit note"
+            disabled={is_pending}
+            onClick={(event) => {
+              event.stopPropagation()
+              start_editing(note.timestamp)
+            }}
+          >
+            <PencilIcon />
+          </button>
+        ) : null}
+        {on_delete_note !== undefined ? (
+          <button
+            type="button"
+            className={`${edit_button_class} hover:text-danger`}
+            aria-label="Delete note"
+            title="Delete note"
+            disabled={is_pending}
+            onClick={(event) => {
+              event.stopPropagation()
+              handle_delete(note.timestamp)
+            }}
+          >
+            <TrashIcon />
+          </button>
+        ) : null}
+      </div>
+    )
+  }
+
   const handle_toggle = (event: MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation()
 
@@ -132,21 +184,7 @@ export function EntryNotesList({
                       {note.text}
                     </span>
                   </p>
-                  {on_edit_note !== undefined ? (
-                    <button
-                      type="button"
-                      className={edit_button_class}
-                      aria-label="Edit note"
-                      title="Edit note"
-                      disabled={is_pending}
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        start_editing(note.timestamp)
-                      }}
-                    >
-                      <PencilIcon />
-                    </button>
-                  ) : null}
+                  {render_note_actions(note)}
                 </div>
               ) : (
                 <>
@@ -157,18 +195,7 @@ export function EntryNotesList({
                     >
                       {format_time(note.timestamp, time_format)}
                     </time>
-                    {on_edit_note !== undefined ? (
-                      <button
-                        type="button"
-                        className={edit_button_class}
-                        aria-label="Edit note"
-                        title="Edit note"
-                        disabled={is_pending}
-                        onClick={() => start_editing(note.timestamp)}
-                      >
-                        <PencilIcon />
-                      </button>
-                    ) : null}
+                    {render_note_actions(note)}
                   </div>
                   <p className="m-0 overflow-wrap-anywhere text-[0.9rem] leading-snug whitespace-pre-wrap">
                     {note.text}

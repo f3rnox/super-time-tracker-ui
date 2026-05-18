@@ -3,10 +3,13 @@
 import { useSyncExternalStore } from 'react'
 
 import { confirm_destructive_actions_preference } from '@/lib/preferences/confirm_destructive_actions_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 
 const set_confirm_destructive_actions = (enabled: boolean): void => {
-  confirm_destructive_actions_preference.write(enabled ? 'true' : 'false')
-  confirm_destructive_actions_preference.notify()
+  persist_ui_preference(
+    confirm_destructive_actions_preference,
+    enabled ? 'true' : 'false',
+  )
 }
 
 /**

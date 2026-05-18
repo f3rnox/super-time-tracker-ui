@@ -4,7 +4,8 @@ import { get_sheet } from '@/lib/get_sheet'
 import { get_serialized_entries_total_ms } from '@/lib/get_serialized_entries_total_ms'
 import { read_db } from '@/lib/read_db'
 import { resolve_active_sheet_name } from '@/lib/resolve_active_sheet_name'
-import { find_serialized_active_entry } from '@/lib/find_serialized_active_entry'
+import { find_all_serialized_active_entries } from '@/lib/find_all_serialized_active_entries'
+import { find_serialized_active_entry_for_sheet } from '@/lib/find_serialized_active_entry_for_sheet'
 import { serialize_sheet_entries } from '@/lib/serialize_sheet_entries'
 import { set_active_sheet } from '@/lib/set_active_sheet'
 import { sort_serialized_entries } from '@/lib/sort_serialized_entries'
@@ -39,7 +40,12 @@ export async function get_tracker_state(
     )
   }
 
-  const active_entry = find_serialized_active_entry(db)
+  const active_sheet_entry =
+    activeSheetName !== null
+      ? find_serialized_active_entry_for_sheet(db, activeSheetName)
+      : null
+  const running_entries = find_all_serialized_active_entries(db)
+  const running_entry = active_sheet_entry ?? running_entries[0] ?? null
 
   return {
     dbPath: DB_PATH,
@@ -52,7 +58,9 @@ export async function get_tracker_state(
       isActive: sheet.name === activeSheetName,
       hasActiveEntry: sheet.activeEntryID !== null,
     })),
-    activeEntry: active_entry,
+    activeEntry: active_sheet_entry,
+    runningEntry: running_entry,
+    runningEntries: running_entries,
     activeSheetEntries: active_sheet_entries,
     activeSheetTotalMs: get_serialized_entries_total_ms(active_sheet_entries),
   }

@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 
 import { SettingsNav } from '@/components/settings-nav'
+import { SettingsSavedToast } from '@/components/settings-saved-toast'
 import {
   TrackerTopbar,
   type TrackerTopbarBreadcrumb,
@@ -24,6 +25,7 @@ export function SettingsPageLayout({
 }: SettingsPageLayoutProps) {
   return (
     <>
+      <SettingsSavedToast />
       <TrackerTopbar breadcrumb={breadcrumb} />
       <main className="mx-auto grid w-full max-w-[1120px] grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)] gap-6 px-5 pb-10 pt-6 max-[860px]:grid-cols-1">
         <aside className="flex flex-col gap-2">

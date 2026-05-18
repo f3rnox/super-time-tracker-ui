@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 
 import { SettingRadioGroup } from '@/components/setting-radio-group'
 import { theme_mode_preference } from '@/lib/preferences/theme_mode_preference'
+import { notify_settings_saved } from '@/lib/notify_settings_saved'
 import { set_theme_mode } from '@/lib/set_theme_mode'
 import { type ThemeMode } from '@/lib/types/ui_preferences'
 
@@ -34,7 +35,10 @@ export function ThemeModeSetting() {
       description="The topbar toggle still flips between light and dark as a shortcut."
       value={mode}
       options={options}
-      on_change={set_theme_mode}
+      on_change={(mode) => {
+        set_theme_mode(mode)
+        notify_settings_saved()
+      }}
     />
   )
 }

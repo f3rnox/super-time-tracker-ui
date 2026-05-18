@@ -9,6 +9,7 @@ import { build_reporting_stats } from '@/lib/build_reporting_stats'
 import { default_reporting_sort_preference } from '@/lib/preferences/default_reporting_sort_preference'
 import { format_duration } from '@/lib/format_duration'
 import { get_date_range_ms_from_inputs } from '@/lib/get_date_range_ms_from_inputs'
+import { get_initial_reporting_range_inputs } from '@/lib/get_initial_reporting_range_inputs'
 import { parse_reporting_source_sheets } from '@/lib/parse_reporting_source_sheets'
 import { sort_sheet_report_stats } from '@/lib/sort_sheet_report_stats'
 import { use_duration_format } from '@/lib/use_duration_format'
@@ -39,8 +40,9 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
   const [sort, set_sort] = useState<SheetReportSort>(() =>
     default_reporting_sort_preference.read(),
   )
-  const [range_inputs, set_range_inputs] =
-    useState<ReportingDateRangeInputs>(empty_range)
+  const [range_inputs, set_range_inputs] = useState<ReportingDateRangeInputs>(
+    () => get_initial_reporting_range_inputs(undefined, week_starts_on),
+  )
 
   const sheets = useMemo(
     () => parse_reporting_source_sheets(source_sheets),

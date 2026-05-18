@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 
 import { SettingRadioGroup } from '@/components/setting-radio-group'
 import { week_starts_on_preference } from '@/lib/preferences/week_starts_on_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 import { type WeekStartsOn } from '@/lib/types/ui_preferences'
 
 const options: { value: WeekStartsOn; label: string; description: string }[] = [
@@ -12,8 +13,7 @@ const options: { value: WeekStartsOn; label: string; description: string }[] = [
 ]
 
 const set_week_starts_on = (value: WeekStartsOn): void => {
-  week_starts_on_preference.write(value)
-  week_starts_on_preference.notify()
+  persist_ui_preference(week_starts_on_preference, value)
 }
 
 /**

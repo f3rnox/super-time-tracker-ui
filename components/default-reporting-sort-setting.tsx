@@ -4,6 +4,7 @@ import { useSyncExternalStore } from 'react'
 
 import { SettingRadioGroup } from '@/components/setting-radio-group'
 import { default_reporting_sort_preference } from '@/lib/preferences/default_reporting_sort_preference'
+import { persist_ui_preference } from '@/lib/persist_ui_preference'
 import { type DefaultReportingSort } from '@/lib/types/ui_preferences'
 
 const options: {
@@ -18,8 +19,7 @@ const options: {
 ]
 
 const set_default_reporting_sort = (value: DefaultReportingSort): void => {
-  default_reporting_sort_preference.write(value)
-  default_reporting_sort_preference.notify()
+  persist_ui_preference(default_reporting_sort_preference, value)
 }
 
 /**

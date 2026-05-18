@@ -28,7 +28,12 @@ export interface TrackerState {
   activeSheetName: string | null
   sheets: SerializedSheet[]
   knownTags: string[]
+  /** Running entry on the viewed sheet, if any. */
   activeEntry: SerializedEntry | null
+  /** Any running entry (for the header bar and tab title). */
+  runningEntry: SerializedEntry | null
+  /** All running entries across sheets, in sheet order. */
+  runningEntries: SerializedEntry[]
   activeSheetEntries: SerializedEntry[]
   activeSheetTotalMs: number
 }

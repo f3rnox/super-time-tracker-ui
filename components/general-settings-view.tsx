@@ -1,3 +1,4 @@
+import { ClearTagFiltersOnSheetChangeSetting } from '@/components/clear-tag-filters-on-sheet-change-setting'
 import { ConfirmBeforeCheckoutSetting } from '@/components/confirm-before-checkout-setting'
 import { ConfirmDestructiveActionsSetting } from '@/components/confirm-destructive-actions-setting'
 import { DefaultSheetSessionSetting } from '@/components/default-sheet-session-setting'
@@ -29,6 +30,9 @@ export function GeneralSettingsView({ sheet_names }: GeneralSettingsViewProps) {
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <ConfirmDestructiveActionsSetting />
+        </li>
+        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+          <ClearTagFiltersOnSheetChangeSetting />
         </li>
       </ul>
     </SettingsPageLayout>
