@@ -38,7 +38,7 @@ export function CheckInForm({ on_submit, is_pending }: CheckInFormProps) {
   }
 
   return (
-    <form className="check-in-form" onSubmit={handle_submit}>
+    <form className="check-in-form check-in-panel" onSubmit={handle_submit}>
       <label className="check-in-form__label" htmlFor="check-in-description">
         What are you working on?
       </label>

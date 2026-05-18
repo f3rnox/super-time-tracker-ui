@@ -6,6 +6,7 @@ import { ActiveEntryPanel } from '@/components/active-entry-panel'
 import { CheckInForm } from '@/components/check-in-form'
 import { EntryList } from '@/components/entry-list'
 import { SheetSidebar } from '@/components/sheet-sidebar'
+import { TrackerActiveBar } from '@/components/tracker-active-bar'
 import { TrackerTopbar } from '@/components/tracker-topbar'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
@@ -60,23 +61,20 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
   return (
     <>
-      <TrackerTopbar
-        active_sheet_name={active_sheet}
-        active_entry={state.activeEntry}
-      />
+      <div className="tracker-header">
+        <TrackerTopbar />
+        <TrackerActiveBar
+          active_sheet_name={active_sheet}
+          active_entry={state.activeEntry}
+        />
+      </div>
       <div className="tracker-layout">
-      <header className="tracker-header">
-        <h1 className="tracker-header__title">Time sheets</h1>
-        <p className="tracker-header__path" title={state.dbPath}>
-          {state.dbPath}
-        </p>
-      </header>
-
       {error !== null ? <p className="banner banner--error">{error}</p> : null}
 
       <div className="tracker-grid">
         <SheetSidebar
           sheets={state.sheets}
+          db_path={state.dbPath}
           is_pending={is_pending}
           on_select={(name) =>
             run_action(() => post_tracker_action('/api/sheet', { name }))
@@ -130,6 +128,16 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
               on_add_note={(text) =>
                 run_action(() => post_tracker_action('/api/note', { text }))
               }
+              on_edit_note={(timestamp, text) =>
+                run_action(() =>
+                  patch_tracker_action('/api/note', {
+                    sheetName: state.activeEntry?.sheetName,
+                    entryId: state.activeEntry?.id,
+                    timestamp,
+                    text,
+                  }),
+                )
+              }
             />
           ) : (
             <CheckInForm
@@ -176,6 +184,16 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                     entryId: entry.id,
                   })),
                   targetSheetName: target_sheet_name,
+                }),
+              )
+            }
+            on_edit_note={(entry, timestamp, text) =>
+              run_action(() =>
+                patch_tracker_action('/api/note', {
+                  sheetName: entry.sheetName,
+                  entryId: entry.id,
+                  timestamp,
+                  text,
                 }),
               )
             }

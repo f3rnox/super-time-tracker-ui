@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { Checkbox } from '@/components/checkbox'
 import { EntryActionsMenu } from '@/components/entry-actions-menu'
+import { EntryNotesList } from '@/components/entry-notes-list'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { EntryListBulkBar } from '@/components/entry-list-bulk-bar'
 import { format_time } from '@/components/format_time'
@@ -31,6 +32,11 @@ interface EntryListProps {
     entries: SerializedEntry[],
     target_sheet_name: string,
   ) => void
+  on_edit_note: (
+    entry: SerializedEntry,
+    timestamp: string,
+    text: string,
+  ) => void
 }
 
 /**
@@ -48,6 +54,7 @@ export function EntryList({
   on_edit,
   on_move,
   on_move_many,
+  on_edit_note,
 }: EntryListProps) {
   const [editing_key, set_editing_key] = useState<string | null>(null)
   const [selected_keys, set_selected_keys] = useState<Set<string>>(() => new Set())
@@ -107,16 +114,9 @@ export function EntryList({
   return (
     <section className="entry-list-section">
       <header className="entry-list-section__header">
-        <h2 className="entry-list-section__title">{title}</h2>
-        <p className="entry-list-section__total">
-          {format_duration(total_ms)} total
-        </p>
-      </header>
-      {entries.length === 0 ? (
-        <p className="entry-list-section__empty">{empty_message}</p>
-      ) : (
-        <>
-          <div className="entry-list-section__toolbar">
+        <div className="entry-list-section__heading">
+          <h2 className="entry-list-section__title">{title}</h2>
+          {entries.length > 0 ? (
             <Checkbox
               className="entry-list-section__select-all"
               checked={all_selected}
@@ -125,7 +125,18 @@ export function EntryList({
               label="Select all"
               on_change={toggle_all}
             />
-            {selected_entries.length > 0 ? (
+          ) : null}
+        </div>
+        <p className="entry-list-section__total">
+          {format_duration(total_ms)} total
+        </p>
+      </header>
+      {entries.length === 0 ? (
+        <p className="entry-list-section__empty">{empty_message}</p>
+      ) : (
+        <>
+          {selected_entries.length > 0 ? (
+            <div className="entry-list-section__toolbar">
               <EntryListBulkBar
                 selected_count={selected_entries.length}
                 selected_entries={selected_entries}
@@ -134,8 +145,8 @@ export function EntryList({
                 on_move={handle_bulk_move}
                 on_clear={clear_selection}
               />
-            ) : null}
-          </div>
+            </div>
+          ) : null}
           <ul className="entry-list">
             {entries.map((entry) => {
               const row_key = get_entry_row_key(entry)
@@ -165,6 +176,7 @@ export function EntryList({
                     is_selected ? ' entry-row--selected' : ''
                   }`}
                 >
+                  <div className="entry-row__primary">
                   <label
                     className="entry-row__select-area"
                     aria-label={`Select entry ${entry.description || 'Untitled entry'}`}
@@ -230,6 +242,19 @@ export function EntryList({
                       }}
                     />
                   </div>
+                  </div>
+                  {entry.notes.length > 0 ? (
+                    <div className="entry-row__notes">
+                      <EntryNotesList
+                        notes={entry.notes}
+                        variant="inline"
+                        is_pending={is_pending}
+                        on_edit_note={(timestamp, text) =>
+                          on_edit_note(entry, timestamp, text)
+                        }
+                      />
+                    </div>
+                  ) : null}
                 </li>
               )
             })}

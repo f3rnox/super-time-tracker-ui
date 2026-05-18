@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
+import { EntryNotesList } from '@/components/entry-notes-list'
 import { NoteForm } from '@/components/note-form'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
@@ -21,6 +22,7 @@ interface ActiveEntryPanelProps {
   on_edit: (values: EntryEditFormValues) => void
   on_move: (target_sheet_name: string) => void
   on_add_note: (text: string) => void
+  on_edit_note: (timestamp: string, text: string) => void
   is_pending: boolean
 }
 
@@ -35,6 +37,7 @@ export function ActiveEntryPanel({
   on_edit,
   on_move,
   on_add_note,
+  on_edit_note,
   is_pending,
 }: ActiveEntryPanelProps) {
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
@@ -68,32 +71,28 @@ export function ActiveEntryPanel({
 
   return (
     <section className="active-panel">
-      <div className="active-panel__layout">
-        <div className="active-panel__meta">
+      <div className="active-panel__header">
+        <div className="active-panel__heading">
           <span className="active-panel__badge">Tracking</span>
-          <p className="active-panel__sheet">{entry.sheetName}</p>
+          <h2 className="active-panel__title">
+            {entry.description || 'Untitled entry'}
+          </h2>
         </div>
-
-        <div className="active-panel__menu-slot">
-          <EntryActionsMenu
-            current_sheet_name={entry.sheetName}
-            sheets={sheets}
-            is_pending={is_pending}
-            on_edit={() => set_is_editing(true)}
-            on_move={on_move}
-            on_delete={() => {
-              if (confirm_delete_entry(entry)) {
-                on_delete()
-              }
-            }}
-          />
-        </div>
-
-        <h2 className="active-panel__title">
-          {entry.description || 'Untitled entry'}
-        </h2>
-
-        <div className="active-panel__details">
+        <EntryActionsMenu
+          current_sheet_name={entry.sheetName}
+          sheets={sheets}
+          is_pending={is_pending}
+          on_edit={() => set_is_editing(true)}
+          on_move={on_move}
+          on_delete={() => {
+            if (confirm_delete_entry(entry)) {
+              on_delete()
+            }
+          }}
+        />
+      </div>
+      <div className="active-panel__body">
+        <div className="active-panel__timer-block">
           <p className="active-panel__duration">
             {format_duration(duration_ms)}
           </p>
@@ -107,18 +106,20 @@ export function ActiveEntryPanel({
             </ul>
           ) : null}
         </div>
-
-        <div className="active-panel__actions">
-          <button
-            type="button"
-            className="button button--danger active-panel__checkout"
-            disabled={is_pending}
-            onClick={on_check_out}
-          >
-            Check out
-          </button>
-        </div>
+        <button
+          type="button"
+          className="button button--danger active-panel__checkout"
+          disabled={is_pending}
+          onClick={on_check_out}
+        >
+          Check out
+        </button>
       </div>
+      <EntryNotesList
+        notes={entry.notes}
+        is_pending={is_pending}
+        on_edit_note={on_edit_note}
+      />
       <NoteForm is_pending={is_pending} on_submit={on_add_note} />
     </section>
   )

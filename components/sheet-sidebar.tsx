@@ -2,10 +2,12 @@
 
 import { type FormEvent, useState } from 'react'
 
+import { SheetActionsMenu } from '@/components/sheet-actions-menu'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
 interface SheetSidebarProps {
   sheets: SerializedSheet[]
+  db_path: string
   on_select: (name: string) => void
   on_create: (name: string) => void
   on_rename: (name: string, new_name: string) => void
@@ -17,6 +19,7 @@ interface SheetSidebarProps {
  */
 export function SheetSidebar({
   sheets,
+  db_path,
   on_select,
   on_create,
   on_rename,
@@ -120,15 +123,11 @@ export function SheetSidebar({
                       : `${sheet.entryCount} entries`}
                   </span>
                 </button>
-                <button
-                  type="button"
-                  className="sheet-list__rename"
-                  aria-label={`Rename sheet ${sheet.name}`}
-                  disabled={is_pending}
-                  onClick={() => start_rename(sheet.name)}
-                >
-                  Rename
-                </button>
+                <SheetActionsMenu
+                  sheet_name={sheet.name}
+                  is_pending={is_pending}
+                  on_rename={() => start_rename(sheet.name)}
+                />
               </div>
             )}
           </li>
@@ -150,6 +149,9 @@ export function SheetSidebar({
           Add
         </button>
       </form>
+      <p className="sheet-sidebar__path" title={db_path}>
+        {db_path}
+      </p>
     </aside>
   )
 }

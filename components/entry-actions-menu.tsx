@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { HamburgerIcon } from '@/components/hamburger-icon'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
 interface EntryActionsMenuProps {
@@ -66,7 +67,7 @@ export function EntryActionsMenu({
         disabled={is_pending}
         onClick={() => set_is_open((open) => !open)}
       >
-        <span className="entry-actions-menu__icon" aria-hidden="true" />
+        <HamburgerIcon />
       </button>
       {is_open ? (
         <ul className="entry-actions-menu__dropdown" role="menu">
