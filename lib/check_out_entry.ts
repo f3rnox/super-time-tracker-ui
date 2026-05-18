@@ -1,3 +1,4 @@
+import { find_sheet_with_active_entry } from "@/lib/find_sheet_with_active_entry";
 import { get_sheet } from "@/lib/get_sheet";
 import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
 import { read_db } from "@/lib/read_db";
@@ -19,10 +20,7 @@ export async function check_out_entry(
 ): Promise<TimeSheetEntry> {
   const { at, note, sheet_name: input_sheet_name } = args;
   const db = await read_db();
-  const sheet =
-    input_sheet_name === undefined || input_sheet_name.length === 0
-      ? get_active_sheet(db)
-      : get_sheet(db, input_sheet_name);
+  const sheet = resolve_check_out_sheet(db, input_sheet_name);
   const { activeEntryID, name: sheet_name } = sheet;
 
   if (activeEntryID === null) {
@@ -53,7 +51,20 @@ export async function check_out_entry(
   return entry;
 }
 
-function get_active_sheet(db: Awaited<ReturnType<typeof read_db>>) {
+function resolve_check_out_sheet(
+  db: Awaited<ReturnType<typeof read_db>>,
+  input_sheet_name: string | undefined,
+) {
+  if (input_sheet_name !== undefined && input_sheet_name.length > 0) {
+    return get_sheet(db, input_sheet_name);
+  }
+
+  const sheet_with_running_entry = find_sheet_with_active_entry(db);
+
+  if (sheet_with_running_entry !== null) {
+    return sheet_with_running_entry;
+  }
+
   const active_sheet_name = db.activeSheetName;
 
   if (active_sheet_name === null) {

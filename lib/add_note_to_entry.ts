@@ -1,3 +1,4 @@
+import { find_sheet_with_active_entry } from "@/lib/find_sheet_with_active_entry";
 import { get_sheet } from "@/lib/get_sheet";
 import { read_db } from "@/lib/read_db";
 import { write_db } from "@/lib/write_db";
@@ -16,13 +17,16 @@ export async function add_note_to_entry(
 ): Promise<void> {
   const { text, entry_id: input_entry_id, sheet_name: input_sheet_name } = args;
   const db = await read_db();
-  const sheet_name = input_sheet_name ?? db.activeSheetName ?? undefined;
+  const sheet =
+    input_sheet_name !== undefined && input_sheet_name.length > 0
+      ? get_sheet(db, input_sheet_name)
+      : find_sheet_with_active_entry(db);
 
-  if (sheet_name === undefined) {
+  if (sheet === null) {
     throw new Error("No active sheet");
   }
 
-  const sheet = get_sheet(db, sheet_name);
+  const { name: sheet_name } = sheet;
   const entry_id = input_entry_id ?? sheet.activeEntryID;
 
   if (entry_id === null) {

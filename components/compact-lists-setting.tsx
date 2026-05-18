@@ -20,16 +20,16 @@ export function CompactListsSetting() {
   )
 
   return (
-    <label className="settings-option">
+    <label className="flex w-full cursor-pointer items-center gap-2.5">
       <input
         type="checkbox"
-        className="settings-option__input"
+        className="shrink-0"
         checked={compact_lists}
         onChange={(event) => set_compact_lists(event.target.checked)}
       />
-      <span className="settings-option__text">
-        <span className="settings-option__label">Compact lists</span>
-        <span className="settings-option__hint">
+      <span className="flex flex-col gap-0.5">
+        <span className="text-[0.95rem] font-semibold">Compact lists</span>
+        <span className="text-[0.8rem] leading-snug text-muted">
           Flatter, tighter rows in the sheet entry list
         </span>
       </span>

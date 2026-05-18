@@ -36,11 +36,21 @@ export function TrackerActiveBar({
   on_edit_note,
 }: TrackerActiveBarProps) {
   return (
-    <div className="tracker-active-bar">
-      <div className="tracker-active-bar__inner">
-        <div className="tracker-active-bar__sheet-row">
-          <span className="tracker-active-bar__label">Sheet</span>
-          <span className="tracker-active-bar__sheet">{active_sheet_name}</span>
+    <div className="w-full border-b border-panel-border bg-[color-mix(in_srgb,var(--accent-soft)_55%,var(--panel))]">
+      <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 px-5 py-3.5 max-[860px]:gap-2.5 max-[860px]:py-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <span className="text-[0.72rem] font-semibold uppercase tracking-[0.04em] text-muted whitespace-nowrap">
+            Viewing
+          </span>
+          <span className="truncate text-[0.95rem] font-[650] leading-tight">
+            {active_sheet_name}
+          </span>
+          {active_entry !== null &&
+          active_entry.sheetName !== active_sheet_name ? (
+            <span className="text-[0.82rem] text-muted">
+              (timer on {active_entry.sheetName})
+            </span>
+          ) : null}
         </div>
         {active_entry !== null ? (
           <ActiveEntryPanel
@@ -57,7 +67,7 @@ export function TrackerActiveBar({
             on_edit_note={on_edit_note}
           />
         ) : (
-          <p className="tracker-active-bar__idle">Not tracking</p>
+          <p className="m-0 text-[0.85rem] leading-tight text-muted">Not tracking</p>
         )}
       </div>
     </div>

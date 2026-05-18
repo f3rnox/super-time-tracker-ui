@@ -27,6 +27,7 @@ export interface TrackerState {
   dbPath: string
   activeSheetName: string | null
   sheets: SerializedSheet[]
+  knownTags: string[]
   activeEntry: SerializedEntry | null
   activeSheetEntries: SerializedEntry[]
   activeSheetTotalMs: number

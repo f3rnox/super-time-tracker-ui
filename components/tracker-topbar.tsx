@@ -3,17 +3,56 @@
 import Link from 'next/link'
 
 import { ThemeSwitcher } from '@/components/theme_switcher'
+import {
+  TrackerBreadcrumb,
+  type TrackerBreadcrumbSegment,
+} from '@/components/tracker-breadcrumb'
+
+export interface TrackerTopbarBreadcrumb {
+  current: string
+  parent?: TrackerBreadcrumbSegment
+}
+
+interface TrackerTopbarProps {
+  breadcrumb?: TrackerTopbarBreadcrumb
+}
 
 /**
- * Sticky app navbar with branding and theme switcher.
+ * Sticky app navbar with branding, breadcrumbs, and theme switcher.
  */
-export function TrackerTopbar() {
+export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
   return (
-    <header className="tracker-topbar">
-      <div className="tracker-topbar__inner">
-        <span className="tracker-topbar__brand">super-time-tracker</span>
-        <div className="tracker-topbar__actions">
-          <Link className="tracker-topbar__settings" href="/settings">
+    <header className="relative z-1 border-b border-panel-border bg-[color-mix(in_srgb,var(--panel)_92%,var(--background))] shadow-sm backdrop-blur-[10px]">
+      <div className="mx-auto flex max-w-[1120px] min-h-13 flex-wrap items-center gap-x-4 gap-y-2 px-5">
+        <span className="inline-flex shrink-0 items-center font-mono text-[0.72rem] font-semibold uppercase leading-tight tracking-[0.08em] text-accent whitespace-nowrap">
+          super-time-tracker
+        </span>
+        {breadcrumb !== undefined ? (
+          <TrackerBreadcrumb current={breadcrumb.current} parent={breadcrumb.parent} />
+        ) : null}
+        <div className="ml-auto flex shrink-0 items-center justify-end gap-2">
+          <Link
+            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
+            href="/"
+          >
+            Tracker
+          </Link>
+          <Link
+            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
+            href="/reporting"
+          >
+            Reporting
+          </Link>
+          <Link
+            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
+            href="/settings/tags"
+          >
+            Manage tags
+          </Link>
+          <Link
+            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
+            href="/settings"
+          >
             Settings
           </Link>
           <ThemeSwitcher />

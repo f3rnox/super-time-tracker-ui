@@ -3,13 +3,16 @@
 import { useEffect, useState } from 'react'
 
 import { CheckoutButtonGroup } from '@/components/checkout-button-group'
+import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { EntryNotesList } from '@/components/entry-notes-list'
 import { NoteForm } from '@/components/note-form'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
-import { confirm_delete_entry } from '@/lib/confirm_delete_entry'
+import { use_duration_format } from '@/lib/use_duration_format'
+import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
+import { get_active_panel_class_name } from '@/lib/get_active_panel_class_name'
 import {
   type SerializedEntry,
   type SerializedSheet,
@@ -28,6 +31,9 @@ interface ActiveEntryPanelProps {
   is_pending: boolean
 }
 
+const tag_item_class =
+  'rounded-full bg-tag-bg px-2 py-0.5 text-xs text-tag-text'
+
 /**
  * Shows the running active entry with a live duration timer.
  */
@@ -43,6 +49,8 @@ export function ActiveEntryPanel({
   on_edit_note,
   is_pending,
 }: ActiveEntryPanelProps) {
+  const { confirm } = use_confirm_dialog()
+  const duration_format = use_duration_format()
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
   const [is_editing, set_is_editing] = useState(false)
 
@@ -56,9 +64,7 @@ export function ActiveEntryPanel({
     return () => window.clearInterval(interval)
   }, [entry.durationMs, entry.start])
 
-  const panel_class = in_bar
-    ? 'active-panel active-panel--in-bar'
-    : 'active-panel'
+  const panel_class = get_active_panel_class_name(in_bar, is_editing)
 
   if (is_editing) {
     return (
@@ -66,6 +72,7 @@ export function ActiveEntryPanel({
         <EntryEditForm
           entry={entry}
           is_pending={is_pending}
+          in_active_panel
           on_cancel={() => set_is_editing(false)}
           on_save={(values) => {
             on_edit(values)
@@ -78,10 +85,12 @@ export function ActiveEntryPanel({
 
   return (
     <section className={panel_class}>
-      <div className="active-panel__header">
-        <div className="active-panel__heading">
-          <span className="active-panel__badge">Tracking</span>
-          <h2 className="active-panel__title">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-1.5">
+          <span className="self-start rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on">
+            Tracking
+          </span>
+          <h2 className="m-0 text-xl font-[650] leading-tight tracking-tight">
             {entry.description || 'Untitled entry'}
           </h2>
         </div>
@@ -91,39 +100,40 @@ export function ActiveEntryPanel({
           is_pending={is_pending}
           on_edit={() => set_is_editing(true)}
           on_move={on_move}
-          on_delete={() => {
-            if (confirm_delete_entry(entry)) {
+          on_delete={async () => {
+            const confirmed = await confirm(get_delete_entry_confirm_dialog(entry))
+
+            if (confirmed) {
               on_delete()
             }
           }}
         />
       </div>
-      <div className="active-panel__body">
-        <div className="active-panel__timer-block">
-          <p className="active-panel__duration">
-            {format_duration(duration_ms)}
+      <div className="flex items-end justify-between gap-4 max-[860px]:flex-col max-[860px]:items-stretch">
+        <div className="flex min-w-0 flex-col gap-2">
+          <p className="m-0 font-mono text-[2rem] font-medium leading-none tracking-tight text-accent">
+            {format_duration(duration_ms, duration_format)}
           </p>
           {entry.tags.length > 0 ? (
-            <ul className="tag-list">
+            <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
               {entry.tags.map((tag) => (
-                <li key={tag} className="tag-list__item">
+                <li key={tag} className={tag_item_class}>
                   {format_display_tag(tag)}
                 </li>
               ))}
             </ul>
           ) : null}
         </div>
-        <CheckoutButtonGroup
-          is_pending={is_pending}
-          on_check_out={on_check_out}
-        />
+        <CheckoutButtonGroup in_bar={in_bar} is_pending={is_pending} on_check_out={on_check_out} />
       </div>
       <EntryNotesList
         notes={entry.notes}
+        variant="panel"
+        in_bar={in_bar}
         is_pending={is_pending}
         on_edit_note={on_edit_note}
       />
-      <NoteForm is_pending={is_pending} on_submit={on_add_note} />
+      <NoteForm in_active_panel in_bar={in_bar} is_pending={is_pending} on_submit={on_add_note} />
     </section>
   )
 }

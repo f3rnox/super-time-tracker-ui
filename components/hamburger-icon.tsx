@@ -4,7 +4,7 @@
 export function HamburgerIcon() {
   return (
     <svg
-      className="hamburger-icon"
+      className="block h-4 w-4 text-muted"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Script from 'next/script'
+
+import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
+import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { theme_init_script } from '@/lib/theme_init_script'
 import { ui_settings_init_script } from '@/lib/ui_settings_init_script'
 
@@ -32,7 +35,7 @@ export default function RootLayout({
       className={`${geist_sans.variable} ${geist_mono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full">
+      <body className="min-h-full font-sans transition-[background-color,color] duration-200">
         <Script
           id="theme-init"
           strategy="beforeInteractive"
@@ -43,7 +46,8 @@ export default function RootLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: ui_settings_init_script }}
         />
-        {children}
+        <ThemeModeSystemListener />
+        <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
       </body>
     </html>
   )

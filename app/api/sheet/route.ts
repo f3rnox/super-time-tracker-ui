@@ -34,7 +34,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       await set_active_sheet(name);
     }
 
-    const state = await get_tracker_state();
+    const state = await get_tracker_state(body.delete === true ? undefined : name);
     return NextResponse.json(state);
   } catch (error: unknown) {
     return api_error_response(error);

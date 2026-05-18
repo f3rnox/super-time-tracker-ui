@@ -7,8 +7,13 @@ import { HamburgerIcon } from '@/components/hamburger-icon'
 interface SheetActionsMenuProps {
   sheet_name: string
   is_pending: boolean
+  can_delete: boolean
   on_rename: () => void
+  on_delete: () => void
 }
+
+const menu_item_class =
+  'block w-full cursor-pointer rounded-[0.45rem] border-0 bg-transparent px-2.5 py-1.5 text-left font-inherit text-[0.85rem] text-inherit hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-55'
 
 /**
  * Hamburger menu for sheet actions such as rename.
@@ -16,7 +21,9 @@ interface SheetActionsMenuProps {
 export function SheetActionsMenu({
   sheet_name,
   is_pending,
+  can_delete,
   on_rename,
+  on_delete,
 }: SheetActionsMenuProps) {
   const [is_open, set_is_open] = useState(false)
   const menu_ref = useRef<HTMLDivElement>(null)
@@ -47,10 +54,10 @@ export function SheetActionsMenu({
   }
 
   return (
-    <div className="entry-actions-menu sheet-list__menu" ref={menu_ref}>
+    <div className="relative shrink-0 self-center" ref={menu_ref}>
       <button
         type="button"
-        className="entry-actions-menu__button"
+        className="inline-flex cursor-pointer appearance-none items-center justify-center rounded-none border-0 bg-transparent p-0.5 text-muted shadow-none hover:opacity-75 focus-visible:outline-2 focus-visible:outline-input-focus-border focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
         aria-label={`Actions for sheet ${sheet_name}`}
         aria-expanded={is_open}
         aria-haspopup="menu"
@@ -60,11 +67,14 @@ export function SheetActionsMenu({
         <HamburgerIcon />
       </button>
       {is_open ? (
-        <ul className="entry-actions-menu__dropdown" role="menu">
+        <ul
+          className="absolute right-0 top-full z-10 mt-1.5 min-w-56 list-none rounded-md border border-panel-border bg-panel p-1.5 shadow-md"
+          role="menu"
+        >
           <li role="none">
             <button
               type="button"
-              className="entry-actions-menu__item"
+              className={menu_item_class}
               role="menuitem"
               disabled={is_pending}
               onClick={() => {
@@ -73,6 +83,22 @@ export function SheetActionsMenu({
               }}
             >
               Rename
+            </button>
+          </li>
+          <li className="my-1 border-t border-panel-border" role="separator" aria-hidden="true" />
+          <li role="none">
+            <button
+              type="button"
+              className={`${menu_item_class} text-danger`}
+              role="menuitem"
+              disabled={is_pending || !can_delete}
+              title={can_delete ? undefined : 'Cannot delete the last sheet'}
+              onClick={() => {
+                close_menu()
+                on_delete()
+              }}
+            >
+              Delete sheet
             </button>
           </li>
         </ul>

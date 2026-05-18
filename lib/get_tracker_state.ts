@@ -1,9 +1,12 @@
+import { collect_known_tags } from '@/lib/collect_known_tags'
 import { DB_PATH } from '@/lib/config'
 import { get_sheet } from '@/lib/get_sheet'
 import { get_serialized_entries_total_ms } from '@/lib/get_serialized_entries_total_ms'
 import { read_db } from '@/lib/read_db'
-import { serialize_entry } from '@/lib/serialize_entry'
+import { resolve_active_sheet_name } from '@/lib/resolve_active_sheet_name'
+import { find_serialized_active_entry } from '@/lib/find_serialized_active_entry'
 import { serialize_sheet_entries } from '@/lib/serialize_sheet_entries'
+import { set_active_sheet } from '@/lib/set_active_sheet'
 import { sort_serialized_entries } from '@/lib/sort_serialized_entries'
 import {
   type SerializedEntry,
@@ -13,33 +16,35 @@ import {
 /**
  * Builds the tracker snapshot consumed by the web UI.
  */
-export async function get_tracker_state(): Promise<TrackerState> {
+export async function get_tracker_state(
+  preferred_sheet_name?: string | null,
+): Promise<TrackerState> {
   const db = await read_db()
+  const resolved_sheet_name = resolve_active_sheet_name(db, preferred_sheet_name)
+
+  if (db.activeSheetName !== resolved_sheet_name) {
+    await set_active_sheet(resolved_sheet_name)
+    db.activeSheetName = resolved_sheet_name
+  }
+
   const { activeSheetName, sheets } = db
 
-  let active_entry: SerializedEntry | null = null
   let active_sheet_entries: SerializedEntry[] = []
 
   if (activeSheetName !== null) {
     const sheet = get_sheet(db, activeSheetName)
-    const { activeEntryID, entries, name } = sheet
 
     active_sheet_entries = sort_serialized_entries(
       serialize_sheet_entries(sheet),
     )
-
-    if (activeEntryID !== null) {
-      const entry = entries.find(({ id }) => id === activeEntryID)
-
-      if (entry !== undefined) {
-        active_entry = serialize_entry(entry, name, true)
-      }
-    }
   }
+
+  const active_entry = find_serialized_active_entry(db)
 
   return {
     dbPath: DB_PATH,
     activeSheetName,
+    knownTags: collect_known_tags(db),
     sheets: sheets.map((sheet) => ({
       name: sheet.name,
       activeEntryID: sheet.activeEntryID,

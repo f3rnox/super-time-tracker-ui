@@ -18,6 +18,9 @@ interface EntryActionsMenuProps {
   on_move: (target_sheet_name: string) => void
 }
 
+const menu_item_class =
+  'block w-full cursor-pointer rounded-[0.45rem] border-0 bg-transparent px-2.5 py-1.5 text-left font-inherit text-[0.85rem] text-inherit hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-55'
+
 /**
  * Hamburger menu for entry edit, move, and delete actions.
  */
@@ -71,10 +74,10 @@ export function EntryActionsMenu({
   }
 
   return (
-    <div className="entry-actions-menu" ref={menu_ref}>
+    <div className="relative shrink-0" ref={menu_ref}>
       <button
         type="button"
-        className="entry-actions-menu__button"
+        className="inline-flex cursor-pointer appearance-none items-center justify-center rounded-none border-0 bg-transparent p-0.5 text-muted shadow-none hover:opacity-75 focus-visible:outline-2 focus-visible:outline-input-focus-border focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-55"
         aria-label="Entry actions"
         aria-expanded={is_open}
         aria-haspopup="menu"
@@ -84,11 +87,14 @@ export function EntryActionsMenu({
         <HamburgerIcon />
       </button>
       {is_open ? (
-        <ul className="entry-actions-menu__dropdown" role="menu">
+        <ul
+          className="absolute right-0 top-full z-10 mt-1.5 min-w-56 list-none rounded-md border border-panel-border bg-panel p-1.5 shadow-md"
+          role="menu"
+        >
           <li role="none">
             <button
               type="button"
-              className="entry-actions-menu__item"
+              className={menu_item_class}
               role="menuitem"
               disabled={is_pending}
               onClick={() => {
@@ -103,7 +109,7 @@ export function EntryActionsMenu({
             <li role="none">
               <button
                 type="button"
-                className="entry-actions-menu__item"
+                className={menu_item_class}
                 role="menuitem"
                 disabled={is_pending}
                 onClick={() => {
@@ -123,7 +129,7 @@ export function EntryActionsMenu({
             <li role="none">
               <button
                 type="button"
-                className="entry-actions-menu__item"
+                className={menu_item_class}
                 role="menuitem"
                 disabled={is_pending || resume_blocked}
                 title={resume_blocked ? resume_blocked_reason : undefined}
@@ -136,22 +142,15 @@ export function EntryActionsMenu({
               </button>
             </li>
           ) : null}
-          <li
-            className="entry-actions-menu__separator"
-            role="separator"
-            aria-hidden="true"
-          />
+          <li className="my-1 border-t border-panel-border" role="separator" aria-hidden="true" />
           <li role="none">
-            <p className="entry-actions-menu__heading">Move to sheet</p>
+            <p className="m-0 px-2.5 py-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.04em] text-muted">
+              Move to sheet
+            </p>
           </li>
           {other_sheets.length === 0 ? (
             <li role="none">
-              <button
-                type="button"
-                className="entry-actions-menu__item"
-                role="menuitem"
-                disabled
-              >
+              <button type="button" className={menu_item_class} role="menuitem" disabled>
                 No other sheets
               </button>
             </li>
@@ -160,7 +159,7 @@ export function EntryActionsMenu({
               <li key={sheet.name} role="none">
                 <button
                   type="button"
-                  className="entry-actions-menu__item entry-actions-menu__item--nested"
+                  className={`${menu_item_class} pl-4`}
                   role="menuitem"
                   disabled={is_pending || sheet.hasActiveEntry}
                   title={
@@ -178,15 +177,11 @@ export function EntryActionsMenu({
               </li>
             ))
           )}
-          <li
-            className="entry-actions-menu__separator"
-            role="separator"
-            aria-hidden="true"
-          />
+          <li className="my-1 border-t border-panel-border" role="separator" aria-hidden="true" />
           <li role="none">
             <button
               type="button"
-              className="entry-actions-menu__item entry-actions-menu__item--danger"
+              className={`${menu_item_class} text-danger`}
               role="menuitem"
               disabled={is_pending}
               onClick={() => {

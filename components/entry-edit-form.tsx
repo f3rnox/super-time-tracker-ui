@@ -3,6 +3,8 @@
 import { type FormEvent, useState } from 'react'
 
 import { format_datetime_hint } from '@/components/format_datetime_hint'
+import { get_button_class_name } from '@/lib/get_button_class_name'
+import { get_input_class_name } from '@/lib/get_input_class_name'
 import { type SerializedEntry } from '@/lib/types/tracker_state'
 
 export interface EntryEditFormValues {
@@ -13,6 +15,7 @@ export interface EntryEditFormValues {
 interface EntryEditFormProps {
   entry: SerializedEntry
   is_pending: boolean
+  in_active_panel?: boolean
   on_save: (values: EntryEditFormValues) => void
   on_cancel: () => void
 }
@@ -23,6 +26,7 @@ interface EntryEditFormProps {
 export function EntryEditForm({
   entry,
   is_pending,
+  in_active_panel = false,
   on_save,
   on_cancel,
 }: EntryEditFormProps) {
@@ -50,29 +54,32 @@ export function EntryEditForm({
     : format_datetime_hint(entry.end ?? entry.start)
 
   return (
-    <form className="entry-edit-form" onSubmit={handle_submit}>
-      <p className="entry-edit-form__title">Edit times</p>
-      <div className="entry-edit-form__fields">
-        <label className="entry-edit-form__field" htmlFor={`entry-start-${entry.id}`}>
-          <span className="entry-edit-form__label">Start</span>
-          <span className="entry-edit-form__current">
+    <form
+      className={`flex flex-col gap-3 rounded-[0.65rem] border border-panel-border bg-input-bg p-3 ${in_active_panel ? 'mt-2' : ''}`}
+      onSubmit={handle_submit}
+    >
+      <p className="m-0 text-[0.85rem] font-semibold">Edit times</p>
+      <div className="grid grid-cols-2 gap-2.5 max-[860px]:grid-cols-1">
+        <label className="flex flex-col gap-1" htmlFor={`entry-start-${entry.id}`}>
+          <span className="text-[0.8rem] font-semibold">Start</span>
+          <span className="text-[0.72rem] text-muted">
             Current: {format_datetime_hint(entry.start)}
           </span>
           <input
             id={`entry-start-${entry.id}`}
-            className="input input--compact"
+            className={get_input_class_name('compact')}
             value={start}
             onChange={(event) => set_start(event.target.value)}
             placeholder="e.g. 10am, 30 minutes ago"
             disabled={is_pending}
           />
         </label>
-        <label className="entry-edit-form__field" htmlFor={`entry-end-${entry.id}`}>
-          <span className="entry-edit-form__label">End</span>
-          <span className="entry-edit-form__current">Current: {end_hint}</span>
+        <label className="flex flex-col gap-1" htmlFor={`entry-end-${entry.id}`}>
+          <span className="text-[0.8rem] font-semibold">End</span>
+          <span className="text-[0.72rem] text-muted">Current: {end_hint}</span>
           <input
             id={`entry-end-${entry.id}`}
-            className="input input--compact"
+            className={get_input_class_name('compact')}
             value={end}
             onChange={(event) => set_end(event.target.value)}
             placeholder={
@@ -82,10 +89,10 @@ export function EntryEditForm({
           />
         </label>
       </div>
-      <div className="entry-edit-form__actions">
+      <div className="flex flex-wrap gap-2">
         <button
           type="submit"
-          className="button button--small button--primary"
+          className={get_button_class_name('primary', 'small')}
           disabled={
             is_pending || (start.trim().length === 0 && end.trim().length === 0)
           }
@@ -94,7 +101,7 @@ export function EntryEditForm({
         </button>
         <button
           type="button"
-          className="button button--small button--ghost"
+          className={get_button_class_name('ghost', 'small')}
           disabled={is_pending}
           onClick={on_cancel}
         >

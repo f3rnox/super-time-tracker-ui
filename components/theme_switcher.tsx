@@ -23,18 +23,16 @@ export function ThemeSwitcher() {
   return (
     <button
       type="button"
-      className="theme-switcher"
+      className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-panel-border bg-ghost-bg px-3 py-1.5 font-inherit text-[0.85rem] font-semibold text-inherit hover:bg-surface-hover disabled:cursor-wait disabled:opacity-60"
       onClick={toggle_theme}
       aria-label={`${active_label} theme. ${switch_label}`}
       title={switch_label}
       suppressHydrationWarning
     >
-      <span className="theme-switcher__icon" aria-hidden="true">
+      <span className="text-base leading-none" aria-hidden="true">
         {theme === 'dark' ? '☾' : '☀'}
       </span>
-      <span className="theme-switcher__label" suppressHydrationWarning>
-        {active_label}
-      </span>
+      <span suppressHydrationWarning>{active_label}</span>
     </button>
   )
 }
