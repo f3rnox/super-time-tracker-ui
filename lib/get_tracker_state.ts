@@ -37,6 +37,7 @@ export async function get_tracker_state(
 
     active_sheet_entries = sort_serialized_entries(
       serialize_sheet_entries(sheet),
+      'newest',
     )
   }
 
