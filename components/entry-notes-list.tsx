@@ -39,7 +39,9 @@ export function EntryNotesList({
   const [editing_timestamp, set_editing_timestamp] = useState<string | null>(
     null,
   )
-  const [is_expanded, set_is_expanded] = useState(variant === 'panel')
+  const [is_expanded, set_is_expanded] = useState(
+    variant === 'panel' && !in_bar,
+  )
 
   if (notes.length === 0) {
     return null
@@ -52,8 +54,7 @@ export function EntryNotesList({
 
   const is_inline = variant === 'inline'
   const is_panel_in_bar = variant === 'panel' && in_bar
-  const is_list_visible =
-    is_panel_in_bar || is_expanded || editing_timestamp !== null
+  const is_list_visible = is_expanded || editing_timestamp !== null
   const toggle_label = is_inline
     ? `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`
     : `Notes (${notes.length})`
@@ -63,7 +64,11 @@ export function EntryNotesList({
     in_bar && !is_inline
       ? 'border-[color-mix(in_srgb,var(--accent-border)_65%,var(--panel-border))]'
       : '',
-    is_panel_in_bar ? 'flex min-h-0 flex-1 flex-col' : '',
+    is_panel_in_bar && is_list_visible
+      ? 'flex min-h-0 flex-1 flex-col'
+      : is_panel_in_bar
+        ? 'flex shrink-0 flex-col'
+        : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -72,11 +77,7 @@ export function EntryNotesList({
     ? 'inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 font-inherit text-xs font-medium normal-case tracking-normal text-muted hover:text-foreground'
     : 'inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent px-0 py-0.5 font-inherit text-[0.72rem] font-semibold uppercase tracking-[0.04em] text-muted hover:text-foreground'
 
-  const list_visibility_class = is_list_visible
-    ? is_panel_in_bar
-      ? ''
-      : 'mt-1.5'
-    : 'hidden'
+  const list_visibility_class = is_list_visible ? 'mt-1.5' : 'hidden'
 
   const list_class = is_inline
     ? `m-0 flex list-none flex-col gap-1.5 overflow-visible p-0 compact:gap-0.5 ${list_visibility_class}`
@@ -161,17 +162,15 @@ export function EntryNotesList({
 
   return (
     <section className={root_class} aria-label="Entry notes">
-      {is_panel_in_bar ? null : (
-        <button
-          type="button"
-          className={toggle_class}
-          aria-expanded={is_list_visible}
-          onClick={handle_toggle}
-        >
-          <ChevronIcon rotated={is_list_visible} />
-          <span>{toggle_label}</span>
-        </button>
-      )}
+      <button
+        type="button"
+        className={toggle_class}
+        aria-expanded={is_list_visible}
+        onClick={handle_toggle}
+      >
+        <ChevronIcon rotated={is_list_visible} />
+        <span>{toggle_label}</span>
+      </button>
       <ul className={list_class}>
         {sorted_notes.map((note, index) => {
           const is_editing = editing_timestamp === note.timestamp

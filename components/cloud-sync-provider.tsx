@@ -6,6 +6,10 @@ import { useEffect, useRef } from 'react'
 import { apply_ui_preferences_record } from '@/lib/apply_ui_preferences_record'
 import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
 import { create_browser_supabase_client } from '@/lib/create_browser_supabase_client'
+import {
+  clear_tracker_db_merged_this_browser_session,
+  has_tracker_db_merged_this_browser_session,
+} from '@/lib/has_tracker_db_merged_this_browser_session'
 import { is_supabase_configured } from '@/lib/is_supabase_configured'
 import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
 import { should_merge_tracker_db_on_navigation } from '@/lib/should_merge_tracker_db_on_navigation'
@@ -20,8 +24,8 @@ export function CloudSyncProvider({
 }): React.ReactElement {
   const router = useRouter()
   const pathname = usePathname()
-  const did_merge_on_session_ref = useRef(false)
-  const last_merged_pathname_ref = useRef<string | null>(null)
+  const last_greedy_merged_pathname_ref = useRef<string | null>(null)
+  const skip_next_greedy_pathname_sync_ref = useRef(true)
 
   useEffect(() => {
     if (!is_supabase_configured()) {
@@ -83,28 +87,19 @@ export function CloudSyncProvider({
       })
         .then(() => sync_preferences())
         .catch(() => {
-          // Toast shows the error; allow retry on next navigation or sign-in.
+          // Toast shows the error.
         })
     }
 
     const start_session_sync = (refresh_after: boolean): void => {
-      const merge_on_navigation = should_merge_tracker_db_on_navigation()
-
-      if (merge_on_navigation) {
-        if (last_merged_pathname_ref.current === pathname) {
-          return
-        }
-
-        last_merged_pathname_ref.current = pathname
-        run_merge_on_load(refresh_after)
+      if (
+        !should_merge_tracker_db_on_navigation() &&
+        has_tracker_db_merged_this_browser_session()
+      ) {
+        void sync_preferences()
         return
       }
 
-      if (did_merge_on_session_ref.current) {
-        return
-      }
-
-      did_merge_on_session_ref.current = true
       run_merge_on_load(refresh_after)
     }
 
@@ -120,15 +115,17 @@ export function CloudSyncProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
-        last_merged_pathname_ref.current = null
-        did_merge_on_session_ref.current = false
+        clear_tracker_db_merged_this_browser_session()
+        last_greedy_merged_pathname_ref.current = null
+        skip_next_greedy_pathname_sync_ref.current = true
         start_session_sync(true)
         return
       }
 
       if (event === 'SIGNED_OUT') {
-        did_merge_on_session_ref.current = false
-        last_merged_pathname_ref.current = null
+        clear_tracker_db_merged_this_browser_session()
+        last_greedy_merged_pathname_ref.current = null
+        skip_next_greedy_pathname_sync_ref.current = true
         router.refresh()
       }
     })
@@ -136,7 +133,29 @@ export function CloudSyncProvider({
     return () => {
       subscription.unsubscribe()
     }
-  }, [pathname, router])
+  }, [router])
+
+  useEffect(() => {
+    if (!is_supabase_configured() || !should_merge_tracker_db_on_navigation()) {
+      return
+    }
+
+    if (skip_next_greedy_pathname_sync_ref.current) {
+      skip_next_greedy_pathname_sync_ref.current = false
+      last_greedy_merged_pathname_ref.current = pathname
+      return
+    }
+
+    if (last_greedy_merged_pathname_ref.current === pathname) {
+      return
+    }
+
+    last_greedy_merged_pathname_ref.current = pathname
+
+    void run_tracker_db_cloud_sync({ merge_on_load: true }).catch(() => {
+      // Toast shows the error.
+    })
+  }, [pathname])
 
   return <>{children}</>
 }

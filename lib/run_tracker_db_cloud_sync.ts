@@ -1,3 +1,4 @@
+import { mark_tracker_db_merged_this_browser_session } from '@/lib/has_tracker_db_merged_this_browser_session'
 import { notify_cloud_db_sync } from '@/lib/notify_cloud_db_sync'
 
 export interface RunTrackerDbCloudSyncOptions {
@@ -37,6 +38,10 @@ export async function run_tracker_db_cloud_sync(
     if (!sync_response.ok) {
       const body = (await sync_response.json()) as { error?: string }
       throw new Error(body.error ?? `${action} failed`)
+    }
+
+    if (options.merge_on_load === true) {
+      mark_tracker_db_merged_this_browser_session()
     }
 
     notify_cloud_db_sync({ phase: 'success', message: success_message })
