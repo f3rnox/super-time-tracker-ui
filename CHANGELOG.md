@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.10](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.9...v0.1.10) (2026-05-19)
+
+
+### Features
+
+* add ability to edit active entry description ([697cdc8](https://github.com/f3rnox/super-time-tracker-ui/commit/697cdc883360f13a7756ed94e92c5445e4ef79b3))
+
 ### [0.1.9](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.7...v0.1.9) (2026-05-19)
 
 
