@@ -126,7 +126,7 @@ export function SheetSidebar({
                 <button
                   type="button"
                   className="flex min-w-0 flex-1 cursor-pointer items-center justify-between gap-2 rounded-md border border-transparent bg-transparent px-2.5 py-2 text-left transition-[background-color,color] duration-150 hover:bg-surface-hover"
-                  disabled={is_pending}
+                  disabled={is_pending && !sheet.isActive}
                   onClick={() => on_select(sheet.name)}
                 >
                   <span

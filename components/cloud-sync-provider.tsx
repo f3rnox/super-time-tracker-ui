@@ -25,6 +25,18 @@ export function CloudSyncProvider({
 
     const supabase = create_browser_supabase_client()
 
+    const sync_on_load = async (): Promise<void> => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session === null) {
+        return
+      }
+
+      await fetch('/api/sync/merge-on-load', { method: 'POST' })
+    }
+
     const sync_preferences = async (): Promise<void> => {
       const {
         data: { session },
@@ -73,9 +85,12 @@ export function CloudSyncProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
-        void sync_preferences().then(() => {
-          router.refresh()
-        })
+        void sync_on_load()
+          .then(() => sync_preferences())
+          .then(() => {
+            router.refresh()
+          })
+        return
       }
 
       if (event === 'SIGNED_OUT') {

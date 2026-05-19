@@ -28,6 +28,7 @@ import { post_tracker_action } from '@/lib/post_tracker_action'
 import { set_sheet_tag_filter } from '@/lib/set_sheet_tag_filter'
 import { sort_serialized_entries } from '@/lib/sort_serialized_entries'
 import { subscribe_sheet_tag_filters } from '@/lib/subscribe_sheet_tag_filters'
+import { apply_optimistic_sheet_switch } from '@/lib/apply_optimistic_sheet_switch'
 import { sync_active_sheet_preference } from '@/lib/sync_active_sheet_preference'
 import { use_clear_tag_filters_on_sheet_change } from '@/lib/use_clear_tag_filters_on_sheet_change'
 import { use_entry_list_sort } from '@/lib/use_entry_list_sort'
@@ -46,6 +47,9 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   const [state, set_state] = useState<TrackerState>(initial_state)
   const [error, set_error] = useState<string | null>(null)
   const [is_pending, set_is_pending] = useState(false)
+  const [is_switching_sheet, set_is_switching_sheet] = useState(false)
+  const state_before_sheet_switch_ref = useRef<TrackerState>(initial_state)
+
   useEffect(() => {
     sync_active_sheet_preference(initial_state)
   }, [initial_state])
@@ -72,7 +76,9 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   }
 
   const active_sheet =
-    state.sheets.find((sheet) => sheet.isActive)?.name ?? 'main'
+    state.activeSheetName ??
+    state.sheets.find((sheet) => sheet.isActive)?.name ??
+    'main'
 
   const tag_filter_mode = use_tag_filter_mode()
   const entry_list_sort = use_entry_list_sort()
@@ -107,6 +113,10 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   )
 
   const filtered_entries = useMemo(() => {
+    if (is_switching_sheet) {
+      return []
+    }
+
     const matching = filter_entries_by_tags(
       state.activeSheetEntries,
       filter_tags,
@@ -114,19 +124,52 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
     )
 
     return sort_serialized_entries(matching, entry_list_sort)
-  }, [state.activeSheetEntries, filter_tags, tag_filter_mode, entry_list_sort])
+  }, [state.activeSheetEntries, filter_tags, tag_filter_mode, entry_list_sort, is_switching_sheet])
 
   const filtered_total_ms = useMemo(
     () => get_serialized_entries_total_ms(filtered_entries),
     [filtered_entries],
   )
 
-  const entries_empty_message =
-    filter_tags.length > 0
+  const entries_empty_message = is_switching_sheet
+    ? `Loading entries for "${active_sheet}"…`
+    : filter_tags.length > 0
       ? tag_filter_mode === 'any'
         ? `No entries on sheet "${active_sheet}" match any selected tag.`
         : `No entries on sheet "${active_sheet}" match all selected tags.`
       : `No entries on sheet "${active_sheet}".`
+
+  const select_sheet = (name: string): void => {
+    if (name === active_sheet && !is_switching_sheet) {
+      return
+    }
+
+    state_before_sheet_switch_ref.current = state
+
+    const optimistic = apply_optimistic_sheet_switch(state, name)
+
+    sync_active_sheet_preference(optimistic)
+    set_state(optimistic)
+    set_is_switching_sheet(true)
+    set_error(null)
+
+    void post_tracker_action('/api/sheet', { name })
+      .then((next_state) => {
+        sync_active_sheet_preference(next_state)
+        set_state(next_state)
+      })
+      .catch((action_error: unknown) => {
+        set_error(
+          action_error instanceof Error
+            ? action_error.message
+            : String(action_error),
+        )
+        set_state(state_before_sheet_switch_ref.current)
+      })
+      .finally(() => {
+        set_is_switching_sheet(false)
+      })
+  }
 
   const edit_entry = (
     sheet_name: string,
@@ -149,9 +192,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
         is_pending={is_pending}
         check_in_form_ref={check_in_form_ref}
         active_entry_panel_ref={active_entry_panel_ref}
-        on_select_sheet={(name) =>
-          run_action(() => post_tracker_action('/api/sheet', { name }))
-        }
+        on_select_sheet={select_sheet}
         on_check_out={(at) =>
           run_action(() =>
             post_tracker_action('/api/out', {
@@ -242,9 +283,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
             sheets={state.sheets}
             db_path={state.dbPath}
             is_pending={is_pending}
-            on_select={(name) =>
-              run_action(() => post_tracker_action('/api/sheet', { name }))
-            }
+            on_select={select_sheet}
             on_create={(name) =>
               run_action(() => post_tracker_action('/api/sheet', { name }))
             }

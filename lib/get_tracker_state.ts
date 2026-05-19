@@ -28,35 +28,33 @@ export async function get_tracker_state(
     db.activeSheetName = resolved_sheet_name
   }
 
-  const { activeSheetName, sheets } = db
+  const { sheets } = db
 
   let active_sheet_entries: SerializedEntry[] = []
 
-  if (activeSheetName !== null) {
-    const sheet = get_sheet(db, activeSheetName)
+  const sheet = get_sheet(db, resolved_sheet_name)
 
-    active_sheet_entries = sort_serialized_entries(
-      serialize_sheet_entries(sheet),
-      'newest',
-    )
-  }
+  active_sheet_entries = sort_serialized_entries(
+    serialize_sheet_entries(sheet),
+    'newest',
+  )
 
-  const active_sheet_entry =
-    activeSheetName !== null
-      ? find_serialized_active_entry_for_sheet(db, activeSheetName)
-      : null
+  const active_sheet_entry = find_serialized_active_entry_for_sheet(
+    db,
+    resolved_sheet_name,
+  )
   const running_entries = find_all_serialized_active_entries(db)
   const running_entry = active_sheet_entry ?? running_entries[0] ?? null
 
   return {
     dbPath: await resolve_db_path_label(),
-    activeSheetName,
+    activeSheetName: resolved_sheet_name,
     knownTags: collect_known_tags(db),
     sheets: sheets.map((sheet) => ({
       name: sheet.name,
       activeEntryID: sheet.activeEntryID,
       entryCount: sheet.entries.length,
-      isActive: sheet.name === activeSheetName,
+      isActive: sheet.name === resolved_sheet_name,
       hasActiveEntry: sheet.activeEntryID !== null,
     })),
     activeEntry: active_sheet_entry,

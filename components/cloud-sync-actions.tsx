@@ -60,16 +60,16 @@ export function CloudSyncActions(): React.ReactElement | null {
     const confirmed = await confirm(
       action === 'push'
         ? {
-            title: 'Overwrite cloud data?',
+            title: 'Push local to cloud?',
             message:
-              'Replace your cloud tracker database with the contents of the local db.json on this machine. This cannot be undone.',
+              'Merge your local db.json into the cloud database. Entries with the same id are combined; local data wins when they conflict.',
             confirmLabel: 'Push to cloud',
             variant: 'danger',
           }
         : {
-            title: 'Overwrite local data?',
+            title: 'Pull cloud to local?',
             message:
-              'Replace the local db.json on this machine with your cloud tracker database. This cannot be undone.',
+              'Merge the cloud database into your local db.json. Entries with the same id are combined; cloud data wins when they conflict.',
             confirmLabel: 'Pull from cloud',
             variant: 'danger',
           },
@@ -94,8 +94,8 @@ export function CloudSyncActions(): React.ReactElement | null {
 
       set_message(
         action === 'push'
-          ? 'Cloud database updated from local file.'
-          : 'Local db.json updated from cloud database.',
+          ? 'Cloud database merged with local file.'
+          : 'Local db.json merged with cloud database.',
       )
 
       await load_status()
@@ -121,8 +121,8 @@ export function CloudSyncActions(): React.ReactElement | null {
       <div className="flex flex-col gap-0.5">
         <h2 className="m-0 text-[0.95rem] font-semibold">Manual sync</h2>
         <p className="m-0 text-[0.8rem] leading-snug text-muted">
-          Force a one-way sync between this machine&rsquo;s db.json file and your
-          cloud database.
+          Merge local db.json with your cloud database. Conflicting entries keep
+          the most recent timer; push favors local, pull favors cloud.
         </p>
       </div>
       {is_loading ? (
