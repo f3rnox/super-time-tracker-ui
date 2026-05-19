@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict'
 
-const { spawn } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const { existsSync } = require('fs')
 const http = require('http')
 const { join } = require('path')
@@ -27,6 +27,51 @@ if (!existsSync(server_js)) {
 const port = process.env.PORT ?? '3000'
 const hostname = process.env.STT_UI_HOSTNAME ?? '127.0.0.1'
 const { HOSTNAME: _machine_hostname, ...env } = process.env
+
+/**
+ * Frees port so a new server can bind (e.g. previous stt-ui still running).
+ * @param {string | number} port
+ */
+function release_port(port) {
+  const port_num = Number(port)
+
+  if (!Number.isFinite(port_num)) {
+    return
+  }
+
+  if (process.platform === 'win32') {
+    try {
+      execSync(
+        `powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort ${port_num} -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"`,
+        { stdio: 'ignore' },
+      )
+    } catch {
+      // no listener
+    }
+
+    return
+  }
+
+  try {
+    execSync(`fuser -k ${port_num}/tcp`, { stdio: 'ignore' })
+    return
+  } catch {
+    // fuser missing or no listener
+  }
+
+  try {
+    const pids = execSync(`lsof -ti :${port_num}`, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    }).trim()
+
+    if (pids.length > 0) {
+      execSync(`kill ${pids.split('\n').join(' ')}`, { stdio: 'ignore' })
+    }
+  } catch {
+    // no listener
+  }
+}
 
 /**
  * Hostname suitable for URLs opened in a browser.
@@ -142,6 +187,10 @@ const should_open_browser =
 
 const app_url = `http://${browser_hostname(hostname)}:${port}`
 
+if (process.env.STT_UI_KILL_EXISTING !== '0') {
+  release_port(port)
+}
+
 const child = spawn(process.execPath, [server_js], {
   cwd: standalone_dir,
   env: {
@@ -168,4 +217,4 @@ child.on('exit', (code, signal) => {
   process.exit(code ?? 0)
 })
 
-console.error(`stt-ui listening on ${app_url}`)
+console.error(`stt-ui starting at ${app_url}`)

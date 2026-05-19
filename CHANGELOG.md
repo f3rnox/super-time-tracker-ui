@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.18](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.16...v0.1.18) (2026-05-19)
+
+
+### Features
+
+* initial supabase integration ([28b7469](https://github.com/f3rnox/super-time-tracker-ui/commit/28b7469dfc46ef4d8feb4d21279fdb385d551d39))
+
+
+### Bug Fixes
+
+* bin script port usage ([4ff06a6](https://github.com/f3rnox/super-time-tracker-ui/commit/4ff06a65efabb7416a7ce283a515a0b767e088e4))
+
+### [0.1.17](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.16...v0.1.17) (2026-05-19)
+
+
+### Bug Fixes
+
+* bin script port usage ([936fb61](https://github.com/f3rnox/super-time-tracker-ui/commit/936fb61cf95c8d9192cc4e7fc12edbfbec103563))
+
 ### [0.1.16](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.14...v0.1.16) (2026-05-19)
 
 
