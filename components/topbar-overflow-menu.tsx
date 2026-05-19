@@ -118,7 +118,7 @@ export function TopbarOverflowMenu(): React.ReactElement {
               role="menuitem"
               onClick={close_menu}
             >
-              Cloud sync
+              Sync settings
             </Link>
           </li>
           <li

@@ -22,7 +22,7 @@ const items: SettingsNavItem[] = [
   },
   {
     href: '/settings/cloud-sync',
-    label: 'Cloud sync',
+    label: 'Sync settings',
     match: (pathname) => pathname.startsWith('/settings/cloud-sync'),
   },
   {
