@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.12](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.11...v0.1.12) (2026-05-19)
+
+
+### Features
+
+* add sorting (order by) to the sheet entry list in the main view ([4a92cf2](https://github.com/f3rnox/super-time-tracker-ui/commit/4a92cf26e6c8785759d6045656b157ffb10117fd))
+
 ### [0.1.11](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.9...v0.1.11) (2026-05-19)
 
 
