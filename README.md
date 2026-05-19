@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# super-time-tracker-ui
 
-## Getting Started
+Web UI for [super-time-tracker](https://github.com/f3rnox/super-time-tracker) time
+sheets. The npm package ships a standalone Next.js build and the `stt-ui` CLI to
+run it locally.
 
-First, run the development server:
+Requires Node.js 20 or newer.
+
+## Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install -g super-time-tracker-ui
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then start the UI:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+stt-ui
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000) (default port).
 
-## Learn More
+`stt-ui --version` prints the installed package version.
 
-To learn more about Next.js, take a look at the following resources:
+On start, the default browser opens at the server URL. Pass `--no-open` or set
+`STT_UI_OPEN_BROWSER=0` to skip that.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PORT` | `3000` | HTTP port |
+| `STT_UI_HOSTNAME` | `127.0.0.1` | Bind address and URL shown in the terminal |
+| `STT_UI_OPEN_BROWSER` | enabled | Set to `0` or `false` to disable auto-open |
 
-## Deploy on Vercel
+The CLI ignores the shell `HOSTNAME` variable (on WSL it is often the Windows
+machine name).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Examples:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+PORT=8080 stt-ui
+STT_UI_HOSTNAME=0.0.0.0 stt-ui
+stt-ui --no-open
+```
+
+## Development
+
+Clone the repo and install dependencies:
+
+```bash
+pnpm install
+```
+
+Run the dev server:
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### Production build
+
+`pnpm build` produces a standalone app under `dist/standalone`. Build output uses
+`next-output/` as the Next.js dist directory. Post-build scripts copy static
+assets into the standalone tree and prune the publish bundle.
+
+Run the production server from the repo:
+
+```bash
+pnpm build
+pnpm stt-ui
+```
+
+`pnpm start` runs `next start` against the project root and is mainly for local
+Next.js workflows. The published package uses `stt-ui` and the standalone
+output instead.
+
+## Publishing
+
+`prepublishOnly` runs `pnpm build`. The published tarball includes `bin/stt-ui.js`
+and `dist/standalone` only.
+
+## License
+
+MIT
