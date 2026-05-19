@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { build_auth_page_href } from '@/lib/build_auth_page_href'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
 
@@ -17,7 +18,7 @@ export function CloudAccountSetting(): React.ReactElement | null {
     return null
   }
 
-  const login_href = `/login?next=${encodeURIComponent(pathname)}`
+  const login_href = build_auth_page_href('sign_in', pathname)
 
   return (
     <div className="flex w-full flex-col gap-3">

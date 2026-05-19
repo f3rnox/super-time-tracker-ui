@@ -1,29 +1,54 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
 import { create_browser_supabase_client } from '@/lib/create_browser_supabase_client'
+import { build_auth_page_href, type AuthPageMode } from '@/lib/build_auth_page_href'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { is_auth_form_submittable } from '@/lib/is_auth_form_submittable'
 import { is_supabase_configured } from '@/lib/is_supabase_configured'
 
 interface SupabaseAuthFormProps {
+  mode: AuthPageMode
   redirect_to?: string
 }
 
 /**
- * Email sign-in and sign-up form for single-user cloud sync.
+ * Email sign-in or register form for Supabase cloud sync.
  */
-export function SupabaseAuthForm({ redirect_to = '/' }: SupabaseAuthFormProps) {
+export function SupabaseAuthForm({
+  mode,
+  redirect_to = '/',
+}: SupabaseAuthFormProps): React.ReactElement {
   const router = useRouter()
   const [email, set_email] = useState('')
   const [password, set_password] = useState('')
-  const [mode, set_mode] = useState<'sign_in' | 'sign_up'>('sign_in')
+  const [password_confirm, set_password_confirm] = useState('')
   const [error, set_error] = useState<string | null>(null)
   const [status, set_status] = useState<string | null>(null)
   const [is_pending, set_is_pending] = useState(false)
+
+  const is_sign_up = mode === 'sign_up'
+  const alternate_href = build_auth_page_href(
+    is_sign_up ? 'sign_in' : 'sign_up',
+    redirect_to,
+  )
+
+  const can_submit = is_auth_form_submittable({
+    email,
+    password,
+    password_confirm,
+    is_sign_up,
+  })
+
+  const passwords_mismatch =
+    is_sign_up &&
+    password_confirm.length > 0 &&
+    password !== password_confirm
 
   if (!is_supabase_configured()) {
     return (
@@ -38,6 +63,11 @@ export function SupabaseAuthForm({ redirect_to = '/' }: SupabaseAuthFormProps) {
     event: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault()
+
+    if (!can_submit) {
+      return
+    }
+
     set_is_pending(true)
     set_error(null)
     set_status(null)
@@ -46,7 +76,7 @@ export function SupabaseAuthForm({ redirect_to = '/' }: SupabaseAuthFormProps) {
     const trimmed_email = email.trim()
 
     try {
-      if (mode === 'sign_up') {
+      if (is_sign_up) {
         const { error: sign_up_error } = await supabase.auth.signUp({
           email: trimmed_email,
           password,
@@ -102,7 +132,7 @@ export function SupabaseAuthForm({ redirect_to = '/' }: SupabaseAuthFormProps) {
 
   return (
     <form
-      className="flex w-full max-w-md flex-col gap-3"
+      className="flex w-full flex-col gap-3"
       onSubmit={(event) => void handle_submit(event)}
     >
       <label className="flex flex-col gap-1 text-[0.85rem]">
@@ -120,7 +150,7 @@ export function SupabaseAuthForm({ redirect_to = '/' }: SupabaseAuthFormProps) {
         <span className="font-semibold">Password</span>
         <input
           type="password"
-          autoComplete={mode === 'sign_up' ? 'new-password' : 'current-password'}
+          autoComplete={is_sign_up ? 'new-password' : 'current-password'}
           required
           minLength={8}
           className={get_input_class_name()}
@@ -128,36 +158,49 @@ export function SupabaseAuthForm({ redirect_to = '/' }: SupabaseAuthFormProps) {
           onChange={(event) => set_password(event.target.value)}
         />
       </label>
-      <div className="flex flex-wrap gap-2">
+      {is_sign_up ? (
+        <label className="flex flex-col gap-1 text-[0.85rem]">
+          <span className="font-semibold">Confirm password</span>
+          <input
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+            className={get_input_class_name()}
+            value={password_confirm}
+            onChange={(event) => set_password_confirm(event.target.value)}
+          />
+        </label>
+      ) : null}
+      {passwords_mismatch ? (
+        <p className="m-0 text-[0.82rem] text-danger">
+          Passwords do not match.
+        </p>
+      ) : null}
+      <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="submit"
           className={get_button_class_name('primary')}
-          disabled={is_pending}
+          disabled={is_pending || !can_submit}
         >
           {is_pending
             ? 'Working…'
-            : mode === 'sign_up'
+            : is_sign_up
               ? 'Create account'
               : 'Sign in'}
         </button>
-        <button
-          type="button"
-          className={get_button_class_name('ghost', 'small')}
-          disabled={is_pending}
-          onClick={() => {
-            set_mode(mode === 'sign_in' ? 'sign_up' : 'sign_in')
-            set_error(null)
-            set_status(null)
-          }}
+        <Link
+          href={alternate_href}
+          className={`${get_button_class_name('ghost', 'small')} no-underline`}
         >
-          {mode === 'sign_in' ? 'Need an account?' : 'Already have an account?'}
-        </button>
+          {is_sign_up ? 'Already have an account?' : 'Need an account?'}
+        </Link>
       </div>
       {status !== null ? (
-        <p className="m-0 text-[0.82rem] text-accent">{status}</p>
+        <p className="m-0 text-center text-[0.82rem] text-accent">{status}</p>
       ) : null}
       {error !== null ? (
-        <p className="m-0 text-[0.82rem] text-danger">{error}</p>
+        <p className="m-0 text-center text-[0.82rem] text-danger">{error}</p>
       ) : null}
     </form>
   )

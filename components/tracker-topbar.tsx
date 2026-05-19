@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 
+import { TopbarCloudStatus } from '@/components/topbar-cloud-status'
 import { TopbarOverflowMenu } from '@/components/topbar-overflow-menu'
 import {
   TrackerBreadcrumb,
@@ -43,18 +44,7 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
           >
             Reporting
           </Link>
-          <Link
-            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
-            href="/settings/tags"
-          >
-            Manage tags
-          </Link>
-          <Link
-            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
-            href="/settings"
-          >
-            Settings
-          </Link>
+          <TopbarCloudStatus />
           <TopbarOverflowMenu />
         </div>
       </div>

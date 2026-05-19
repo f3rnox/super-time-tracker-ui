@@ -1,9 +1,11 @@
 'use client'
 
+import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { HamburgerIcon } from '@/components/hamburger-icon'
+import { build_auth_page_href } from '@/lib/build_auth_page_href'
 import { get_theme_server_snapshot, get_theme_snapshot } from '@/lib/get_theme_snapshot'
 import { subscribe_theme } from '@/lib/subscribe_theme'
 import { toggle_theme } from '@/lib/toggle_theme'
@@ -69,9 +71,7 @@ export function TopbarOverflowMenu(): React.ReactElement {
   }
 
   const handle_sign_in = (): void => {
-    const login_href = `/login?next=${encodeURIComponent(pathname)}`
-
-    router.push(login_href)
+    router.push(build_auth_page_href('sign_in', pathname))
   }
 
   return (
@@ -101,6 +101,31 @@ export function TopbarOverflowMenu(): React.ReactElement {
               </p>
             </li>
           ) : null}
+          <li role="none">
+            <Link
+              href="/settings"
+              className={menu_item_class}
+              role="menuitem"
+              onClick={close_menu}
+            >
+              Settings
+            </Link>
+          </li>
+          <li role="none">
+            <Link
+              href="/settings/tags"
+              className={menu_item_class}
+              role="menuitem"
+              onClick={close_menu}
+            >
+              Manage tags
+            </Link>
+          </li>
+          <li
+            className="my-1 border-t border-panel-border"
+            role="separator"
+            aria-hidden="true"
+          />
           <li role="none">
             <button
               type="button"
