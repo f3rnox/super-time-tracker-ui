@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.16](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.14...v0.1.16) (2026-05-19)
+
+
+### Bug Fixes
+
+* bin script browser auto-open if xdg-open is missing ([c2af320](https://github.com/f3rnox/super-time-tracker-ui/commit/c2af320a41fc974a76b354ca1688f9f82e3ba863))
+* checkout button contrast ([2d23a05](https://github.com/f3rnox/super-time-tracker-ui/commit/2d23a0537deb4573b61e679c3275c780751f2f3c))
+
 ### [0.1.15](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.14...v0.1.15) (2026-05-19)
 
 
