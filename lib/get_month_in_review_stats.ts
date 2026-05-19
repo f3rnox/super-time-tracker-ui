@@ -1,6 +1,7 @@
 import { endOfMonth, format, getDaysInMonth, startOfMonth } from "date-fns";
 
 import { get_clipped_entry_duration_ms } from "@/lib/get_clipped_entry_duration_ms";
+import { get_current_tracking_streak_days } from "@/lib/get_current_tracking_streak_days";
 import { get_daily_time_buckets } from "@/lib/get_daily_time_buckets";
 import { get_tag_time_breakdown } from "@/lib/get_tag_time_breakdown";
 import { type MonthInReviewStats } from "@/lib/types/reporting";
@@ -87,7 +88,12 @@ export function get_month_in_review_stats(
     }
   }
 
-  const streaks = compute_streaks(daily_buckets);
+  const current_streak_days = get_current_tracking_streak_days(
+    sheets,
+    reference,
+    now,
+  );
+  const longest_streak_days = compute_longest_streak_in_buckets(daily_buckets);
 
   const best_day_label =
     best_day_ms_index === -1
@@ -109,25 +115,23 @@ export function get_month_in_review_stats(
     topSheetMs: top_sheet_ms,
     topTag: top_tag,
     topTagMs: top_tag_ms,
-    currentStreakDays: streaks.current,
-    longestStreakDays: streaks.longest,
+    currentStreakDays: current_streak_days,
+    longestStreakDays: longest_streak_days,
     averageActiveDayMs: average_active_day_ms,
   };
 }
 
 /**
- * Computes the current trailing streak and the longest streak within a month bucket list.
+ * Returns the longest run of consecutive tracked days within a month bucket list.
  */
-function compute_streaks(daily_buckets: { totalMs: number }[]): {
-  current: number;
-  longest: number;
-} {
+function compute_longest_streak_in_buckets(
+  daily_buckets: { totalMs: number }[],
+): number {
   let longest = 0;
   let running = 0;
-  let trailing = 0;
 
-  for (let index = 0; index < daily_buckets.length; index += 1) {
-    if (daily_buckets[index].totalMs > 0) {
+  for (const bucket of daily_buckets) {
+    if (bucket.totalMs > 0) {
       running += 1;
       longest = Math.max(longest, running);
     } else {
@@ -135,13 +139,5 @@ function compute_streaks(daily_buckets: { totalMs: number }[]): {
     }
   }
 
-  for (let index = daily_buckets.length - 1; index >= 0; index -= 1) {
-    if (daily_buckets[index].totalMs > 0) {
-      trailing += 1;
-    } else {
-      break;
-    }
-  }
-
-  return { current: trailing, longest };
+  return longest;
 }
