@@ -1,6 +1,6 @@
 {
   "name": "super-time-tracker-ui",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Web UI for the super-time-tracker CLI time sheets",
   "keywords": [
     "nextjs",
@@ -34,7 +34,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/stop-standalone-server.js",
     "build": "next build",
-    "postbuild": "node scripts/sync-standalone-assets.js",
+    "postbuild": "node scripts/sync-standalone-assets.js && node scripts/prune-standalone-dist.js",
     "start": "next start",
     "stt-ui": "node bin/stt-ui.js",
     "format": "pnpm format:prettier",

@@ -5,7 +5,8 @@ const { existsSync, cpSync, rmSync } = require('fs')
 const { join } = require('path')
 
 const root = join(__dirname, '..')
-const next_standalone = join(root, 'next-output', 'standalone')
+const dist_dir = 'next-output'
+const next_standalone = join(root, dist_dir, 'standalone')
 const dist_standalone = join(root, 'dist', 'standalone')
 const server_js = join(next_standalone, 'server.js')
 
@@ -14,8 +15,8 @@ const server_js = join(next_standalone, 'server.js')
  * @param {string} standalone_dir
  */
 function sync_assets_into(standalone_dir) {
-  const static_src = join(root, 'next-output', 'static')
-  const static_dest = join(standalone_dir, '.next', 'static')
+  const static_src = join(root, dist_dir, 'static')
+  const static_dest = join(standalone_dir, dist_dir, 'static')
 
   if (existsSync(static_src)) {
     cpSync(static_src, static_dest, { recursive: true })
