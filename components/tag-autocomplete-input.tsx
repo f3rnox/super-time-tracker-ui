@@ -13,6 +13,7 @@ import { filter_known_tags } from '@/lib/filter_known_tags'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { get_tag_autocomplete_context } from '@/lib/get_tag_autocomplete_context'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { is_complete_tag_autocomplete_query } from '@/lib/is_complete_tag_autocomplete_query'
 
 interface TagAutocompleteInputProps {
   id: string
@@ -48,7 +49,14 @@ export function TagAutocompleteInput({
   const context = get_tag_autocomplete_context(value, cursor_index)
   const suggestions =
     context === null ? [] : filter_known_tags(known_tags, context.query)
-  const is_open = context !== null && suggestions.length > 0 && !disabled
+  const is_query_complete =
+    context !== null &&
+    is_complete_tag_autocomplete_query(context.query, known_tags)
+  const is_open =
+    context !== null &&
+    suggestions.length > 0 &&
+    !is_query_complete &&
+    !disabled
 
   useLayoutEffect(() => {
     if (pending_cursor_ref.current === null || input_ref.current === null) {
