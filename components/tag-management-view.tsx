@@ -9,7 +9,7 @@ import { format_display_tag } from '@/lib/format_display_tag'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
 import { get_merge_tags_confirm_dialog } from '@/lib/get_merge_tags_confirm_dialog'
-import { schedule_tracker_db_cloud_sync } from '@/lib/schedule_tracker_db_cloud_sync'
+import { push_tracker_db_cloud_after_change } from '@/lib/push_tracker_db_cloud_after_change'
 import { type TagStat } from '@/lib/types/tag_management'
 
 interface TagManagementViewProps {
@@ -76,7 +76,7 @@ export function TagManagementView({ initial_tags }: TagManagementViewProps) {
         : `Updated ${result.entries_updated} entries.`,
     )
 
-    schedule_tracker_db_cloud_sync()
+    push_tracker_db_cloud_after_change()
   }
 
   const handle_rename = async (from_tag: string): Promise<void> => {

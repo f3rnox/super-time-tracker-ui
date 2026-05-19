@@ -1,4 +1,4 @@
-import { schedule_tracker_db_cloud_sync } from '@/lib/schedule_tracker_db_cloud_sync'
+import { notify_tracker_db_cloud_sync } from '@/lib/notify_tracker_db_cloud_sync'
 import { type TrackerState } from '@/lib/types/tracker_state'
 
 /**
@@ -21,7 +21,7 @@ export async function post_tracker_action(
 
   const state = (await response.json()) as TrackerState
 
-  schedule_tracker_db_cloud_sync()
+  notify_tracker_db_cloud_sync(path, body)
 
   return state
 }

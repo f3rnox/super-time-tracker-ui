@@ -102,3 +102,8 @@ export const CLEAR_TAG_FILTERS_ON_SHEET_CHANGE_STORAGE_KEY =
   'super-time-tracker-clear-tag-filters-on-sheet-change'
 export const CLEAR_TAG_FILTERS_ON_SHEET_CHANGE_DEFAULT: ClearTagFiltersOnSheetChange =
   'false'
+
+export type GreedyCloudSync = 'true' | 'false'
+export const GREEDY_CLOUD_SYNC_STORAGE_KEY =
+  'super-time-tracker-greedy-cloud-sync'
+export const GREEDY_CLOUD_SYNC_DEFAULT: GreedyCloudSync = 'true'

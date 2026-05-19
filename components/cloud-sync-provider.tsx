@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
 import { apply_ui_preferences_record } from '@/lib/apply_ui_preferences_record'
@@ -8,6 +8,7 @@ import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences
 import { create_browser_supabase_client } from '@/lib/create_browser_supabase_client'
 import { is_supabase_configured } from '@/lib/is_supabase_configured'
 import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
+import { should_merge_tracker_db_on_navigation } from '@/lib/should_merge_tracker_db_on_navigation'
 
 /**
  * Pulls cloud UI preferences after sign-in and refreshes server state.
@@ -18,7 +19,9 @@ export function CloudSyncProvider({
   children: React.ReactNode
 }): React.ReactElement {
   const router = useRouter()
+  const pathname = usePathname()
   const did_merge_on_session_ref = useRef(false)
+  const last_merged_pathname_ref = useRef<string | null>(null)
 
   useEffect(() => {
     if (!is_supabase_configured()) {
@@ -69,13 +72,7 @@ export function CloudSyncProvider({
       }
     }
 
-    const start_session_sync = (refresh_after: boolean): void => {
-      if (did_merge_on_session_ref.current) {
-        return
-      }
-
-      did_merge_on_session_ref.current = true
-
+    const run_merge_on_load = (refresh_after: boolean): void => {
       void run_tracker_db_cloud_sync({
         merge_on_load: true,
         on_complete: refresh_after
@@ -86,8 +83,29 @@ export function CloudSyncProvider({
       })
         .then(() => sync_preferences())
         .catch(() => {
-          did_merge_on_session_ref.current = false
+          // Toast shows the error; allow retry on next navigation or sign-in.
         })
+    }
+
+    const start_session_sync = (refresh_after: boolean): void => {
+      const merge_on_navigation = should_merge_tracker_db_on_navigation()
+
+      if (merge_on_navigation) {
+        if (last_merged_pathname_ref.current === pathname) {
+          return
+        }
+
+        last_merged_pathname_ref.current = pathname
+        run_merge_on_load(refresh_after)
+        return
+      }
+
+      if (did_merge_on_session_ref.current) {
+        return
+      }
+
+      did_merge_on_session_ref.current = true
+      run_merge_on_load(refresh_after)
     }
 
     void supabase.auth.getSession().then(({ data: { session } }) => {
@@ -102,12 +120,15 @@ export function CloudSyncProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
+        last_merged_pathname_ref.current = null
+        did_merge_on_session_ref.current = false
         start_session_sync(true)
         return
       }
 
       if (event === 'SIGNED_OUT') {
         did_merge_on_session_ref.current = false
+        last_merged_pathname_ref.current = null
         router.refresh()
       }
     })
@@ -115,7 +136,7 @@ export function CloudSyncProvider({
     return () => {
       subscription.unsubscribe()
     }
-  }, [router])
+  }, [pathname, router])
 
   return <>{children}</>
 }
