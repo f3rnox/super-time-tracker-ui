@@ -36,11 +36,17 @@ export function SheetSidebar({
   const { confirm } = use_confirm_dialog()
   const confirm_destructive_actions = use_confirm_destructive_actions()
   const can_delete_sheet = sheets.length > 1
+  const [is_adding_sheet, set_is_adding_sheet] = useState(false)
   const [new_sheet_name, set_new_sheet_name] = useState('')
   const [editing_sheet_name, set_editing_sheet_name] = useState<string | null>(
     null,
   )
   const [edited_sheet_name, set_edited_sheet_name] = useState('')
+
+  const cancel_add_sheet = (): void => {
+    set_is_adding_sheet(false)
+    set_new_sheet_name('')
+  }
 
   const handle_create = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -51,7 +57,7 @@ export function SheetSidebar({
     }
 
     on_create(trimmed)
-    set_new_sheet_name('')
+    cancel_add_sheet()
   }
 
   const start_rename = (sheet_name: string): void => {
@@ -65,6 +71,7 @@ export function SheetSidebar({
   }
 
   use_escape_to_cancel(cancel_rename, editing_sheet_name !== null)
+  use_escape_to_cancel(cancel_add_sheet, is_adding_sheet)
 
   const handle_rename = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -172,22 +179,47 @@ export function SheetSidebar({
           </li>
         ))}
       </ul>
-      <form className="flex w-full min-w-0 flex-col gap-2" onSubmit={handle_create}>
-        <input
-          className={get_input_class_name('compact')}
-          value={new_sheet_name}
-          onChange={(event) => set_new_sheet_name(event.target.value)}
-          placeholder="New sheet name"
-          disabled={is_pending}
-        />
-        <button
-          type="submit"
-          className={get_button_class_name('ghost')}
-          disabled={is_pending || new_sheet_name.trim().length === 0}
+      {is_adding_sheet ? (
+        <form
+          className="flex w-full min-w-0 flex-col gap-2"
+          onSubmit={handle_create}
         >
-          Add
+          <input
+            className={get_input_class_name('compact')}
+            value={new_sheet_name}
+            onChange={(event) => set_new_sheet_name(event.target.value)}
+            placeholder="New sheet name"
+            disabled={is_pending}
+            autoFocus
+          />
+          <div className="flex gap-1.5">
+            <button
+              type="submit"
+              className={`${get_button_class_name('ghost')} flex-1`}
+              disabled={is_pending || new_sheet_name.trim().length === 0}
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              className={`${get_button_class_name('ghost')} flex-1`}
+              disabled={is_pending}
+              onClick={cancel_add_sheet}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button
+          type="button"
+          className={get_button_class_name('ghost')}
+          disabled={is_pending}
+          onClick={() => set_is_adding_sheet(true)}
+        >
+          Add sheet
         </button>
-      </form>
+      )}
       <p
         className="mt-auto shrink-0 overflow-wrap-anywhere border-t border-panel-border pt-3 font-mono text-[0.65rem] leading-snug text-muted"
         title={db_path}
