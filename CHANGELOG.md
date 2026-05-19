@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.19](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.18...v0.1.19) (2026-05-19)
+
+
+### Features
+
+* link auth nav in topbar ([6224842](https://github.com/f3rnox/super-time-tracker-ui/commit/6224842ccf8ce30a70a3737c5897653c5ea9a076))
+* tweak login and register forms ([b7ad02b](https://github.com/f3rnox/super-time-tracker-ui/commit/b7ad02bada67584258981861fdbdeda8333fc4c1))
+
 ### [0.1.18](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.16...v0.1.18) (2026-05-19)
 
 
