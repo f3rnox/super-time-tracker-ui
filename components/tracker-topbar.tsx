@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { TopbarCloudStatus } from '@/components/topbar-cloud-status'
 import { TopbarOverflowMenu } from '@/components/topbar-overflow-menu'
+import { TopbarSettingsLink } from '@/components/topbar-settings-link'
 import {
   TrackerBreadcrumb,
   type TrackerBreadcrumbSegment,
@@ -45,6 +46,7 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
             Reporting
           </Link>
           <TopbarCloudStatus />
+          <TopbarSettingsLink />
           <TopbarOverflowMenu />
         </div>
       </div>

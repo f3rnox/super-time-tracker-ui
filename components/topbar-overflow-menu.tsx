@@ -103,16 +103,6 @@ export function TopbarOverflowMenu(): React.ReactElement {
           ) : null}
           <li role="none">
             <Link
-              href="/settings"
-              className={menu_item_class}
-              role="menuitem"
-              onClick={close_menu}
-            >
-              Settings
-            </Link>
-          </li>
-          <li role="none">
-            <Link
               href="/settings/tags"
               className={menu_item_class}
               role="menuitem"
