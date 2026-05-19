@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 
-import { KeyboardShortcutsHelpButton } from '@/components/keyboard-shortcuts-help-button'
-import { ThemeSwitcher } from '@/components/theme_switcher'
+import { TopbarOverflowMenu } from '@/components/topbar-overflow-menu'
 import {
   TrackerBreadcrumb,
   type TrackerBreadcrumbSegment,
@@ -56,8 +55,7 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
           >
             Settings
           </Link>
-          <KeyboardShortcutsHelpButton />
-          <ThemeSwitcher />
+          <TopbarOverflowMenu />
         </div>
       </div>
     </header>

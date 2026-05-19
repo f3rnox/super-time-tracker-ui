@@ -5,6 +5,7 @@ import Script from 'next/script'
 import { AppKeyboardShortcuts } from '@/components/app-keyboard-shortcuts'
 import { CloudSyncProvider } from '@/components/cloud-sync-provider'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
+import { SettingsSavedToast } from '@/components/settings-saved-toast'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { theme_init_script } from '@/lib/theme_init_script'
 import { ui_settings_init_script } from '@/lib/ui_settings_init_script'
@@ -53,6 +54,7 @@ export default function RootLayout({
           <CloudSyncProvider>
             <AppKeyboardShortcuts />
             {children}
+            <SettingsSavedToast />
           </CloudSyncProvider>
         </ConfirmDialogProvider>
       </body>

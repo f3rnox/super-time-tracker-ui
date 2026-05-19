@@ -1,59 +1,23 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
-import { create_browser_supabase_client } from '@/lib/create_browser_supabase_client'
 import { get_button_class_name } from '@/lib/get_button_class_name'
-import { is_supabase_configured } from '@/lib/is_supabase_configured'
+import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
 
 /**
  * Cloud account status and sign-out control for Settings.
  */
 export function CloudAccountSetting(): React.ReactElement | null {
-  const router = useRouter()
-  const [email, set_email] = useState<string | null>(null)
-  const [is_pending, set_is_pending] = useState(false)
+  const pathname = usePathname() ?? '/settings/data'
+  const { email, is_configured, is_pending, sign_out } = use_supabase_auth_session()
 
-  useEffect(() => {
-    if (!is_supabase_configured()) {
-      return
-    }
-
-    const supabase = create_browser_supabase_client()
-
-    void supabase.auth.getUser().then(({ data: { user } }) => {
-      set_email(user?.email ?? null)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      set_email(session?.user.email ?? null)
-    })
-
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
-
-  if (!is_supabase_configured()) {
+  if (!is_configured) {
     return null
   }
 
-  const handle_sign_out = async (): Promise<void> => {
-    set_is_pending(true)
-
-    try {
-      await fetch('/api/auth/signout', { method: 'POST' })
-      const supabase = create_browser_supabase_client()
-      await supabase.auth.signOut()
-      router.refresh()
-    } finally {
-      set_is_pending(false)
-    }
-  }
+  const login_href = `/login?next=${encodeURIComponent(pathname)}`
 
   return (
     <div className="flex w-full flex-col gap-3">
@@ -66,7 +30,7 @@ export function CloudAccountSetting(): React.ReactElement | null {
       </div>
       {email === null ? (
         <Link
-          href="/login?next=/settings/data"
+          href={login_href}
           className={`${get_button_class_name('primary', 'small')} self-start no-underline`}
         >
           Sign in to enable cloud sync
@@ -80,7 +44,7 @@ export function CloudAccountSetting(): React.ReactElement | null {
             type="button"
             className={`${get_button_class_name('ghost', 'small')} self-start`}
             disabled={is_pending}
-            onClick={() => void handle_sign_out()}
+            onClick={() => void sign_out()}
           >
             {is_pending ? 'Signing out…' : 'Sign out'}
           </button>
