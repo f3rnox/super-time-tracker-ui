@@ -46,7 +46,7 @@ export function EntryTagFilter({ sheet_name, sheet_tags }: EntryTagFilterProps) 
   const has_filter = filter_tags.length > 0
 
   return (
-    <fieldset className="m-0 rounded-lg border border-panel-border bg-panel p-3.5 shadow-sm compact:p-3">
+    <fieldset className="m-0 border border-panel-border bg-panel p-3.5 shadow-sm compact:p-3">
       <legend className="px-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
         Filter by tag
       </legend>

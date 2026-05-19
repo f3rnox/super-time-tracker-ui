@@ -48,7 +48,7 @@ export function CheckInForm({
 
   return (
     <form
-      className="flex flex-col gap-2 rounded-lg border border-panel-border bg-panel p-[1.1rem] shadow-sm"
+      className="flex flex-col gap-2 border border-panel-border bg-panel p-[1.1rem] shadow-sm"
       onSubmit={handle_submit}
     >
       <label className="text-[0.85rem] text-muted" htmlFor="check-in-description">

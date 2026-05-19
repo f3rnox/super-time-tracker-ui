@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useImperativeHandle, useState } from 'react'
+import { type ReactNode, forwardRef, useImperativeHandle, useState } from 'react'
 
 import { CheckInForm, type CheckInFormValues } from '@/components/check-in-form'
 import { get_button_class_name } from '@/lib/get_button_class_name'
@@ -14,6 +14,7 @@ interface CheckInFormCollapsibleProps {
   known_tags: string[]
   is_pending: boolean
   on_submit: (values: CheckInFormValues) => void
+  trailing?: ReactNode
 }
 
 /**
@@ -23,7 +24,7 @@ export const CheckInFormCollapsible = forwardRef<
   CheckInFormCollapsibleHandle,
   CheckInFormCollapsibleProps
 >(function CheckInFormCollapsible(
-  { known_tags, is_pending, on_submit },
+  { known_tags, is_pending, on_submit, trailing },
   ref,
 ) {
   const should_collapse_by_default = use_check_in_form_collapsed()
@@ -48,14 +49,17 @@ export const CheckInFormCollapsible = forwardRef<
 
   if (should_collapse_by_default && !is_expanded) {
     return (
-      <button
-        type="button"
-        className={`${get_button_class_name('primary')} self-start`}
-        disabled={is_pending}
-        onClick={() => set_is_expanded(true)}
-      >
-        Check in
-      </button>
+      <div className="flex min-w-0 flex-wrap items-center gap-3">
+        <button
+          type="button"
+          className={get_button_class_name('primary')}
+          disabled={is_pending}
+          onClick={() => set_is_expanded(true)}
+        >
+          Check in
+        </button>
+        {trailing}
+      </div>
     )
   }
 

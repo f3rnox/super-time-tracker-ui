@@ -33,7 +33,7 @@ const tracking_pill_class =
   'shrink-0 rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on'
 
 /**
- * Full-width header region for the active sheet and running entry controls.
+ * Active entry display for the tracker content column.
  */
 export const TrackerActiveBar = forwardRef<
   ActiveEntryPanelHandle,
@@ -54,38 +54,34 @@ export const TrackerActiveBar = forwardRef<
   },
   ref,
 ) {
+  if (active_entry === null) {
+    return null
+  }
+
   return (
-    <div className="w-full border-b border-panel-border bg-[color-mix(in_srgb,var(--accent-soft)_55%,var(--panel))]">
-      <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 px-5 py-3.5 max-[860px]:gap-2.5 max-[860px]:py-3">
-        {active_entry !== null ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <span className={`${section_label_class} truncate`}>
-                Sheet {active_entry.sheetName}
-              </span>
-              <span className={tracking_pill_class}>Tracking</span>
-            </div>
-            <ActiveEntryPanel
-              ref={ref}
-              key={`${active_entry.sheetName}-${active_entry.id}`}
-              entry={active_entry}
-              sheets={sheets}
-              known_tags={known_tags}
-              in_bar
-              is_pending={is_pending}
-              on_check_out={on_check_out}
-              on_delete={on_delete}
-              on_edit={on_edit}
-              on_move={on_move}
-              on_add_note={on_add_note}
-              on_edit_note={on_edit_note}
-              on_delete_note={on_delete_note}
-            />
-          </div>
-        ) : (
-          <p className="m-0 text-[0.85rem] leading-tight text-muted">Not tracking</p>
-        )}
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <span className={`${section_label_class} truncate`}>
+          Sheet {active_entry.sheetName}
+        </span>
+        <span className={tracking_pill_class}>Tracking</span>
       </div>
+      <ActiveEntryPanel
+        ref={ref}
+        key={`${active_entry.sheetName}-${active_entry.id}`}
+        entry={active_entry}
+        sheets={sheets}
+        known_tags={known_tags}
+        in_bar
+        is_pending={is_pending}
+        on_check_out={on_check_out}
+        on_delete={on_delete}
+        on_edit={on_edit}
+        on_move={on_move}
+        on_add_note={on_add_note}
+        on_edit_note={on_edit_note}
+        on_delete_note={on_delete_note}
+      />
     </div>
   )
 })

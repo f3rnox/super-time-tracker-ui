@@ -204,121 +204,131 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
       />
       <div className="relative z-1">
         <TrackerTopbar />
-        <TrackerActiveBar
-          ref={active_entry_panel_ref}
-          active_entry={state.activeEntry}
-          sheets={state.sheets}
-          known_tags={state.knownTags}
-          is_pending={is_pending}
-          on_check_out={(at) =>
-            run_action(() =>
-              post_tracker_action('/api/out', {
-                sheetName: active_sheet,
-                ...(at !== undefined ? { at } : {}),
-              }),
-            )
-          }
-          on_delete={() =>
-            run_action(() =>
-              post_tracker_action('/api/entry', {
-                sheetName: active_sheet,
-                entryId: state.activeEntry?.id,
-              }),
-            )
-          }
-          on_edit={(values) =>
-            run_action(() =>
-              edit_entry(active_sheet, state.activeEntry?.id ?? 0, values),
-            )
-          }
-          on_move={(target_sheet_name) =>
-            run_action(() =>
-              post_tracker_action('/api/entry/move', {
-                sheetName: active_sheet,
-                entryId: state.activeEntry?.id,
-                targetSheetName: target_sheet_name,
-              }),
-            )
-          }
-          on_add_note={(text, at) =>
-            run_action(() =>
-              post_tracker_action('/api/note', {
-                text,
-                ...(at !== undefined ? { at } : {}),
-                sheetName: active_sheet,
-                entryId: state.activeEntry?.id,
-              }),
-            )
-          }
-          on_edit_note={(timestamp, text) =>
-            run_action(() =>
-              patch_tracker_action('/api/note', {
-                sheetName: active_sheet,
-                entryId: state.activeEntry?.id,
-                timestamp,
-                text,
-              }),
-            )
-          }
-          on_delete_note={(timestamp) =>
-            run_action(() =>
-              delete_tracker_action('/api/note', {
-                sheetName: active_sheet,
-                entryId: state.activeEntry?.id,
-                timestamp,
-              }),
-            )
-          }
-        />
       </div>
       <div className="mx-auto max-w-[1120px] px-5 pb-10 pt-5">
         {error !== null ? (
-          <p className="mb-4 rounded-[0.65rem] border border-danger-border bg-danger-soft px-3 py-2.5 text-danger-text">
+          <p className="mb-4 border border-danger-border bg-danger-soft px-3 py-2.5 text-danger-text">
             {error}
           </p>
         ) : null}
 
-        <div className="grid grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] items-start gap-4 max-[860px]:grid-cols-1">
-          <SheetSidebar
-            sheets={state.sheets}
-            db_path={state.dbPath}
-            is_pending={is_pending}
-            on_select={select_sheet}
-            on_create={(name) =>
-              run_action(() => post_tracker_action('/api/sheet', { name }))
-            }
-            on_rename={(name, new_name) =>
-              run_action(() =>
-                patch_tracker_action('/api/sheet', { name, newName: new_name }),
-              )
-            }
-            on_delete={(name) =>
-              run_action(() =>
-                post_tracker_action('/api/sheet', { name, delete: true }),
-              )
-            }
-          />
+        <div className="grid grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] items-stretch border border-panel-border bg-panel shadow-sm max-[860px]:grid-cols-1">
+          <div className="flex min-h-0 min-w-0 flex-col border-r border-panel-border p-4 max-[860px]:border-r-0 max-[860px]:border-b">
+            <SheetSidebar
+              sheets={state.sheets}
+              db_path={state.dbPath}
+              is_pending={is_pending}
+              on_select={select_sheet}
+              on_create={(name) =>
+                run_action(() => post_tracker_action('/api/sheet', { name }))
+              }
+              on_rename={(name, new_name) =>
+                run_action(() =>
+                  patch_tracker_action('/api/sheet', { name, newName: new_name }),
+                )
+              }
+              on_delete={(name) =>
+                run_action(() =>
+                  post_tracker_action('/api/sheet', { name, delete: true }),
+                )
+              }
+            />
+          </div>
 
-          <main className="flex min-w-0 flex-col gap-4 rounded-lg border border-panel-border bg-panel p-4 shadow-sm">
-            {state.activeEntry === null ? (
-              <CheckInFormCollapsible
-                ref={check_in_form_ref}
+          <div className="flex min-w-0 flex-col">
+            <section className="flex min-w-0 flex-col gap-4 border-b border-panel-border border-l-4 border-l-accent p-4">
+              <TrackerActiveBar
+                ref={active_entry_panel_ref}
+                active_entry={state.activeEntry}
+                sheets={state.sheets}
                 known_tags={state.knownTags}
                 is_pending={is_pending}
-                on_submit={(values) =>
+                on_check_out={(at) =>
                   run_action(() =>
-                    post_tracker_action('/api/in', {
-                      ...values,
+                    post_tracker_action('/api/out', {
                       sheetName: active_sheet,
+                      ...(at !== undefined ? { at } : {}),
+                    }),
+                  )
+                }
+                on_delete={() =>
+                  run_action(() =>
+                    post_tracker_action('/api/entry', {
+                      sheetName: active_sheet,
+                      entryId: state.activeEntry?.id,
+                    }),
+                  )
+                }
+                on_edit={(values) =>
+                  run_action(() =>
+                    edit_entry(active_sheet, state.activeEntry?.id ?? 0, values),
+                  )
+                }
+                on_move={(target_sheet_name) =>
+                  run_action(() =>
+                    post_tracker_action('/api/entry/move', {
+                      sheetName: active_sheet,
+                      entryId: state.activeEntry?.id,
+                      targetSheetName: target_sheet_name,
+                    }),
+                  )
+                }
+                on_add_note={(text, at) =>
+                  run_action(() =>
+                    post_tracker_action('/api/note', {
+                      text,
+                      ...(at !== undefined ? { at } : {}),
+                      sheetName: active_sheet,
+                      entryId: state.activeEntry?.id,
+                    }),
+                  )
+                }
+                on_edit_note={(timestamp, text) =>
+                  run_action(() =>
+                    patch_tracker_action('/api/note', {
+                      sheetName: active_sheet,
+                      entryId: state.activeEntry?.id,
+                      timestamp,
+                      text,
+                    }),
+                  )
+                }
+                on_delete_note={(timestamp) =>
+                  run_action(() =>
+                    delete_tracker_action('/api/note', {
+                      sheetName: active_sheet,
+                      entryId: state.activeEntry?.id,
+                      timestamp,
                     }),
                   )
                 }
               />
-            ) : null}
+              {state.activeEntry === null ? (
+                <CheckInFormCollapsible
+                  ref={check_in_form_ref}
+                  known_tags={state.knownTags}
+                  is_pending={is_pending}
+                  trailing={
+                    <p className="m-0 text-[0.85rem] leading-tight text-muted">
+                      Not tracking
+                    </p>
+                  }
+                  on_submit={(values) =>
+                    run_action(() =>
+                      post_tracker_action('/api/in', {
+                        ...values,
+                        sheetName: active_sheet,
+                      }),
+                    )
+                  }
+                />
+              ) : null}
+            </section>
 
-            <EntryTagFilter sheet_name={active_sheet} sheet_tags={sheet_tags} />
+            <section className="flex min-w-0 flex-col gap-4 p-4">
+              <EntryTagFilter sheet_name={active_sheet} sheet_tags={sheet_tags} />
 
-            <EntryList
+              <EntryList
               title="Entries"
               entries={filtered_entries}
               sheets={state.sheets}
@@ -399,7 +409,8 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                 )
               }
             />
-          </main>
+            </section>
+          </div>
         </div>
       </div>
     </>
