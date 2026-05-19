@@ -326,8 +326,6 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
             </section>
 
             <section className="flex min-w-0 flex-col gap-4 p-4">
-              <EntryTagFilter sheet_name={active_sheet} sheet_tags={sheet_tags} />
-
               <EntryList
               title="Entries"
               entries={filtered_entries}
@@ -337,6 +335,12 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
               empty_message={entries_empty_message}
               is_pending={is_pending}
               show_sheet_name={false}
+              header_extra={
+                <EntryTagFilter
+                  sheet_name={active_sheet}
+                  sheet_tags={sheet_tags}
+                />
+              }
               on_delete={(entry) =>
                 run_action(() =>
                   post_tracker_action('/api/entry', {

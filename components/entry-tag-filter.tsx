@@ -46,54 +46,52 @@ export function EntryTagFilter({ sheet_name, sheet_tags }: EntryTagFilterProps) 
   const has_filter = filter_tags.length > 0
 
   return (
-    <fieldset className="m-0 border border-panel-border bg-panel p-3.5 shadow-sm compact:p-3">
-      <legend className="px-0.5 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
+    <div
+      role="group"
+      aria-label="Filter by tag"
+      className="flex flex-wrap items-center gap-x-3 gap-y-2"
+    >
+      <h2 className="m-0 shrink-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em]">
         Filter by tag
-      </legend>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <p className="m-0 shrink-0 text-[0.8rem] leading-snug text-muted">
-          {tag_filter_mode === 'any'
-            ? 'Show entries that include any selected tag.'
-            : 'Show entries that include every selected tag.'}
-        </p>
-        <div
-          className="flex min-w-0 flex-1 flex-wrap justify-end gap-1.5"
-          role="group"
-          aria-label="Filter by tag"
-        >
-          {sheet_tags.map((tag) => {
-            const is_selected = filter_tags.some((filter_tag) =>
-              tags_are_equal(filter_tag, tag.name),
-            )
+      </h2>
+      <p className="m-0 shrink-0 text-[0.8rem] text-muted">
+        {tag_filter_mode === 'any'
+          ? 'Show entries that include any selected tag.'
+          : 'Show entries that include every selected tag.'}
+      </p>
+      <div className="ml-auto flex min-w-0 flex-wrap justify-end gap-1">
+        {sheet_tags.map((tag) => {
+          const is_selected = filter_tags.some((filter_tag) =>
+            tags_are_equal(filter_tag, tag.name),
+          )
 
-            return (
-              <button
-                key={tag.name}
-                type="button"
-                className={`${get_button_class_name('ghost', 'small')} ${
-                  is_selected
-                    ? 'border-accent-border bg-accent-soft text-foreground'
-                    : ''
-                }`}
-                aria-pressed={is_selected}
-                onClick={() => toggle_sheet_tag_filter(sheet_name, tag.name)}
-              >
-                {format_display_tag(tag.name)}
-                <span className="ml-1 font-normal text-muted">({tag.entryCount})</span>
-              </button>
-            )
-          })}
-        </div>
+          return (
+            <button
+              key={tag.name}
+              type="button"
+              className={`${get_button_class_name('ghost', 'small')} ${
+                is_selected
+                  ? 'border-accent-border bg-accent-soft text-foreground'
+                  : ''
+              }`}
+              aria-pressed={is_selected}
+              onClick={() => toggle_sheet_tag_filter(sheet_name, tag.name)}
+            >
+              {format_display_tag(tag.name)}
+              <span className="ml-1 font-normal text-muted">({tag.entryCount})</span>
+            </button>
+          )
+        })}
+        {has_filter ? (
+          <button
+            type="button"
+            className={get_button_class_name('ghost', 'small')}
+            onClick={() => set_sheet_tag_filter(sheet_name, [])}
+          >
+            Clear filter
+          </button>
+        ) : null}
       </div>
-      {has_filter ? (
-        <button
-          type="button"
-          className={`${get_button_class_name('ghost', 'small')} mt-2.5`}
-          onClick={() => set_sheet_tag_filter(sheet_name, [])}
-        >
-          Clear filter
-        </button>
-      ) : null}
-    </fieldset>
+    </div>
   )
 }

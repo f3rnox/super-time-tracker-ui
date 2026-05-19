@@ -33,6 +33,7 @@ interface EntryListProps {
   empty_message: string
   is_pending: boolean
   show_sheet_name?: boolean
+  header_extra?: React.ReactNode
   on_delete: (entry: SerializedEntry) => void
   on_edit: (entry: SerializedEntry, values: EntryEditFormValues) => void
   on_move: (entry: SerializedEntry, target_sheet_name: string) => void
@@ -65,6 +66,7 @@ export function EntryList({
   empty_message,
   is_pending,
   show_sheet_name = true,
+  header_extra,
   on_delete,
   on_edit,
   on_move,
@@ -173,32 +175,33 @@ export function EntryList({
           />
         ) : (
           <>
+            {header_extra}
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2.5">
-              {entries.length > 0 ? (
-                <Checkbox
-                  className="shrink-0"
-                  checked={all_selected}
-                  indeterminate={some_selected}
-                  disabled={is_pending}
-                  aria_label="Select all entries"
-                  on_change={toggle_all}
-                />
-              ) : null}
-              <h2 className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em]">
-                {title}
-              </h2>
-              <span className="text-[0.8rem] text-muted">
-                {entries.length === 0
-                  ? null
-                  : entries.length === 1
-                    ? '1 entry'
-                    : `${entries.length} entries`}
-              </span>
-            </div>
-            <p className="m-0 font-mono text-[0.85rem] text-muted">
-              {format_duration(total_ms, duration_format)} total
-            </p>
+                {entries.length > 0 ? (
+                  <Checkbox
+                    className="shrink-0"
+                    checked={all_selected}
+                    indeterminate={some_selected}
+                    disabled={is_pending}
+                    aria_label="Select all entries"
+                    on_change={toggle_all}
+                  />
+                ) : null}
+                <h2 className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em]">
+                  {title}
+                </h2>
+                <span className="text-[0.8rem] text-muted">
+                  {entries.length === 0
+                    ? null
+                    : entries.length === 1
+                      ? '1 entry'
+                      : `${entries.length} entries`}
+                </span>
+              </div>
+              <p className="m-0 font-mono text-[0.85rem] text-muted">
+                {format_duration(total_ms, duration_format)} total
+              </p>
             </div>
             <EntryListSortControls is_pending={is_pending} />
           </>
