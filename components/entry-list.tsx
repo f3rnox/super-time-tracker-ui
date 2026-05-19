@@ -27,6 +27,7 @@ interface EntryListProps {
   title: string
   entries: SerializedEntry[]
   sheets: SerializedSheet[]
+  known_tags: string[]
   total_ms: number
   empty_message: string
   is_pending: boolean
@@ -58,6 +59,7 @@ export function EntryList({
   title,
   entries,
   sheets,
+  known_tags,
   total_ms,
   empty_message,
   is_pending,
@@ -216,6 +218,7 @@ export function EntryList({
                   >
                     <EntryEditForm
                       entry={entry}
+                      known_tags={known_tags}
                       is_pending={is_pending}
                       on_cancel={() => set_editing_key(null)}
                       on_save={(values) => {

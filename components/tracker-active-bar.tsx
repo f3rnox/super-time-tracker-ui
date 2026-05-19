@@ -15,6 +15,7 @@ import {
 interface TrackerActiveBarProps {
   active_entry: SerializedEntry | null
   sheets: SerializedSheet[]
+  known_tags: string[]
   is_pending: boolean
   on_check_out: (at?: string) => void
   on_delete: () => void
@@ -41,6 +42,7 @@ export const TrackerActiveBar = forwardRef<
   {
     active_entry,
     sheets,
+    known_tags,
     is_pending,
     on_check_out,
     on_delete,
@@ -68,6 +70,7 @@ export const TrackerActiveBar = forwardRef<
               key={`${active_entry.sheetName}-${active_entry.id}`}
               entry={active_entry}
               sheets={sheets}
+              known_tags={known_tags}
               in_bar
               is_pending={is_pending}
               on_check_out={on_check_out}

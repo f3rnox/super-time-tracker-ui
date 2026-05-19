@@ -1,5 +1,6 @@
 import { get_sheet } from "@/lib/get_sheet";
 import { has_string_value } from "@/lib/has_string_value";
+import { parse_entry_from_input } from "@/lib/parse_entry_from_input";
 import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
 import { read_db } from "@/lib/read_db";
 import { validate_entry_times } from "@/lib/validate_entry_times";
@@ -30,7 +31,18 @@ export async function edit_entry(args: EditEntryArgs): Promise<TimeSheetEntry> {
   let did_update = false;
 
   if (has_string_value(description)) {
-    entry.description = description.trim();
+    const parsed = parse_entry_from_input(
+      entry.id,
+      description,
+      entry.start,
+      entry.end,
+    );
+
+    entry.description =
+      parsed.description.length > 0
+        ? parsed.description
+        : description.trim();
+    entry.tags = parsed.tags;
     did_update = true;
   }
 

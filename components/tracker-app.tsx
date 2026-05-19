@@ -167,6 +167,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           ref={active_entry_panel_ref}
           active_entry={state.activeEntry}
           sheets={state.sheets}
+          known_tags={state.knownTags}
           is_pending={is_pending}
           on_check_out={(at) =>
             run_action(() =>
@@ -282,6 +283,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
               title="Entries"
               entries={filtered_entries}
               sheets={state.sheets}
+              known_tags={state.knownTags}
               total_ms={filtered_total_ms}
               empty_message={entries_empty_message}
               is_pending={is_pending}

@@ -2,12 +2,14 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
+import { ActiveEntryDescriptionInline } from '@/components/active-entry-description-inline'
 import { CheckoutButtonGroup } from '@/components/checkout-button-group'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { EntryNotesList } from '@/components/entry-notes-list'
 import { NoteForm } from '@/components/note-form'
+import { PencilIcon } from '@/components/pencil-icon'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
@@ -30,6 +32,7 @@ export interface ActiveEntryPanelHandle {
 interface ActiveEntryPanelProps {
   entry: SerializedEntry
   sheets: SerializedSheet[]
+  known_tags: string[]
   in_bar?: boolean
   on_check_out: (at?: string) => void
   on_delete: () => void
@@ -44,6 +47,9 @@ interface ActiveEntryPanelProps {
 const tag_item_class =
   'rounded-full bg-tag-bg px-2 py-0.5 text-xs text-tag-text'
 
+const description_edit_button_class =
+  'inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[0.35rem] border-0 bg-transparent p-0 text-muted hover:bg-surface-hover hover:text-foreground disabled:cursor-not-allowed disabled:opacity-55'
+
 /**
  * Shows the running active entry with a live duration timer.
  */
@@ -54,6 +60,7 @@ export const ActiveEntryPanel = forwardRef<
   {
     entry,
     sheets,
+    known_tags,
     in_bar = false,
     on_check_out,
     on_delete,
@@ -71,28 +78,31 @@ export const ActiveEntryPanel = forwardRef<
   const duration_format = use_duration_format()
   const show_seconds = use_timer_show_seconds()
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
-  const [is_editing, set_is_editing] = useState(false)
+  const [is_editing_description, set_is_editing_description] = useState(false)
+  const [is_editing_times, set_is_editing_times] = useState(false)
   const [is_adding_note, set_is_adding_note] = useState(false)
 
   useImperativeHandle(
     ref,
     () => ({
       start_edit: () => {
-        if (!is_editing) {
-          set_is_editing(true)
+        if (!is_editing_description && !is_editing_times) {
+          set_is_editing_description(true)
         }
       },
       start_add_note: () => {
-        if (!is_editing && !is_adding_note) {
+        if (!is_editing_description && !is_editing_times && !is_adding_note) {
           set_is_adding_note(true)
         }
       },
     }),
-    [is_adding_note, is_editing],
+    [is_adding_note, is_editing_description, is_editing_times],
   )
 
   useEffect(() => {
     set_is_adding_note(false)
+    set_is_editing_description(false)
+    set_is_editing_times(false)
   }, [entry.id, entry.sheetName])
 
   useEffect(() => {
@@ -105,7 +115,8 @@ export const ActiveEntryPanel = forwardRef<
     return () => window.clearInterval(interval)
   }, [entry.durationMs, entry.start])
 
-  const panel_class = get_active_panel_class_name(in_bar, is_editing)
+  const is_panel_editing = is_editing_description || is_editing_times
+  const panel_class = get_active_panel_class_name(in_bar, is_panel_editing)
 
   const handle_delete_note = async (timestamp: string): Promise<void> => {
     const note = entry.notes.find((item) => item.timestamp === timestamp)
@@ -118,17 +129,19 @@ export const ActiveEntryPanel = forwardRef<
     }
   }
 
-  if (is_editing) {
+  if (is_editing_times) {
     return (
       <section className={panel_class}>
         <EntryEditForm
           entry={entry}
+          known_tags={known_tags}
           is_pending={is_pending}
           in_active_panel
-          on_cancel={() => set_is_editing(false)}
+          times_only
+          on_cancel={() => set_is_editing_times(false)}
           on_save={(values) => {
             on_edit(values)
-            set_is_editing(false)
+            set_is_editing_times(false)
           }}
         />
       </section>
@@ -138,21 +151,46 @@ export const ActiveEntryPanel = forwardRef<
   return (
     <section className={panel_class}>
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1.5">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {!in_bar ? (
             <span className="self-start rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on">
               Tracking
             </span>
           ) : null}
-          <h2 className="m-0 text-xl font-[650] leading-tight tracking-tight">
-            {entry.description || 'Untitled entry'}
-          </h2>
+          {is_editing_description ? (
+            <ActiveEntryDescriptionInline
+              entry={entry}
+              known_tags={known_tags}
+              is_pending={is_pending}
+              on_cancel={() => set_is_editing_description(false)}
+              on_save={(description) => {
+                on_edit({ description })
+                set_is_editing_description(false)
+              }}
+            />
+          ) : (
+            <div className="inline-flex max-w-full flex-wrap items-center gap-1">
+              <h2 className="m-0 text-xl font-[650] leading-tight tracking-tight">
+                {entry.description || 'Untitled entry'}
+              </h2>
+              <button
+                type="button"
+                className={description_edit_button_class}
+                aria-label="Edit description"
+                title="Edit description"
+                disabled={is_pending || is_adding_note}
+                onClick={() => set_is_editing_description(true)}
+              >
+                <PencilIcon />
+              </button>
+            </div>
+          )}
         </div>
         <EntryActionsMenu
           current_sheet_name={entry.sheetName}
           sheets={sheets}
           is_pending={is_pending}
-          on_edit={() => set_is_editing(true)}
+          on_edit={() => set_is_editing_times(true)}
           on_show_add_note_form={() => set_is_adding_note(true)}
           on_move={on_move}
           on_delete={async () => {
@@ -171,7 +209,7 @@ export const ActiveEntryPanel = forwardRef<
           <p className="m-0 font-mono text-[2rem] font-medium leading-none tracking-tight text-accent">
             {format_duration(duration_ms, duration_format, show_seconds)}
           </p>
-          {entry.tags.length > 0 ? (
+          {!is_editing_description && entry.tags.length > 0 ? (
             <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
               {entry.tags.map((tag) => (
                 <li key={tag} className={tag_item_class}>
@@ -188,7 +226,7 @@ export const ActiveEntryPanel = forwardRef<
             <button
               type="button"
               className={`${get_button_class_name('ghost')} max-[860px]:flex-1`}
-              disabled={is_pending}
+              disabled={is_pending || is_editing_description}
               onClick={() => set_is_adding_note(true)}
             >
               Add note

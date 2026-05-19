@@ -20,7 +20,7 @@ export function get_tracker_keyboard_shortcut_sections(): KeyboardShortcutSectio
         },
         {
           label: 'E',
-          description: 'Edit active entry',
+          description: 'Edit active entry description',
         },
         {
           label: 'N',
