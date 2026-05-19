@@ -11,7 +11,7 @@ import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
  * Cloud account status and sign-out control for Settings.
  */
 export function CloudAccountSetting(): React.ReactElement | null {
-  const pathname = usePathname() ?? '/settings/data'
+  const pathname = usePathname() ?? '/settings/cloud-sync'
   const { email, is_configured, is_pending, sign_out } = use_supabase_auth_session()
 
   if (!is_configured) {
@@ -23,7 +23,7 @@ export function CloudAccountSetting(): React.ReactElement | null {
   return (
     <div className="flex w-full flex-col gap-3">
       <div className="flex flex-col gap-0.5">
-        <h2 className="m-0 text-[0.95rem] font-semibold">Cloud sync</h2>
+        <h2 className="m-0 text-[0.95rem] font-semibold">Account</h2>
         <p className="m-0 text-[0.8rem] leading-snug text-muted">
           When signed in, tracker data and settings sync to your Supabase project
           instead of the local db.json file.

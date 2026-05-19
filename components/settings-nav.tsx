@@ -21,6 +21,11 @@ const items: SettingsNavItem[] = [
     match: (pathname) => pathname.startsWith('/settings/display'),
   },
   {
+    href: '/settings/cloud-sync',
+    label: 'Cloud sync',
+    match: (pathname) => pathname.startsWith('/settings/cloud-sync'),
+  },
+  {
     href: '/settings/data',
     label: 'Data & backup',
     match: (pathname) => pathname.startsWith('/settings/data'),

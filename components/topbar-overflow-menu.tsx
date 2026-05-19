@@ -111,6 +111,16 @@ export function TopbarOverflowMenu(): React.ReactElement {
               Manage tags
             </Link>
           </li>
+          <li role="none">
+            <Link
+              href="/settings/cloud-sync"
+              className={menu_item_class}
+              role="menuitem"
+              onClick={close_menu}
+            >
+              Cloud sync
+            </Link>
+          </li>
           <li
             className="my-1 border-t border-panel-border"
             role="separator"
