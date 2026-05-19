@@ -33,10 +33,13 @@ export async function write_supabase_ui_preferences(
 
   const merged = { ...cloud, ...preferences }
 
-  const { error: write_error } = await supabase
-    .from('tracker_accounts')
-    .update({ ui_preferences: merged })
-    .eq('user_id', user_id)
+  const { error: write_error } = await supabase.from('tracker_accounts').upsert(
+    {
+      user_id,
+      ui_preferences: merged,
+    },
+    { onConflict: 'user_id' },
+  )
 
   if (write_error !== null) {
     throw new Error(`Failed to save UI preferences: ${write_error.message}`)

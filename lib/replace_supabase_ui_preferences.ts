@@ -10,10 +10,13 @@ export async function replace_supabase_ui_preferences(
 ): Promise<void> {
   const supabase = await create_server_supabase_client()
 
-  const { error } = await supabase
-    .from('tracker_accounts')
-    .update({ ui_preferences: preferences })
-    .eq('user_id', user_id)
+  const { error } = await supabase.from('tracker_accounts').upsert(
+    {
+      user_id,
+      ui_preferences: preferences,
+    },
+    { onConflict: 'user_id' },
+  )
 
   if (error !== null) {
     throw new Error(`Failed to save UI preferences: ${error.message}`)

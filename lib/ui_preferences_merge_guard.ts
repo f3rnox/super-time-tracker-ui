@@ -1,3 +1,6 @@
+import { take_pending_ui_preferences_cloud_sync } from '@/lib/pending_ui_preferences_cloud_sync'
+import { run_ui_preferences_cloud_sync } from '@/lib/run_ui_preferences_cloud_sync'
+
 let active_merge_count = 0
 
 /**
@@ -19,5 +22,9 @@ export async function with_ui_preferences_merge_guard<T>(
     return await work()
   } finally {
     active_merge_count -= 1
+
+    if (active_merge_count === 0 && take_pending_ui_preferences_cloud_sync()) {
+      run_ui_preferences_cloud_sync()
+    }
   }
 }
