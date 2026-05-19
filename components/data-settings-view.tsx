@@ -1,9 +1,6 @@
 import Link from 'next/link'
 
 import { BackupRestoreSetting } from '@/components/backup-restore-setting'
-import { CloudAccountSetting } from '@/components/cloud-account-setting'
-import { CloudSyncActions } from '@/components/cloud-sync-actions'
-import { GreedyCloudSyncSetting } from '@/components/greedy-cloud-sync-setting'
 import { SettingsPageLayout } from '@/components/settings-page-layout'
 
 interface DataSettingsViewProps {
@@ -27,15 +24,6 @@ export function DataSettingsView({ db_path }: DataSettingsViewProps) {
         className="m-0 flex w-full list-none flex-col gap-2 p-0"
         aria-label="Data settings"
       >
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <CloudAccountSetting />
-        </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <GreedyCloudSyncSetting />
-        </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <CloudSyncActions />
-        </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <BackupRestoreSetting db_path={db_path} />
         </li>
