@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.8](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.7...v0.1.8) (2026-05-19)
+
+
+### Bug Fixes
+
+* displayed hostname on bin exec ([5900f24](https://github.com/f3rnox/super-time-tracker-ui/commit/5900f24f88de9f45a7c089e2f68e7852db397e4a))
+
 ### 0.1.7 (2026-05-19)
 
 
