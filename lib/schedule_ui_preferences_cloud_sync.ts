@@ -1,5 +1,6 @@
 import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
 import { is_supabase_configured } from '@/lib/is_supabase_configured'
+import { is_ui_preferences_merge_in_progress } from '@/lib/ui_preferences_merge_guard'
 
 let sync_timeout: ReturnType<typeof setTimeout> | null = null
 
@@ -7,7 +8,11 @@ let sync_timeout: ReturnType<typeof setTimeout> | null = null
  * Debounces pushing local UI preferences to the cloud API.
  */
 export function schedule_ui_preferences_cloud_sync(): void {
-  if (typeof window === 'undefined' || !is_supabase_configured()) {
+  if (
+    typeof window === 'undefined' ||
+    !is_supabase_configured() ||
+    is_ui_preferences_merge_in_progress()
+  ) {
     return
   }
 

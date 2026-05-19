@@ -7,6 +7,7 @@ import { CloudSyncProvider } from '@/components/cloud-sync-provider'
 import { ToastNotifications } from '@/components/toast-notifications'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
+import { UiPreferencesDocumentSync } from '@/components/ui-preferences-document-sync'
 import { theme_init_script } from '@/lib/theme_init_script'
 import { ui_settings_init_script } from '@/lib/ui_settings_init_script'
 
@@ -50,6 +51,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: ui_settings_init_script }}
         />
         <ThemeModeSystemListener />
+        <UiPreferencesDocumentSync />
         <ConfirmDialogProvider>
           <CloudSyncProvider>
             <AppKeyboardShortcuts />
