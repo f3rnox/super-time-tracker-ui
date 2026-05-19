@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.9](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.7...v0.1.9) (2026-05-19)
+
+
+### Features
+
+* add keyboard shortcuts ([ec469b7](https://github.com/f3rnox/super-time-tracker-ui/commit/ec469b7180d9cc7f74777bab511ac3a1e8bc0509))
+* support escape to cancel operations ([5ec7145](https://github.com/f3rnox/super-time-tracker-ui/commit/5ec7145a9f1814ed425e5d75dbea47862e08e0f3))
+
+
+### Bug Fixes
+
+* displayed hostname on bin exec ([fc6eb6e](https://github.com/f3rnox/super-time-tracker-ui/commit/fc6eb6e1ae3ff5f5b57c3f178f9aec5b627a65cc))
+
 ### [0.1.8](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.7...v0.1.8) (2026-05-19)
 
 
