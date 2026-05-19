@@ -28,10 +28,11 @@
   },
   "files": [
     "bin",
-    ".next/standalone"
+    "dist/standalone"
   ],
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/stop-standalone-server.js",
     "build": "next build",
     "postbuild": "node scripts/sync-standalone-assets.js",
     "start": "next start",
@@ -48,7 +49,7 @@
     "lint:markdownlint:fix": "markdownlint --fix README.md",
     "prepare": "husky",
     "prepare-release": "pnpm build && git add docs",
-    "prepublishOnly": "pnpm build && node scripts/sync-standalone-assets.js",
+    "prepublishOnly": "pnpm build",
     "release": "pnpm prepare-release && pnpm update-version && git push --follow-tags origin main",
     "serve:coverage": "http-server ./coverage",
     "serve:docs": "http-server ./docs",

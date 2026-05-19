@@ -2,7 +2,7 @@
 'use strict'
 
 const { spawn } = require('child_process')
-const { existsSync, cpSync } = require('fs')
+const { existsSync } = require('fs')
 const { join } = require('path')
 
 const root = join(__dirname, '..')
@@ -13,27 +13,8 @@ if (process.argv.includes('--version') || process.argv.includes('-V')) {
   process.exit(0)
 }
 
-const standalone_dir = join(root, '.next', 'standalone')
+const standalone_dir = join(root, 'dist', 'standalone')
 const server_js = join(standalone_dir, 'server.js')
-
-/**
- * Copies build artifacts required by the Next.js standalone server.
- */
-function sync_standalone_assets() {
-  const static_src = join(root, '.next', 'static')
-  const static_dest = join(standalone_dir, '.next', 'static')
-
-  if (existsSync(static_src)) {
-    cpSync(static_src, static_dest, { recursive: true })
-  }
-
-  const public_src = join(root, 'public')
-  const public_dest = join(standalone_dir, 'public')
-
-  if (existsSync(public_src)) {
-    cpSync(public_src, public_dest, { recursive: true })
-  }
-}
 
 if (!existsSync(server_js)) {
   console.error(
@@ -41,8 +22,6 @@ if (!existsSync(server_js)) {
   )
   process.exit(1)
 }
-
-sync_standalone_assets()
 
 const port = process.env.PORT ?? '3000'
 const hostname = process.env.HOSTNAME ?? '127.0.0.1'

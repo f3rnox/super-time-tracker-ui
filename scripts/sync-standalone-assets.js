@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 'use strict'
 
-const { existsSync, cpSync } = require('fs')
+const { existsSync, cpSync, rmSync } = require('fs')
 const { join } = require('path')
 
 const root = join(__dirname, '..')
-const standalone_dir = join(root, '.next', 'standalone')
+const next_standalone = join(root, 'next-output', 'standalone')
+const dist_standalone = join(root, 'dist', 'standalone')
+const server_js = join(next_standalone, 'server.js')
 
 /**
- * Copies static and public assets into the Next.js standalone output directory.
+ * Copies static and public assets into a standalone directory.
+ * @param {string} standalone_dir
  */
-function sync_standalone_assets() {
-  const static_src = join(root, '.next', 'static')
+function sync_assets_into(standalone_dir) {
+  const static_src = join(root, 'next-output', 'static')
   const static_dest = join(standalone_dir, '.next', 'static')
 
   if (existsSync(static_src)) {
@@ -26,4 +29,15 @@ function sync_standalone_assets() {
   }
 }
 
-sync_standalone_assets()
+if (!existsSync(server_js)) {
+  console.error('`next-output/standalone` is missing. Run `pnpm build` first.')
+  process.exit(1)
+}
+
+sync_assets_into(next_standalone)
+
+if (existsSync(dist_standalone)) {
+  rmSync(dist_standalone, { recursive: true, force: true })
+}
+
+cpSync(next_standalone, dist_standalone, { recursive: true })
