@@ -3,6 +3,7 @@ import { notify_theme_subscribers } from "@/lib/subscribe_theme";
 import { read_document_theme } from "@/lib/read_document_theme";
 import { theme_mode_preference } from "@/lib/preferences/theme_mode_preference";
 import { type Theme } from "@/lib/types/theme";
+import { write_document_preference_cookies } from "@/lib/write_document_preference_cookies";
 import { write_stored_theme } from "@/lib/write_stored_theme";
 
 /**
@@ -15,6 +16,10 @@ export function toggle_theme(): void {
   apply_theme(next_theme);
   write_stored_theme(next_theme);
   theme_mode_preference.write(next_theme);
+  write_document_preference_cookies({
+    theme_mode: next_theme,
+    theme: next_theme,
+  });
   theme_mode_preference.notify();
   notify_theme_subscribers();
 }
