@@ -22,6 +22,7 @@ import { format_duration } from '@/lib/format_duration'
 import { get_date_range_ms_from_inputs } from '@/lib/get_date_range_ms_from_inputs'
 import { get_initial_reporting_range_inputs } from '@/lib/get_initial_reporting_range_inputs'
 import { parse_reporting_source_sheets } from '@/lib/parse_reporting_source_sheets'
+import { round_chart_percent } from '@/lib/round_chart_percent'
 import { sort_sheet_report_stats } from '@/lib/sort_sheet_report_stats'
 import { use_duration_format } from '@/lib/use_duration_format'
 import { use_week_starts_on } from '@/lib/use_week_starts_on'
@@ -35,6 +36,7 @@ import {
 
 interface ReportingViewProps {
   source_sheets: ReportingSourceSheet[]
+  reference_now: number
 }
 
 const empty_range: ReportingDateRangeInputs = {
@@ -45,7 +47,10 @@ const empty_range: ReportingDateRangeInputs = {
 /**
  * Reporting dashboard with tag/time charts, trends, and a month-in-review summary.
  */
-export function ReportingView({ source_sheets }: ReportingViewProps) {
+export function ReportingView({
+  source_sheets,
+  reference_now,
+}: ReportingViewProps) {
   const duration_format = use_duration_format()
   const week_starts_on = use_week_starts_on()
   const [active_tab, set_active_tab] = useState<ReportingViewTab>('dashboard')
@@ -54,11 +59,20 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
   )
   const [range_inputs, set_range_inputs] =
     useState<ReportingDateRangeInputs>(empty_range)
+  const [calculation_now, set_calculation_now] = useState(reference_now)
 
   useEffect(() => {
     set_range_inputs(get_initial_reporting_range_inputs(undefined, week_starts_on))
     set_sort(default_reporting_sort_preference.read())
   }, [week_starts_on])
+
+  useEffect(() => {
+    set_calculation_now(reference_now)
+  }, [reference_now])
+
+  useEffect(() => {
+    set_calculation_now(Date.now())
+  }, [range_inputs, source_sheets, week_starts_on])
 
   const sheets = useMemo(
     () => parse_reporting_source_sheets(source_sheets),
@@ -83,22 +97,21 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
 
   const week_starts_on_index = week_starts_on_to_index(week_starts_on)
   const { stats, analytics } = useMemo(() => {
-    const now = Date.now()
     return {
       stats: build_reporting_stats(
         sheets,
         date_range,
-        now,
+        calculation_now,
         week_starts_on_index,
       ),
       analytics: build_reporting_analytics(
         sheets,
         date_range,
-        now,
+        calculation_now,
         week_starts_on_index,
       ),
     }
-  }, [sheets, date_range, week_starts_on_index])
+  }, [sheets, date_range, week_starts_on_index, calculation_now])
 
   const {
     activeSheets,
@@ -386,7 +399,10 @@ function SheetStatsRow({
 }: SheetStatsRowProps) {
   const share_percent =
     grand_total_ms > 0 ? Math.round((sheet.totalMs / grand_total_ms) * 100) : 0
-  const bar_percent = grand_total_ms > 0 ? (sheet.totalMs / grand_total_ms) * 100 : 0
+  const bar_percent =
+    grand_total_ms > 0
+      ? round_chart_percent((sheet.totalMs / grand_total_ms) * 100)
+      : 0
 
   return (
     <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">

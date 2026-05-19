@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 
 import { format_duration } from '@/lib/format_duration'
+import { round_chart_percent } from '@/lib/round_chart_percent'
 import { type WeekdayTimeStat } from '@/lib/types/reporting'
 import { type DurationFormat } from '@/lib/types/ui_preferences'
 
@@ -51,7 +52,9 @@ export function ReportingWeekdayBars({
         <ul className="m-0 flex flex-col gap-1.5 p-0">
           {weekday_distribution.map((stat) => {
             const width_percent =
-              max_ms > 0 ? (stat.totalMs / max_ms) * 100 : 0
+              max_ms > 0
+                ? round_chart_percent((stat.totalMs / max_ms) * 100)
+                : 0
 
             return (
               <li

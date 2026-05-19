@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 
 import { format_duration } from '@/lib/format_duration'
+import { round_chart_percent } from '@/lib/round_chart_percent'
 import { type DailyTimeBucket } from '@/lib/types/reporting'
 import { type DurationFormat } from '@/lib/types/ui_preferences'
 
@@ -67,7 +68,9 @@ export function ReportingDailyBarChart({
         <div className="flex h-44 items-end gap-[3px] overflow-x-auto pb-2">
           {visible_buckets.map((bucket) => {
             const height_percent =
-              max_ms > 0 ? (bucket.totalMs / max_ms) * 100 : 0
+              max_ms > 0
+                ? round_chart_percent((bucket.totalMs / max_ms) * 100)
+                : 0
             const is_weekend =
               bucket.weekdayIndex === 0 || bucket.weekdayIndex === 6
             const has_time = bucket.totalMs > 0

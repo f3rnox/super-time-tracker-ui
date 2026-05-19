@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import { format_duration } from '@/lib/format_duration'
 import { get_tag_chart_color } from '@/lib/get_tag_chart_color'
+import { round_svg_coord } from '@/lib/round_svg_coord'
 import { type DurationFormat } from '@/lib/types/ui_preferences'
 import { type TagTimeStat } from '@/lib/types/reporting'
 
@@ -252,7 +253,7 @@ function polar_to_cartesian(
   radius: number,
 ): { x: number; y: number } {
   return {
-    x: CENTER + radius * Math.sin(angle_radians),
-    y: CENTER - radius * Math.cos(angle_radians),
+    x: round_svg_coord(CENTER + radius * Math.sin(angle_radians)),
+    y: round_svg_coord(CENTER - radius * Math.cos(angle_radians)),
   }
 }

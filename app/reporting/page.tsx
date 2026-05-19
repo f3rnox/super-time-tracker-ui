@@ -6,6 +6,9 @@ import { get_reporting_stats } from '@/lib/get_reporting_stats'
  */
 export default async function ReportingPage() {
   const { sourceSheets } = await get_reporting_stats()
+  const reference_now = Date.now()
 
-  return <ReportingView source_sheets={sourceSheets} />
+  return (
+    <ReportingView source_sheets={sourceSheets} reference_now={reference_now} />
+  )
 }
