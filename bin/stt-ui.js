@@ -25,11 +25,12 @@ if (!existsSync(server_js)) {
 
 const port = process.env.PORT ?? '3000'
 const hostname = process.env.STT_UI_HOSTNAME ?? '127.0.0.1'
+const { HOSTNAME: _machine_hostname, ...env } = process.env
 
 const child = spawn(process.execPath, [server_js], {
   cwd: standalone_dir,
   env: {
-    ...process.env,
+    ...env,
     NODE_ENV: 'production',
     HOSTNAME: hostname,
     PORT: port,
