@@ -1,5 +1,5 @@
 import { collect_known_tags } from '@/lib/collect_known_tags'
-import { DB_PATH } from '@/lib/config'
+import { resolve_db_path_label } from '@/lib/resolve_db_path_label'
 import { get_sheet } from '@/lib/get_sheet'
 import { get_serialized_entries_total_ms } from '@/lib/get_serialized_entries_total_ms'
 import { read_db } from '@/lib/read_db'
@@ -49,7 +49,7 @@ export async function get_tracker_state(
   const running_entry = active_sheet_entry ?? running_entries[0] ?? null
 
   return {
-    dbPath: DB_PATH,
+    dbPath: await resolve_db_path_label(),
     activeSheetName,
     knownTags: collect_known_tags(db),
     sheets: sheets.map((sheet) => ({

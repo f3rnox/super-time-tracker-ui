@@ -1,3 +1,4 @@
+import { schedule_ui_preferences_cloud_sync } from '@/lib/schedule_ui_preferences_cloud_sync'
 import {
   ACTIVE_SHEET_COOKIE_NAME,
   ACTIVE_SHEET_STORAGE_KEY,
@@ -15,6 +16,7 @@ export function write_active_sheet_preference(sheet_name: string): void {
 
   try {
     window.localStorage.setItem(ACTIVE_SHEET_STORAGE_KEY, trimmed)
+    schedule_ui_preferences_cloud_sync()
   } catch {
     // Ignore storage failures in private browsing.
   }

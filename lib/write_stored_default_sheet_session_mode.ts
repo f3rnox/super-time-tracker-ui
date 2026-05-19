@@ -1,3 +1,4 @@
+import { schedule_ui_preferences_cloud_sync } from '@/lib/schedule_ui_preferences_cloud_sync'
 import { type DefaultSheetSessionMode } from '@/lib/types/ui_settings'
 import {
   DEFAULT_SHEET_SESSION_MODE_COOKIE_NAME,
@@ -12,6 +13,7 @@ export function write_stored_default_sheet_session_mode(
 ): void {
   try {
     window.localStorage.setItem(DEFAULT_SHEET_SESSION_MODE_STORAGE_KEY, mode)
+    schedule_ui_preferences_cloud_sync()
   } catch {
     // Ignore storage failures in private browsing.
   }

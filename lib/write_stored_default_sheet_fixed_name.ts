@@ -1,3 +1,4 @@
+import { schedule_ui_preferences_cloud_sync } from '@/lib/schedule_ui_preferences_cloud_sync'
 import {
   DEFAULT_SHEET_FIXED_NAME_COOKIE_NAME,
   DEFAULT_SHEET_FIXED_NAME_STORAGE_KEY,
@@ -15,6 +16,7 @@ export function write_stored_default_sheet_fixed_name(sheet_name: string): void 
 
   try {
     window.localStorage.setItem(DEFAULT_SHEET_FIXED_NAME_STORAGE_KEY, trimmed)
+    schedule_ui_preferences_cloud_sync()
   } catch {
     // Ignore storage failures in private browsing.
   }

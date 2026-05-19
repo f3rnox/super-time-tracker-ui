@@ -1,4 +1,4 @@
-import { read_stored_sheet_tag_filters } from '@/lib/read_stored_sheet_tag_filters'
+import { schedule_ui_preferences_cloud_sync } from '@/lib/schedule_ui_preferences_cloud_sync'
 import { SHEET_TAG_FILTERS_STORAGE_KEY } from '@/lib/types/ui_settings'
 
 /**
@@ -12,6 +12,7 @@ export function write_stored_sheet_tag_filters(
       SHEET_TAG_FILTERS_STORAGE_KEY,
       JSON.stringify(filters),
     )
+    schedule_ui_preferences_cloud_sync()
   } catch {
     // Ignore storage failures in private browsing.
   }

@@ -1,3 +1,5 @@
+import { schedule_ui_preferences_cloud_sync } from '@/lib/schedule_ui_preferences_cloud_sync'
+
 type PreferenceListener = () => void
 
 export interface UiPreferenceStore<T extends string> {
@@ -48,6 +50,7 @@ export function create_ui_preference_store<T extends string>(
   const write = (value: T): void => {
     try {
       window.localStorage.setItem(storage_key, value)
+      schedule_ui_preferences_cloud_sync()
     } catch {
       // Ignore storage failures.
     }

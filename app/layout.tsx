@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import Script from 'next/script'
 
 import { AppKeyboardShortcuts } from '@/components/app-keyboard-shortcuts'
+import { CloudSyncProvider } from '@/components/cloud-sync-provider'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { theme_init_script } from '@/lib/theme_init_script'
@@ -49,8 +50,10 @@ export default function RootLayout({
         />
         <ThemeModeSystemListener />
         <ConfirmDialogProvider>
-          <AppKeyboardShortcuts />
-          {children}
+          <CloudSyncProvider>
+            <AppKeyboardShortcuts />
+            {children}
+          </CloudSyncProvider>
         </ConfirmDialogProvider>
       </body>
     </html>

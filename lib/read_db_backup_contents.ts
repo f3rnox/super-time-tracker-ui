@@ -1,22 +1,12 @@
-import { promises as fs } from 'node:fs'
-
-import { DB_PATH } from '@/lib/config'
+import { convert_db_to_json } from '@/lib/convert_db_to_json'
 import { read_db } from '@/lib/read_db'
-import { write_db } from '@/lib/write_db'
 
 /**
- * Reads the on-disk database JSON used for backup downloads.
+ * Reads the tracker database JSON used for backup downloads.
  */
-export async function read_db_backup_contents(
-  db_path: string = DB_PATH,
-): Promise<string> {
-  try {
-    return await fs.readFile(db_path, 'utf-8')
-  } catch {
-    const db = await read_db(db_path)
+export async function read_db_backup_contents(): Promise<string> {
+  const db = await read_db()
+  const json_db = convert_db_to_json(db)
 
-    await write_db(db, db_path)
-
-    return await fs.readFile(db_path, 'utf-8')
-  }
+  return JSON.stringify(json_db, null, 2)
 }
