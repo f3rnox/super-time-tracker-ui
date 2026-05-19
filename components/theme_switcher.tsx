@@ -29,10 +29,10 @@ export function ThemeSwitcher() {
       title={switch_label}
       suppressHydrationWarning
     >
+      <span suppressHydrationWarning>{active_label}</span>
       <span className="text-base leading-none" aria-hidden="true">
         {theme === 'dark' ? '☾' : '☀'}
       </span>
-      <span suppressHydrationWarning>{active_label}</span>
     </button>
   )
 }

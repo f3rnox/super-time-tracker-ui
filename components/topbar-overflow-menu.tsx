@@ -127,9 +127,9 @@ export function TopbarOverflowMenu(): React.ReactElement {
               }}
               suppressHydrationWarning
             >
-              <span className="inline-flex items-center gap-2">
-                <span aria-hidden="true">{theme === 'dark' ? '☾' : '☀'}</span>
+              <span className="inline-flex w-full items-center justify-between gap-2">
                 <span>{active_theme_label} theme</span>
+                <span aria-hidden="true">{theme === 'dark' ? '☾' : '☀'}</span>
               </span>
             </button>
           </li>
@@ -143,8 +143,12 @@ export function TopbarOverflowMenu(): React.ReactElement {
                 open_shortcuts_dialog()
               }}
             >
-              Keyboard shortcuts
-              <span className="ml-1 text-muted">(?)</span>
+              <span className="inline-flex w-full items-center justify-between gap-2">
+                <span>Keyboard shortcuts</span>
+                <span className="text-muted" aria-hidden="true">
+                  (?)
+                </span>
+              </span>
             </button>
           </li>
           {is_configured ? (
