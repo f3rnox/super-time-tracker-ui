@@ -150,7 +150,7 @@ export const ActiveEntryPanel = forwardRef<
 
   return (
     <section className={panel_class}>
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex shrink-0 items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {!in_bar ? (
             <span className="self-start rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on">
@@ -204,7 +204,7 @@ export const ActiveEntryPanel = forwardRef<
           }}
         />
       </div>
-      <div className="flex items-end justify-between gap-4 max-[860px]:flex-col max-[860px]:items-stretch">
+      <div className="flex shrink-0 items-end justify-between gap-4 max-[860px]:flex-col max-[860px]:items-stretch">
         <div className="flex min-w-0 flex-col gap-2">
           <p className="m-0 font-mono text-[2rem] font-medium leading-none tracking-tight text-accent">
             {format_duration(duration_ms, duration_format, show_seconds)}
@@ -248,6 +248,7 @@ export const ActiveEntryPanel = forwardRef<
         on_delete_note={handle_delete_note}
       />
       {is_adding_note ? (
+        <div className="shrink-0">
         <NoteForm
           in_active_panel
           in_bar={in_bar}
@@ -259,6 +260,7 @@ export const ActiveEntryPanel = forwardRef<
             set_is_adding_note(false)
           }}
         />
+        </div>
       ) : null}
     </section>
   )

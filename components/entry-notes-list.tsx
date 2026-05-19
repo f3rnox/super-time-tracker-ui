@@ -39,7 +39,7 @@ export function EntryNotesList({
   const [editing_timestamp, set_editing_timestamp] = useState<string | null>(
     null,
   )
-  const [is_expanded, set_is_expanded] = useState(false)
+  const [is_expanded, set_is_expanded] = useState(variant === 'panel')
 
   if (notes.length === 0) {
     return null
@@ -51,7 +51,9 @@ export function EntryNotesList({
   )
 
   const is_inline = variant === 'inline'
-  const is_list_visible = is_expanded || editing_timestamp !== null
+  const is_panel_in_bar = variant === 'panel' && in_bar
+  const is_list_visible =
+    is_panel_in_bar || is_expanded || editing_timestamp !== null
   const toggle_label = is_inline
     ? `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`
     : `Notes (${notes.length})`
@@ -61,6 +63,7 @@ export function EntryNotesList({
     in_bar && !is_inline
       ? 'border-[color-mix(in_srgb,var(--accent-border)_65%,var(--panel-border))]'
       : '',
+    is_panel_in_bar ? 'flex min-h-0 flex-1 flex-col' : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -69,13 +72,23 @@ export function EntryNotesList({
     ? 'inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 font-inherit text-xs font-medium normal-case tracking-normal text-muted hover:text-foreground'
     : 'inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent px-0 py-0.5 font-inherit text-[0.72rem] font-semibold uppercase tracking-[0.04em] text-muted hover:text-foreground'
 
+  const list_visibility_class = is_list_visible
+    ? is_panel_in_bar
+      ? ''
+      : 'mt-1.5'
+    : 'hidden'
+
   const list_class = is_inline
-    ? `m-0 flex list-none flex-col gap-1.5 overflow-visible p-0 compact:gap-0.5 ${is_list_visible ? 'mt-1.5' : 'hidden'}`
-    : `m-0 grid max-h-48 list-none grid-cols-2 gap-2 overflow-y-auto p-0 max-[860px]:grid-cols-1 ${is_list_visible ? 'mt-1.5' : 'hidden'}`
+    ? `m-0 flex list-none flex-col gap-1.5 overflow-visible p-0 compact:gap-0.5 ${list_visibility_class}`
+    : is_panel_in_bar
+      ? `m-0 grid min-h-0 flex-1 list-none auto-rows-fr grid-cols-2 gap-2 p-0 max-[860px]:grid-cols-1 ${list_visibility_class}`
+      : `m-0 grid list-none grid-cols-2 gap-2 p-0 max-[860px]:grid-cols-1 ${list_visibility_class}`
 
   const item_class = is_inline
     ? 'flex flex-col gap-0.5 rounded-sm border border-panel-border bg-ghost-bg px-2 py-1.5 compact:rounded-none compact:px-1.5 compact:py-1'
-    : 'flex flex-col gap-0.5 rounded-sm border border-panel-border bg-[color-mix(in_srgb,var(--panel)_55%,var(--background))] px-2.5 py-2'
+    : is_panel_in_bar
+      ? 'flex min-h-0 flex-col justify-center gap-0.5 rounded-sm border border-panel-border bg-[color-mix(in_srgb,var(--panel)_55%,var(--background))] px-2.5 py-2'
+      : 'flex flex-col gap-0.5 rounded-sm border border-panel-border bg-[color-mix(in_srgb,var(--panel)_55%,var(--background))] px-2.5 py-2'
 
   const handle_save = (timestamp: string, text: string): void => {
     on_edit_note?.(timestamp, text)
@@ -148,15 +161,17 @@ export function EntryNotesList({
 
   return (
     <section className={root_class} aria-label="Entry notes">
-      <button
-        type="button"
-        className={toggle_class}
-        aria-expanded={is_list_visible}
-        onClick={handle_toggle}
-      >
-        <ChevronIcon rotated={is_list_visible} />
-        <span>{toggle_label}</span>
-      </button>
+      {is_panel_in_bar ? null : (
+        <button
+          type="button"
+          className={toggle_class}
+          aria-expanded={is_list_visible}
+          onClick={handle_toggle}
+        >
+          <ChevronIcon rotated={is_list_visible} />
+          <span>{toggle_label}</span>
+        </button>
+      )}
       <ul className={list_class}>
         {sorted_notes.map((note, index) => {
           const is_editing = editing_timestamp === note.timestamp

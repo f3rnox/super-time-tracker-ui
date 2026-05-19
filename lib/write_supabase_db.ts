@@ -1,31 +1,20 @@
 import { create_server_supabase_client } from '@/lib/create_server_supabase_client'
+import { sync_supabase_sheet_entries } from '@/lib/sync_supabase_sheet_entries'
 import { type TimeTrackerDB } from '@/lib/types'
 
-interface SheetInsertRow {
+interface SheetUpsertRow {
   user_id: string
   name: string
   active_entry_id: number | null
 }
 
-interface EntryInsertRow {
-  sheet_id: string
-  id: number
-  start_at: string
-  end_at: string | null
-  description: string
-  tags: string[]
-}
-
-interface NoteInsertRow {
-  sheet_id: string
-  entry_id: number
-  note_index: number
-  noted_at: string
-  text: string
+interface ExistingSheetRow {
+  id: string
+  name: string
 }
 
 /**
- * Replaces the user's cloud tracker data with the in-memory database.
+ * Persists the in-memory database to Supabase for the signed-in user.
  */
 export async function write_supabase_db(
   db: TimeTrackerDB,
@@ -33,49 +22,56 @@ export async function write_supabase_db(
 ): Promise<void> {
   const supabase = await create_server_supabase_client()
 
-  const { error: account_error } = await supabase.from('tracker_accounts').upsert({
-    user_id,
-    active_sheet_name: db.activeSheetName,
-    db_version: db.version,
-    updated_at: new Date().toISOString(),
-  })
+  const { error: account_error } = await supabase.from('tracker_accounts').upsert(
+    {
+      user_id,
+      active_sheet_name: db.activeSheetName,
+      db_version: db.version,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' },
+  )
 
   if (account_error !== null) {
     throw new Error(`Failed to save tracker account: ${account_error.message}`)
   }
 
-  const { data: existing_sheets, error: list_error } = await supabase
+  const { data: existing_sheet_rows, error: list_error } = await supabase
     .from('sheets')
-    .select('id')
+    .select('id, name')
     .eq('user_id', user_id)
 
   if (list_error !== null) {
     throw new Error(`Failed to list sheets: ${list_error.message}`)
   }
 
-  const existing_ids = (existing_sheets ?? []).map((row) => (row as { id: string }).id)
+  const existing_sheets = (existing_sheet_rows ?? []) as ExistingSheetRow[]
+  const desired_sheet_names = new Set(db.sheets.map((sheet) => sheet.name))
+  const sheet_ids_to_delete = existing_sheets
+    .filter((sheet) => !desired_sheet_names.has(sheet.name))
+    .map((sheet) => sheet.id)
 
-  if (existing_ids.length > 0) {
+  if (sheet_ids_to_delete.length > 0) {
     const { error: delete_error } = await supabase
       .from('sheets')
       .delete()
-      .in('id', existing_ids)
+      .in('id', sheet_ids_to_delete)
 
     if (delete_error !== null) {
-      throw new Error(`Failed to clear sheets: ${delete_error.message}`)
+      throw new Error(`Failed to remove deleted sheets: ${delete_error.message}`)
     }
   }
 
   for (const sheet of db.sheets) {
-    const sheet_insert: SheetInsertRow = {
+    const sheet_row: SheetUpsertRow = {
       user_id,
       name: sheet.name,
       active_entry_id: sheet.activeEntryID,
     }
 
-    const { data: inserted_sheet, error: sheet_error } = await supabase
+    const { data: upserted_sheet, error: sheet_error } = await supabase
       .from('sheets')
-      .insert(sheet_insert)
+      .upsert(sheet_row, { onConflict: 'user_id,name' })
       .select('id')
       .single()
 
@@ -83,53 +79,8 @@ export async function write_supabase_db(
       throw new Error(`Failed to save sheet "${sheet.name}": ${sheet_error.message}`)
     }
 
-    const sheet_id = (inserted_sheet as { id: string }).id
+    const sheet_id = (upserted_sheet as { id: string }).id
 
-    if (sheet.entries.length === 0) {
-      continue
-    }
-
-    const entry_rows: EntryInsertRow[] = sheet.entries.map((entry) => ({
-      sheet_id,
-      id: entry.id,
-      start_at: entry.start.toISOString(),
-      end_at: entry.end === null ? null : entry.end.toISOString(),
-      description: entry.description,
-      tags: entry.tags,
-    }))
-
-    const { error: entries_error } = await supabase.from('entries').insert(entry_rows)
-
-    if (entries_error !== null) {
-      throw new Error(
-        `Failed to save entries for "${sheet.name}": ${entries_error.message}`,
-      )
-    }
-
-    const note_rows: NoteInsertRow[] = []
-
-    for (const entry of sheet.entries) {
-      entry.notes.forEach((note, note_index) => {
-        note_rows.push({
-          sheet_id,
-          entry_id: entry.id,
-          note_index,
-          noted_at: note.timestamp.toISOString(),
-          text: note.text,
-        })
-      })
-    }
-
-    if (note_rows.length === 0) {
-      continue
-    }
-
-    const { error: notes_error } = await supabase.from('entry_notes').insert(note_rows)
-
-    if (notes_error !== null) {
-      throw new Error(
-        `Failed to save notes for "${sheet.name}": ${notes_error.message}`,
-      )
-    }
+    await sync_supabase_sheet_entries(supabase, sheet_id, sheet)
   }
 }

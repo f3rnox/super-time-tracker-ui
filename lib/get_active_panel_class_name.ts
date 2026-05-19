@@ -16,5 +16,5 @@ export function get_active_panel_class_name(
     return `${base} rounded-md border border-accent-border bg-[color-mix(in_srgb,var(--panel)_70%,var(--background))] p-3.5`
   }
 
-  return 'flex flex-col gap-3.5 border-0 bg-transparent p-0 shadow-none'
+  return 'flex min-h-[11rem] flex-1 flex-col gap-3.5 border-0 bg-transparent p-0 shadow-none'
 }
