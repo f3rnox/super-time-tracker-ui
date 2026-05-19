@@ -26,9 +26,14 @@
   "bin": {
     "stt-ui": "./bin/stt-ui.js"
   },
+  "files": [
+    "bin",
+    ".next/standalone"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/sync-standalone-assets.js",
     "start": "next start",
     "stt-ui": "node bin/stt-ui.js",
     "format": "pnpm format:prettier",
@@ -43,7 +48,7 @@
     "lint:markdownlint:fix": "markdownlint --fix README.md",
     "prepare": "husky",
     "prepare-release": "pnpm build && git add docs",
-    "prepublish": "pnpm build",
+    "prepublishOnly": "pnpm build && node scripts/sync-standalone-assets.js",
     "release": "pnpm prepare-release && pnpm update-version && git push --follow-tags origin main",
     "serve:coverage": "http-server ./coverage",
     "serve:docs": "http-server ./docs",
