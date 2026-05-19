@@ -6,6 +6,13 @@ const { existsSync, cpSync, unlinkSync } = require('fs')
 const { join } = require('path')
 
 const root = join(__dirname, '..')
+const { version } = require('../package.json')
+
+if (process.argv.includes('--version') || process.argv.includes('-V')) {
+  process.stdout.write(`${version}\n`)
+  process.exit(0)
+}
+
 const standalone_dir = join(root, '.next', 'standalone')
 const server_js = join(standalone_dir, 'server.js')
 const build_lock = join(root, '.next', 'lock')
