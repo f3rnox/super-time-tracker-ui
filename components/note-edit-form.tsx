@@ -4,6 +4,7 @@ import { type FormEvent, useState } from 'react'
 
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 
 interface NoteEditFormProps {
   initial_text: string
@@ -24,6 +25,9 @@ export function NoteEditForm({
   on_cancel,
 }: NoteEditFormProps) {
   const [text, set_text] = useState(initial_text)
+
+  use_escape_to_cancel(on_cancel)
+
   const line_count = initial_text.split('\n').length
   const rows = Math.min(6, Math.max(2, line_count))
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
+import { is_modal_dialog_open } from '@/lib/is_modal_dialog_open'
 import { keyboard_event_matches_binding } from '@/lib/keyboard_event_matches_binding'
 import { should_ignore_keyboard_shortcut } from '@/lib/should_ignore_keyboard_shortcut'
 import { type KeyboardShortcutBinding } from '@/lib/types/keyboard_shortcut'
@@ -21,7 +22,7 @@ export function use_document_keyboard_shortcuts(
         return
       }
 
-      if (document.querySelector('[role="dialog"][aria-modal="true"]') !== null) {
+      if (is_modal_dialog_open()) {
         return
       }
 

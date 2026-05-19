@@ -4,6 +4,7 @@ import { type FormEvent, useState } from 'react'
 
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 
 interface NoteFormProps {
   on_submit: (text: string, at?: string) => void
@@ -27,6 +28,8 @@ export function NoteForm({
 }: NoteFormProps) {
   const [text, set_text] = useState('')
   const [at, set_at] = useState('')
+
+  use_escape_to_cancel(() => on_cancel?.(), on_cancel !== undefined)
 
   const handle_submit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

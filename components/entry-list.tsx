@@ -15,6 +15,7 @@ import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { get_entry_row_key } from '@/lib/get_entry_row_key'
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
+import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { use_duration_format } from '@/lib/use_duration_format'
 import { use_time_format } from '@/lib/use_time_format'
 import {
@@ -147,6 +148,8 @@ export function EntryList({
   }
 
   const has_selection = selected_entries.length > 0
+
+  use_escape_to_cancel(clear_selection, has_selection && editing_key === null)
 
   return (
     <section className="min-w-0">

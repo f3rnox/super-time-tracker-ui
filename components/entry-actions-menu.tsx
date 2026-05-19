@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { HamburgerIcon } from '@/components/hamburger-icon'
 import { prompt_entry_note } from '@/lib/prompt_entry_note'
+import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
 interface EntryActionsMenuProps {
@@ -74,6 +75,8 @@ export function EntryActionsMenu({
   const close_menu = (): void => {
     set_is_open(false)
   }
+
+  use_escape_to_cancel(close_menu, is_open)
 
   return (
     <div className="relative shrink-0" ref={menu_ref}>

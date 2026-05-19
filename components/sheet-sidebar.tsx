@@ -8,6 +8,7 @@ import { get_delete_sheet_confirm_dialog } from '@/lib/get_delete_sheet_confirm_
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
 interface SheetSidebarProps {
@@ -62,6 +63,8 @@ export function SheetSidebar({
     set_editing_sheet_name(null)
     set_edited_sheet_name('')
   }
+
+  use_escape_to_cancel(cancel_rename, editing_sheet_name !== null)
 
   const handle_rename = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()

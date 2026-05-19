@@ -5,6 +5,7 @@ import { type FormEvent, useState } from 'react'
 import { format_datetime_hint } from '@/components/format_datetime_hint'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { type SerializedEntry } from '@/lib/types/tracker_state'
 
 export interface EntryEditFormValues {
@@ -32,6 +33,8 @@ export function EntryEditForm({
 }: EntryEditFormProps) {
   const [start, set_start] = useState('')
   const [end, set_end] = useState('')
+
+  use_escape_to_cancel(on_cancel)
 
   const handle_submit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
