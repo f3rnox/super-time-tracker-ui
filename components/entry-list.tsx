@@ -8,6 +8,7 @@ import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { EntryNotesList } from '@/components/entry-notes-list'
 import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit-form'
 import { EntryListBulkBar } from '@/components/entry-list-bulk-bar'
+import { EntryListSortControls } from '@/components/entry-list-sort-controls'
 import { format_time } from '@/components/format_time'
 import { get_delete_entries_confirm_dialog } from '@/lib/get_delete_entries_confirm_dialog'
 import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
@@ -171,8 +172,9 @@ export function EntryList({
             on_clear={clear_selection}
           />
         ) : (
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2.5">
+          <>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2.5">
               {entries.length > 0 ? (
                 <Checkbox
                   className="shrink-0"
@@ -197,7 +199,9 @@ export function EntryList({
             <p className="m-0 font-mono text-[0.85rem] text-muted">
               {format_duration(total_ms, duration_format)} total
             </p>
-          </div>
+            </div>
+            <EntryListSortControls is_pending={is_pending} />
+          </>
         )}
       </header>
       {entries.length === 0 ? (
