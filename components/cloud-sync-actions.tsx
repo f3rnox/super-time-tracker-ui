@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { type CloudSyncStatus } from '@/lib/get_cloud_sync_status'
+import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
 import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
 
 type SyncAction = 'push' | 'pull'
@@ -84,13 +85,12 @@ export function CloudSyncActions(): React.ReactElement | null {
     set_error(null)
 
     try {
-      const response = await fetch(`/api/sync/${action}`, { method: 'POST' })
-
-      if (!response.ok) {
-        const body = (await response.json()) as { error?: string }
-
-        throw new Error(body.error ?? `${action} failed`)
-      }
+      await run_tracker_db_cloud_sync({
+        action,
+        on_complete: () => {
+          router.refresh()
+        },
+      })
 
       set_message(
         action === 'push'
@@ -99,7 +99,6 @@ export function CloudSyncActions(): React.ReactElement | null {
       )
 
       await load_status()
-      router.refresh()
     } catch (action_error: unknown) {
       set_error(
         action_error instanceof Error

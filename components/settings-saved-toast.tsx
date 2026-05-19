@@ -49,7 +49,7 @@ export function SettingsSavedToast() {
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-md border border-accent-border bg-panel px-4 py-2.5 text-[0.88rem] font-medium text-foreground shadow-md transition-[opacity,transform] duration-200"
+      className="w-full rounded-md border border-accent-border bg-panel px-4 py-2.5 text-[0.88rem] font-medium text-foreground shadow-md transition-[opacity,transform] duration-200"
     >
       {message || SETTINGS_SAVED_DEFAULT_MESSAGE}
     </div>

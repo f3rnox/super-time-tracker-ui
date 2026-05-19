@@ -4,7 +4,6 @@ import { merge_time_tracker_dbs } from '@/lib/merge_time_tracker_dbs'
 import { read_local_db_if_exists } from '@/lib/read_local_db_if_exists'
 import { read_supabase_db } from '@/lib/read_supabase_db'
 import { write_local_db } from '@/lib/write_local_db'
-import { write_supabase_db } from '@/lib/write_supabase_db'
 import { type TimeTrackerDB } from '@/lib/types'
 
 export interface SyncTrackerDbOnLoadResult {
@@ -13,7 +12,7 @@ export interface SyncTrackerDbOnLoadResult {
 }
 
 /**
- * Merges local db.json with cloud data on load and persists the result to Supabase.
+ * Merges local db.json with cloud data on load and persists the result locally.
  */
 export async function sync_tracker_db_on_load(): Promise<SyncTrackerDbOnLoadResult> {
   if (!is_supabase_configured()) {
@@ -30,17 +29,21 @@ export async function sync_tracker_db_on_load(): Promise<SyncTrackerDbOnLoadResu
   const local_db = await read_local_db_if_exists()
 
   if (local_db === null) {
+    if (cloud_db.sheets.length > 0) {
+      await write_local_db(cloud_db)
+      return { synced: true, merged: cloud_db }
+    }
+
     return { synced: false, merged: cloud_db }
   }
 
   if (cloud_db.sheets.length === 0) {
-    await write_supabase_db(local_db, user_id)
+    await write_local_db(local_db)
     return { synced: true, merged: local_db }
   }
 
   const merged = merge_time_tracker_dbs(cloud_db, local_db, 'incoming')
 
-  await write_supabase_db(merged, user_id)
   await write_local_db(merged)
 
   return { synced: true, merged }

@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 
+import { schedule_tracker_db_cloud_sync } from '@/lib/schedule_tracker_db_cloud_sync'
+
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_restore_db_confirm_dialog } from '@/lib/get_restore_db_confirm_dialog'
@@ -102,6 +104,7 @@ export function BackupRestoreSetting({ db_path }: BackupRestoreSettingProps) {
       }
 
       set_status_message('Backup restored. Opening tracker…')
+      schedule_tracker_db_cloud_sync()
       router.push('/')
       router.refresh()
     } catch (restore_error: unknown) {

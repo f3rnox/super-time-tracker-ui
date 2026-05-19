@@ -4,7 +4,6 @@ import { TrackerApp } from '@/components/tracker-app'
 import { get_initial_preferred_sheet_name } from '@/lib/get_initial_preferred_sheet_name'
 import { get_tracker_state } from '@/lib/get_tracker_state'
 import { read_db } from '@/lib/read_db'
-import { sync_tracker_db_on_load } from '@/lib/sync_tracker_db_on_load'
 import {
   ACTIVE_SHEET_COOKIE_NAME,
   DEFAULT_SHEET_FIXED_NAME_COOKIE_NAME,
@@ -13,8 +12,6 @@ import {
 
 export default async function Home() {
   const cookie_store = await cookies()
-
-  await sync_tracker_db_on_load()
 
   const db = await read_db()
   const preferred_sheet = get_initial_preferred_sheet_name(db, {
