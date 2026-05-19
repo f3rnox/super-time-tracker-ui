@@ -79,11 +79,9 @@ export function CloudSyncProvider({
     const run_merge_on_load = (refresh_after: boolean): void => {
       void run_tracker_db_cloud_sync({
         merge_on_load: true,
-        on_complete: refresh_after
-          ? () => {
-              router.refresh()
-            }
-          : undefined,
+        on_complete: () => {
+          router.refresh()
+        },
       })
         .then(() => sync_preferences())
         .catch(() => {

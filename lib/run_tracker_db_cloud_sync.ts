@@ -33,7 +33,12 @@ export async function run_tracker_db_cloud_sync(
       }
     }
 
-    const sync_response = await fetch(`/api/sync/${action}`, { method: 'POST' })
+    const push_url =
+      options.merge_on_load === true && action === 'push'
+        ? '/api/sync/push?verbatim=true'
+        : `/api/sync/${action}`
+
+    const sync_response = await fetch(push_url, { method: 'POST' })
 
     if (!sync_response.ok) {
       const body = (await sync_response.json()) as { error?: string }

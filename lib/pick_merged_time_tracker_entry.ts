@@ -43,11 +43,17 @@ export function pick_merged_time_tracker_entry(
   const incoming_running = incoming.end === null
 
   if (base_running && !incoming_running) {
-    return { ...base, notes: merge_entry_notes(base.notes, incoming.notes) }
+    const winner = prefer === 'base' ? base : incoming
+    const loser = winner === base ? incoming : base
+
+    return { ...winner, notes: merge_entry_notes(winner.notes, loser.notes) }
   }
 
   if (incoming_running && !base_running) {
-    return { ...incoming, notes: merge_entry_notes(base.notes, incoming.notes) }
+    const winner = prefer === 'base' ? base : incoming
+    const loser = winner === base ? incoming : base
+
+    return { ...winner, notes: merge_entry_notes(winner.notes, loser.notes) }
   }
 
   if (base_running && incoming_running) {

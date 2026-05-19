@@ -42,7 +42,7 @@ export async function sync_tracker_db_on_load(): Promise<SyncTrackerDbOnLoadResu
     return { synced: true, merged: local_db }
   }
 
-  const merged = merge_time_tracker_dbs(cloud_db, local_db, 'incoming')
+  const merged = merge_time_tracker_dbs(cloud_db, local_db, 'base')
 
   await write_local_db(merged)
 

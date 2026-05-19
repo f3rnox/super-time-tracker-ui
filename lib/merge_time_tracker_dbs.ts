@@ -121,39 +121,68 @@ function pick_merged_active_entry_id(
   }
 
   if (base_entry === null) {
-    return incoming_entry!.id
+    return normalize_active_entry_id(incoming_entry!.id, entries)
   }
 
   if (incoming_entry === null) {
-    return base_entry.id
+    return normalize_active_entry_id(base_entry.id, entries)
   }
 
   if (base_entry.end === null && incoming_entry.end !== null) {
-    return base_entry.id
+    return prefer === 'base' ? base_entry.id : null
   }
 
   if (incoming_entry.end === null && base_entry.end !== null) {
-    return incoming_entry.id
+    return prefer === 'base' ? null : incoming_entry.id
   }
 
   if (base_entry.end === null && incoming_entry.end === null) {
     if (base_entry.start.getTime() === incoming_entry.start.getTime()) {
-      return prefer === 'incoming' ? incoming_entry.id : base_entry.id
+      return normalize_active_entry_id(
+        prefer === 'incoming' ? incoming_entry.id : base_entry.id,
+        entries,
+      )
     }
 
-    return base_entry.start.getTime() > incoming_entry.start.getTime()
-      ? base_entry.id
-      : incoming_entry.id
+    return normalize_active_entry_id(
+      base_entry.start.getTime() > incoming_entry.start.getTime()
+        ? base_entry.id
+        : incoming_entry.id,
+      entries,
+    )
   }
 
   const base_end = base_entry.end!.getTime()
   const incoming_end = incoming_entry.end!.getTime()
 
   if (base_end === incoming_end) {
-    return prefer === 'incoming' ? incoming_entry.id : base_entry.id
+    return normalize_active_entry_id(
+      prefer === 'incoming' ? incoming_entry.id : base_entry.id,
+      entries,
+    )
   }
 
-  return base_end > incoming_end ? base_entry.id : incoming_entry.id
+  return normalize_active_entry_id(
+    base_end > incoming_end ? base_entry.id : incoming_entry.id,
+    entries,
+  )
+}
+
+function normalize_active_entry_id(
+  active_id: number | null,
+  entries: TimeSheetEntry[],
+): number | null {
+  if (active_id === null) {
+    return null
+  }
+
+  const entry = entries.find((item) => item.id === active_id)
+
+  if (entry === undefined || entry.end !== null) {
+    return null
+  }
+
+  return active_id
 }
 
 function pick_merged_active_sheet_name(
