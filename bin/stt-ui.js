@@ -46,24 +46,57 @@ function browser_hostname(bind_hostname) {
 }
 
 /**
- * Opens a URL in the system default browser.
+ * Commands to open a URL, in fallback order.
+ * @param {string} url
+ * @returns {[string, string[]][]}
+ */
+function browser_openers(url) {
+  if (process.platform === 'darwin') {
+    return [['open', [url]]]
+  }
+
+  if (process.platform === 'win32') {
+    return [['cmd', ['/c', 'start', '', url]]]
+  }
+
+  return [
+    ['xdg-open', [url]],
+    ['wslview', [url]],
+    ['sensible-browser', [url]],
+  ]
+}
+
+/**
+ * Opens a URL in the system default browser; no-op if no opener is available.
  * @param {string} url
  */
 function open_browser(url) {
-  /** @type {[string, string[]]} */
-  const opener =
-    process.platform === 'darwin'
-      ? ['open', [url]]
-      : process.platform === 'win32'
-        ? ['cmd', ['/c', 'start', '', url]]
-        : ['xdg-open', [url]]
+  const openers = browser_openers(url)
+  let index = 0
 
-  const child = spawn(opener[0], opener[1], {
-    detached: true,
-    stdio: 'ignore',
-  })
+  const try_next = () => {
+    if (index >= openers.length) {
+      return
+    }
 
-  child.unref()
+    const [command, args] = openers[index]
+    index += 1
+
+    const child = spawn(command, args, {
+      detached: true,
+      stdio: 'ignore',
+    })
+
+    child.on('error', (err) => {
+      if (err.code === 'ENOENT') {
+        try_next()
+      }
+    })
+
+    child.unref()
+  }
+
+  try_next()
 }
 
 /**
