@@ -1,15 +1,14 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import Script from 'next/script'
 
 import { AppKeyboardShortcuts } from '@/components/app-keyboard-shortcuts'
 import { CloudSyncProvider } from '@/components/cloud-sync-provider'
 import { ToastNotifications } from '@/components/toast-notifications'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
+import { DocumentPreferencesInit } from '@/components/document-preferences-init'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { UiPreferencesDocumentSync } from '@/components/ui-preferences-document-sync'
-import { theme_init_script } from '@/lib/theme_init_script'
-import { ui_settings_init_script } from '@/lib/ui_settings_init_script'
+import { read_document_attrs_from_cookies } from '@/lib/read_document_attrs_from_cookies'
 
 import './globals.css'
 
@@ -28,28 +27,24 @@ export const metadata: Metadata = {
   description: 'Web UI for the super-time-tracker CLI time sheets',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const { theme, palette, compact_lists } = await read_document_attrs_from_cookies()
+
   return (
     <html
       lang="en"
       className={`${geist_sans.variable} ${geist_mono.variable} h-full antialiased`}
+      data-theme={theme}
+      data-palette={palette}
+      data-compact-lists={compact_lists ? 'true' : 'false'}
       suppressHydrationWarning
     >
       <body className="min-h-full font-sans transition-[background-color,color] duration-200">
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: theme_init_script }}
-        />
-        <Script
-          id="ui-settings-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: ui_settings_init_script }}
-        />
+        <DocumentPreferencesInit />
         <ThemeModeSystemListener />
         <UiPreferencesDocumentSync />
         <ConfirmDialogProvider>

@@ -6,6 +6,7 @@ import { apply_theme } from '@/lib/apply_theme'
 import { notify_theme_subscribers } from '@/lib/subscribe_theme'
 import { resolve_theme_mode_to_theme } from '@/lib/resolve_theme_mode_to_theme'
 import { theme_mode_preference } from '@/lib/preferences/theme_mode_preference'
+import { write_document_preference_cookies } from '@/lib/write_document_preference_cookies'
 import { write_stored_theme } from '@/lib/write_stored_theme'
 
 /**
@@ -29,6 +30,7 @@ export function ThemeModeSystemListener() {
 
       apply_theme(resolved)
       write_stored_theme(resolved)
+      write_document_preference_cookies({ theme_mode: 'system', theme: resolved })
       notify_theme_subscribers()
     }
 

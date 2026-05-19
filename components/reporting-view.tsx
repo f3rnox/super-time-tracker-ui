@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 
 import { ReportingActivityHeatmap } from '@/components/reporting-activity-heatmap'
 import { ReportingDailyBarChart } from '@/components/reporting-daily-bar-chart'
@@ -50,11 +50,15 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
   const week_starts_on = use_week_starts_on()
   const [active_tab, set_active_tab] = useState<ReportingViewTab>('dashboard')
   const [sort, set_sort] = useState<SheetReportSort>(() =>
-    default_reporting_sort_preference.read(),
+    default_reporting_sort_preference.get_server_snapshot(),
   )
-  const [range_inputs, set_range_inputs] = useState<ReportingDateRangeInputs>(
-    () => get_initial_reporting_range_inputs(undefined, week_starts_on),
-  )
+  const [range_inputs, set_range_inputs] =
+    useState<ReportingDateRangeInputs>(empty_range)
+
+  useEffect(() => {
+    set_range_inputs(get_initial_reporting_range_inputs(undefined, week_starts_on))
+    set_sort(default_reporting_sort_preference.read())
+  }, [week_starts_on])
 
   const sheets = useMemo(
     () => parse_reporting_source_sheets(source_sheets),
