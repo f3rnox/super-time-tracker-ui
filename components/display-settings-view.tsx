@@ -13,6 +13,11 @@ import { TimerInTitleSetting } from '@/components/timer-in-title-setting'
 import { TimerShowSecondsSetting } from '@/components/timer-show-seconds-setting'
 import { WeekStartsOnSetting } from '@/components/week-starts-on-setting'
 
+const setting_card_class =
+  'rounded-md border border-panel-border bg-panel p-3.5 shadow-sm'
+
+const setting_card_wide_class = `${setting_card_class} md:col-span-2`
+
 /**
  * Settings page: display, layout, and formatting preferences.
  */
@@ -27,46 +32,46 @@ export function DisplaySettingsView() {
       description="How things look across the tracker, reporting, and entry lists."
     >
       <ul
-        className="m-0 flex w-full list-none flex-col gap-2 p-0"
+        className="m-0 grid w-full list-none grid-cols-1 gap-2 p-0 md:grid-cols-2"
         aria-label="Display settings"
       >
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <ThemeModeSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <ColorPaletteSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <CompactListsSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <CheckInFormCollapsedSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <TimeFormatSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <DurationFormatSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_class}>
           <TimerShowSecondsSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_class}>
           <TimerInTitleSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <EntryListSortSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_class}>
           <TagFilterModeSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_class}>
           <WeekStartsOnSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <DefaultReportingSortSetting />
         </li>
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+        <li className={setting_card_wide_class}>
           <DefaultReportingRangeSetting />
         </li>
       </ul>

@@ -9,6 +9,12 @@ export type ColorPalette =
   | 'ocean'
   | 'forest'
   | 'contrast'
+  | 'sunset'
+  | 'lavender'
+  | 'rose'
+  | 'slate'
+  | 'nord'
+  | 'dracula'
 export const COLOR_PALETTE_STORAGE_KEY = 'super-time-tracker-color-palette'
 export const COLOR_PALETTE_DEFAULT: ColorPalette = 'default'
 export const COLOR_PALETTE_VALUES: ColorPalette[] = [
@@ -18,6 +24,12 @@ export const COLOR_PALETTE_VALUES: ColorPalette[] = [
   'ocean',
   'forest',
   'contrast',
+  'sunset',
+  'lavender',
+  'rose',
+  'slate',
+  'nord',
+  'dracula',
 ]
 
 export type TimeFormat = '12h' | '24h'

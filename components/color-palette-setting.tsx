@@ -43,6 +43,36 @@ const options: {
     label: 'High contrast',
     description: 'Stronger text and border contrast for readability.',
   },
+  {
+    value: 'sunset',
+    label: 'Sunset',
+    description: 'Warm oranges and pinks fading into deep plum.',
+  },
+  {
+    value: 'lavender',
+    label: 'Lavender',
+    description: 'Soft violet surfaces with cool highlights.',
+  },
+  {
+    value: 'rose',
+    label: 'Rose',
+    description: 'Blush pinks with rosy accents.',
+  },
+  {
+    value: 'slate',
+    label: 'Slate',
+    description: 'Neutral cool grays without color tinting.',
+  },
+  {
+    value: 'nord',
+    label: 'Nord',
+    description: 'Frosty arctic blues inspired by Nord.',
+  },
+  {
+    value: 'dracula',
+    label: 'Dracula',
+    description: 'Purple and magenta accents on deep night.',
+  },
 ]
 
 /**

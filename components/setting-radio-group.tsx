@@ -2,6 +2,8 @@
 
 import { type ReactNode } from 'react'
 
+import { get_setting_radio_options_grid_class } from '@/lib/get_setting_radio_options_grid_class'
+
 interface SettingRadioGroupOption<T extends string> {
   value: T
   label: string
@@ -40,36 +42,38 @@ export function SettingRadioGroup<T extends string>({
           {description}
         </p>
       ) : null}
-      <div className="flex flex-col gap-1.5">
+      <div className={get_setting_radio_options_grid_class(options.length)}>
         {options.map((option) => {
           const is_selected = option.value === value
 
           return (
             <label
               key={option.value}
-              className={`flex cursor-pointer items-start gap-2 rounded-md border px-2.5 py-2 transition-colors duration-150 ${
+              className={`flex h-full cursor-pointer flex-col gap-2 rounded-md border px-2.5 py-2 transition-colors duration-150 ${
                 is_selected
                   ? 'border-accent-border bg-accent-soft'
                   : 'border-panel-border hover:bg-surface-hover'
               }`}
             >
-              <input
-                type="radio"
-                className="mt-1 shrink-0"
-                name={name}
-                value={option.value}
-                checked={is_selected}
-                disabled={disabled}
-                onChange={() => on_change(option.value)}
-              />
-              <span className="flex flex-col gap-0.5">
-                <span className="text-[0.9rem] font-semibold">{option.label}</span>
-                {option.description !== undefined ? (
-                  <span className="text-[0.8rem] leading-snug text-muted">
-                    {option.description}
-                  </span>
-                ) : null}
+              <span className="flex items-start gap-2">
+                <input
+                  type="radio"
+                  className="mt-0.5 shrink-0"
+                  name={name}
+                  value={option.value}
+                  checked={is_selected}
+                  disabled={disabled}
+                  onChange={() => on_change(option.value)}
+                />
+                <span className="text-[0.9rem] font-semibold leading-snug">
+                  {option.label}
+                </span>
               </span>
+              {option.description !== undefined ? (
+                <span className="text-[0.8rem] leading-snug text-muted">
+                  {option.description}
+                </span>
+              ) : null}
             </label>
           )
         })}

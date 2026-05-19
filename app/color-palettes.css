@@ -258,3 +258,321 @@
   --shadow-md: 0 8px 24px #00000030;
   --body-gradient: none;
 }
+
+/* Sunset — warm orange/pink fading into plum */
+[data-theme='dark'][data-palette='sunset'] {
+  --background: #150a14;
+  --foreground: #fbe8df;
+  --panel: #1f1018;
+  --panel-border: #3a1f2c;
+  --surface-raised: #281422;
+  --surface-hover: #321a2a;
+  --muted: #c69aa6;
+  --input-bg: #170a14;
+  --ghost-bg: #2a1422;
+  --tag-bg: #3a1c2c;
+  --tag-text: #f4c9bb;
+  --overlay: #00000088;
+  --accent: #fb923c;
+  --accent-soft: #3a1a10;
+  --accent-border: #fb923c55;
+  --accent-text-on: #2a0c04;
+  --input-focus-border: #fb923c88;
+  --active-panel-bg: linear-gradient(160deg, #3a1a10 0%, #1f1018 55%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #4a1a24 0%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'][data-palette='sunset'] {
+  --background: #fdece4;
+  --foreground: #2a1410;
+  --panel: #fff8f2;
+  --panel-border: #f0c8b4;
+  --surface-raised: #fde6da;
+  --surface-hover: #f8d6c4;
+  --muted: #7a4a3a;
+  --input-bg: #ffffff;
+  --ghost-bg: #fbe2d4;
+  --tag-bg: #f6d2bf;
+  --tag-text: #5a2818;
+  --overlay: #2a141066;
+  --accent: #ea580c;
+  --accent-soft: #fff1e6;
+  --accent-border: #fdba7455;
+  --accent-text-on: #ffffff;
+  --input-focus-border: #ea580c88;
+  --active-panel-bg: linear-gradient(160deg, #fff1e6 0%, #fff8f2 50%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #fcd0b8 0%,
+    transparent 70%
+  );
+}
+
+/* Lavender — soft violets */
+[data-theme='dark'][data-palette='lavender'] {
+  --background: #0e0b16;
+  --foreground: #ece6f8;
+  --panel: #16121f;
+  --panel-border: #2e2540;
+  --surface-raised: #1d1828;
+  --surface-hover: #261f33;
+  --muted: #a89cc4;
+  --input-bg: #100d18;
+  --ghost-bg: #1f1a2a;
+  --tag-bg: #2a2238;
+  --tag-text: #cabbe2;
+  --overlay: #00000088;
+  --accent: #a78bfa;
+  --accent-soft: #241a3e;
+  --accent-border: #a78bfa55;
+  --accent-text-on: #1a0a2e;
+  --input-focus-border: #a78bfa88;
+  --active-panel-bg: linear-gradient(160deg, #241a3e 0%, #16121f 55%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #2a1f48 0%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'][data-palette='lavender'] {
+  --background: #ece6f6;
+  --foreground: #1a1226;
+  --panel: #fbf8ff;
+  --panel-border: #cfc3e4;
+  --surface-raised: #f1ebf8;
+  --surface-hover: #e6def0;
+  --muted: #5a4a78;
+  --input-bg: #ffffff;
+  --ghost-bg: #ece4f5;
+  --tag-bg: #ddd2ed;
+  --tag-text: #3a2858;
+  --overlay: #1a122666;
+  --accent: #7c3aed;
+  --accent-soft: #f3eaff;
+  --accent-border: #c4b5fd55;
+  --accent-text-on: #ffffff;
+  --input-focus-border: #7c3aed88;
+  --active-panel-bg: linear-gradient(160deg, #f3eaff 0%, #fbf8ff 50%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #d4c5ee 0%,
+    transparent 70%
+  );
+}
+
+/* Rose — blush pinks */
+[data-theme='dark'][data-palette='rose'] {
+  --background: #14080d;
+  --foreground: #f8e2e8;
+  --panel: #1d0e15;
+  --panel-border: #3a1c2a;
+  --surface-raised: #261220;
+  --surface-hover: #321828;
+  --muted: #c89aac;
+  --input-bg: #160910;
+  --ghost-bg: #2a1320;
+  --tag-bg: #381a2a;
+  --tag-text: #ebbccd;
+  --overlay: #00000088;
+  --accent: #fb7185;
+  --accent-soft: #3a1018;
+  --accent-border: #fb718555;
+  --accent-text-on: #2a060c;
+  --input-focus-border: #fb718588;
+  --active-panel-bg: linear-gradient(160deg, #3a1018 0%, #1d0e15 55%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #4a1424 0%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'][data-palette='rose'] {
+  --background: #fce5ec;
+  --foreground: #2a0c18;
+  --panel: #fff5f8;
+  --panel-border: #efc4d2;
+  --surface-raised: #fbe2ea;
+  --surface-hover: #f5cfdc;
+  --muted: #7a4858;
+  --input-bg: #ffffff;
+  --ghost-bg: #fadce5;
+  --tag-bg: #f4ccd9;
+  --tag-text: #5a1c2e;
+  --overlay: #2a0c1866;
+  --accent: #e11d48;
+  --accent-soft: #ffe4e9;
+  --accent-border: #fb718555;
+  --accent-text-on: #ffffff;
+  --input-focus-border: #e11d4888;
+  --active-panel-bg: linear-gradient(160deg, #ffe4e9 0%, #fff5f8 50%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #facdd8 0%,
+    transparent 70%
+  );
+}
+
+/* Slate — neutral cool gray */
+[data-theme='dark'][data-palette='slate'] {
+  --background: #0b0d10;
+  --foreground: #e6ecf2;
+  --panel: #14171c;
+  --panel-border: #2a3038;
+  --surface-raised: #1a1e25;
+  --surface-hover: #232830;
+  --muted: #94a0ad;
+  --input-bg: #0e1115;
+  --ghost-bg: #1c2129;
+  --tag-bg: #252b34;
+  --tag-text: #c0c8d2;
+  --overlay: #00000088;
+  --accent: #94a3b8;
+  --accent-soft: #1f242c;
+  --accent-border: #94a3b855;
+  --accent-text-on: #0b0d10;
+  --input-focus-border: #94a3b888;
+  --active-panel-bg: linear-gradient(160deg, #1f242c 0%, #14171c 55%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #1c2128 0%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'][data-palette='slate'] {
+  --background: #e6e9ee;
+  --foreground: #0d1118;
+  --panel: #f8f9fb;
+  --panel-border: #c4cad4;
+  --surface-raised: #eef0f4;
+  --surface-hover: #e2e6ed;
+  --muted: #4a5566;
+  --input-bg: #ffffff;
+  --ghost-bg: #e8ebf0;
+  --tag-bg: #d8dde4;
+  --tag-text: #2a3344;
+  --overlay: #0d111866;
+  --accent: #475569;
+  --accent-soft: #eef1f5;
+  --accent-border: #94a3b855;
+  --accent-text-on: #ffffff;
+  --input-focus-border: #47556988;
+  --active-panel-bg: linear-gradient(160deg, #eef1f5 0%, #f8f9fb 50%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #ccd2dc 0%,
+    transparent 70%
+  );
+}
+
+/* Nord — frosty arctic blues */
+[data-theme='dark'][data-palette='nord'] {
+  --background: #1a1f29;
+  --foreground: #eceff4;
+  --panel: #232936;
+  --panel-border: #3b4252;
+  --surface-raised: #2a303e;
+  --surface-hover: #353c4a;
+  --muted: #98a4b8;
+  --input-bg: #1e2330;
+  --ghost-bg: #2e3441;
+  --tag-bg: #3b4252;
+  --tag-text: #d8dee9;
+  --overlay: #00000080;
+  --accent: #88c0d0;
+  --accent-soft: #2c3a44;
+  --accent-border: #88c0d055;
+  --accent-text-on: #0f1620;
+  --input-focus-border: #88c0d088;
+  --active-panel-bg: linear-gradient(160deg, #2c3a44 0%, #232936 55%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #2e3a4a 0%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'][data-palette='nord'] {
+  --background: #eceff4;
+  --foreground: #2e3440;
+  --panel: #f9fafc;
+  --panel-border: #c8d0de;
+  --surface-raised: #e5e9f0;
+  --surface-hover: #d8dee9;
+  --muted: #4c566a;
+  --input-bg: #ffffff;
+  --ghost-bg: #e5e9f0;
+  --tag-bg: #d8dee9;
+  --tag-text: #2e3440;
+  --overlay: #2e344066;
+  --accent: #5e81ac;
+  --accent-soft: #e8eef5;
+  --accent-border: #81a1c155;
+  --accent-text-on: #ffffff;
+  --input-focus-border: #5e81ac88;
+  --active-panel-bg: linear-gradient(160deg, #e8eef5 0%, #f9fafc 50%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #c8d4e4 0%,
+    transparent 70%
+  );
+}
+
+/* Dracula — purple and magenta on deep night */
+[data-theme='dark'][data-palette='dracula'] {
+  --background: #1e1f29;
+  --foreground: #f8f8f2;
+  --panel: #282a36;
+  --panel-border: #44475a;
+  --surface-raised: #2f3142;
+  --surface-hover: #3a3c4e;
+  --muted: #a8acc4;
+  --input-bg: #21222c;
+  --ghost-bg: #353746;
+  --tag-bg: #44475a;
+  --tag-text: #f8f8f2;
+  --overlay: #00000088;
+  --accent: #ff79c6;
+  --accent-soft: #3a1e3a;
+  --accent-border: #ff79c655;
+  --accent-text-on: #1a0a18;
+  --input-focus-border: #ff79c688;
+  --active-panel-bg: linear-gradient(160deg, #3a1e3a 0%, #282a36 55%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #382a4a 0%,
+    transparent 70%
+  );
+}
+
+[data-theme='light'][data-palette='dracula'] {
+  --background: #f4eef8;
+  --foreground: #281a3e;
+  --panel: #fbf6ff;
+  --panel-border: #d4c0e8;
+  --surface-raised: #ede2f6;
+  --surface-hover: #e1d2ee;
+  --muted: #5a4a78;
+  --input-bg: #ffffff;
+  --ghost-bg: #ece0f4;
+  --tag-bg: #ddc8ec;
+  --tag-text: #3a1e58;
+  --overlay: #281a3e66;
+  --accent: #c026d3;
+  --accent-soft: #fae8ff;
+  --accent-border: #e879f955;
+  --accent-text-on: #ffffff;
+  --input-focus-border: #c026d388;
+  --active-panel-bg: linear-gradient(160deg, #fae8ff 0%, #fbf6ff 50%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #e0c8f0 0%,
+    transparent 70%
+  );
+}
