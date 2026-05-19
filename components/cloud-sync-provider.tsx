@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
-import { apply_ui_preferences_record } from '@/lib/apply_ui_preferences_record'
+import { apply_ui_preferences_from_record } from '@/lib/apply_ui_preferences_from_record'
 import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
 import { create_browser_supabase_client } from '@/lib/create_browser_supabase_client'
 import {
@@ -63,15 +63,17 @@ export function CloudSyncProvider({
         preferences?: Record<string, string>
       }
       const cloud_preferences = payload.preferences ?? {}
-      const merged = { ...cloud_preferences, ...local_preferences }
+      const merged = { ...local_preferences, ...cloud_preferences }
 
-      apply_ui_preferences_record(merged)
+      apply_ui_preferences_from_record(merged)
 
-      if (Object.keys(local_preferences).length > 0) {
+      const applied_preferences = collect_ui_preferences_from_window()
+
+      if (Object.keys(applied_preferences).length > 0) {
         await fetch('/api/ui-preferences', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ preferences: local_preferences }),
+          body: JSON.stringify({ preferences: applied_preferences }),
         })
       }
     }
