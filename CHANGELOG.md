@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 * add ability to edit active entry description ([697cdc8](https://github.com/f3rnox/super-time-tracker-ui/commit/697cdc883360f13a7756ed94e92c5445e4ef79b3))
 
+### Bug Fixes
+
+* bin hostname ([8450404](https://github.com/f3rnox/super-time-tracker-ui/commit/845040402f8d6728dcde93ac5ff0435d497e671b))
+
 ### [0.1.9](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.7...v0.1.9) (2026-05-19)
 
 
