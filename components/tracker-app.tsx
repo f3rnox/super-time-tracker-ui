@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
-import { CheckInFormCollapsible } from '@/components/check-in-form-collapsible'
+import { type ActiveEntryPanelHandle } from '@/components/active-entry-panel'
+import {
+  CheckInFormCollapsible,
+  type CheckInFormCollapsibleHandle,
+} from '@/components/check-in-form-collapsible'
+import { TrackerKeyboardShortcuts } from '@/components/tracker-keyboard-shortcuts'
 import { EntryTagFilter } from '@/components/entry-tag-filter'
 import { EntryList } from '@/components/entry-list'
 import { SheetSidebar } from '@/components/sheet-sidebar'
@@ -73,6 +78,8 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   const entry_list_sort = use_entry_list_sort()
   const clear_tag_filters_on_sheet_change = use_clear_tag_filters_on_sheet_change()
   const previous_active_sheet_ref = useRef<string | null>(null)
+  const check_in_form_ref = useRef<CheckInFormCollapsibleHandle>(null)
+  const active_entry_panel_ref = useRef<ActiveEntryPanelHandle>(null)
 
   useEffect(() => {
     if (
@@ -135,9 +142,29 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   return (
     <>
       <TrackerDocumentTitle active_entry={state.activeEntry} />
+      <TrackerKeyboardShortcuts
+        sheets={state.sheets}
+        active_sheet_name={active_sheet}
+        active_entry={state.activeEntry}
+        is_pending={is_pending}
+        check_in_form_ref={check_in_form_ref}
+        active_entry_panel_ref={active_entry_panel_ref}
+        on_select_sheet={(name) =>
+          run_action(() => post_tracker_action('/api/sheet', { name }))
+        }
+        on_check_out={(at) =>
+          run_action(() =>
+            post_tracker_action('/api/out', {
+              sheetName: active_sheet,
+              ...(at !== undefined ? { at } : {}),
+            }),
+          )
+        }
+      />
       <div className="relative z-1">
         <TrackerTopbar />
         <TrackerActiveBar
+          ref={active_entry_panel_ref}
           active_entry={state.activeEntry}
           sheets={state.sheets}
           is_pending={is_pending}
@@ -235,6 +262,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           <main className="flex min-w-0 flex-col gap-4 rounded-lg border border-panel-border bg-panel p-4 shadow-sm">
             {state.activeEntry === null ? (
               <CheckInFormCollapsible
+                ref={check_in_form_ref}
                 known_tags={state.knownTags}
                 is_pending={is_pending}
                 on_submit={(values) =>

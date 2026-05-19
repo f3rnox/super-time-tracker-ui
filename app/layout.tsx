@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Script from 'next/script'
 
+import { AppKeyboardShortcuts } from '@/components/app-keyboard-shortcuts'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { theme_init_script } from '@/lib/theme_init_script'
@@ -47,7 +48,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: ui_settings_init_script }}
         />
         <ThemeModeSystemListener />
-        <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+        <ConfirmDialogProvider>
+          <AppKeyboardShortcuts />
+          {children}
+        </ConfirmDialogProvider>
       </body>
     </html>
   )

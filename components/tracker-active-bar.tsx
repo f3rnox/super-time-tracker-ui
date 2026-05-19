@@ -1,6 +1,11 @@
 'use client'
 
-import { ActiveEntryPanel } from '@/components/active-entry-panel'
+import { forwardRef } from 'react'
+
+import {
+  ActiveEntryPanel,
+  type ActiveEntryPanelHandle,
+} from '@/components/active-entry-panel'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
 import {
   type SerializedEntry,
@@ -29,18 +34,24 @@ const tracking_pill_class =
 /**
  * Full-width header region for the active sheet and running entry controls.
  */
-export function TrackerActiveBar({
-  active_entry,
-  sheets,
-  is_pending,
-  on_check_out,
-  on_delete,
-  on_edit,
-  on_move,
-  on_add_note,
-  on_edit_note,
-  on_delete_note,
-}: TrackerActiveBarProps) {
+export const TrackerActiveBar = forwardRef<
+  ActiveEntryPanelHandle,
+  TrackerActiveBarProps
+>(function TrackerActiveBar(
+  {
+    active_entry,
+    sheets,
+    is_pending,
+    on_check_out,
+    on_delete,
+    on_edit,
+    on_move,
+    on_add_note,
+    on_edit_note,
+    on_delete_note,
+  },
+  ref,
+) {
   return (
     <div className="w-full border-b border-panel-border bg-[color-mix(in_srgb,var(--accent-soft)_55%,var(--panel))]">
       <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3 px-5 py-3.5 max-[860px]:gap-2.5 max-[860px]:py-3">
@@ -53,6 +64,7 @@ export function TrackerActiveBar({
               <span className={tracking_pill_class}>Tracking</span>
             </div>
             <ActiveEntryPanel
+              ref={ref}
               key={`${active_entry.sheetName}-${active_entry.id}`}
               entry={active_entry}
               sheets={sheets}
@@ -73,4 +85,4 @@ export function TrackerActiveBar({
       </div>
     </div>
   )
-}
+})

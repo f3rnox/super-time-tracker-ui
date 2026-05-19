@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
 import { CheckoutButtonGroup } from '@/components/checkout-button-group'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
@@ -22,6 +22,11 @@ import {
   type SerializedSheet,
 } from '@/lib/types/tracker_state'
 
+export interface ActiveEntryPanelHandle {
+  start_edit: () => void
+  start_add_note: () => void
+}
+
 interface ActiveEntryPanelProps {
   entry: SerializedEntry
   sheets: SerializedSheet[]
@@ -42,19 +47,25 @@ const tag_item_class =
 /**
  * Shows the running active entry with a live duration timer.
  */
-export function ActiveEntryPanel({
-  entry,
-  sheets,
-  in_bar = false,
-  on_check_out,
-  on_delete,
-  on_edit,
-  on_move,
-  on_add_note,
-  on_edit_note,
-  on_delete_note,
-  is_pending,
-}: ActiveEntryPanelProps) {
+export const ActiveEntryPanel = forwardRef<
+  ActiveEntryPanelHandle,
+  ActiveEntryPanelProps
+>(function ActiveEntryPanel(
+  {
+    entry,
+    sheets,
+    in_bar = false,
+    on_check_out,
+    on_delete,
+    on_edit,
+    on_move,
+    on_add_note,
+    on_edit_note,
+    on_delete_note,
+    is_pending,
+  },
+  ref,
+) {
   const { confirm } = use_confirm_dialog()
   const confirm_destructive_actions = use_confirm_destructive_actions()
   const duration_format = use_duration_format()
@@ -62,6 +73,23 @@ export function ActiveEntryPanel({
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
   const [is_editing, set_is_editing] = useState(false)
   const [is_adding_note, set_is_adding_note] = useState(false)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      start_edit: () => {
+        if (!is_editing) {
+          set_is_editing(true)
+        }
+      },
+      start_add_note: () => {
+        if (!is_editing && !is_adding_note) {
+          set_is_adding_note(true)
+        }
+      },
+    }),
+    [is_adding_note, is_editing],
+  )
 
   useEffect(() => {
     set_is_adding_note(false)
@@ -196,4 +224,4 @@ export function ActiveEntryPanel({
       ) : null}
     </section>
   )
-}
+})

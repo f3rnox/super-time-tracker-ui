@@ -1,10 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { forwardRef, useImperativeHandle, useState } from 'react'
 
 import { CheckInForm, type CheckInFormValues } from '@/components/check-in-form'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { use_check_in_form_collapsed } from '@/lib/use_check_in_form_collapsed'
+
+export interface CheckInFormCollapsibleHandle {
+  expand_and_focus: () => void
+}
 
 interface CheckInFormCollapsibleProps {
   known_tags: string[]
@@ -15,13 +19,32 @@ interface CheckInFormCollapsibleProps {
 /**
  * Renders the check-in form, collapsible to a button when the preference is set.
  */
-export function CheckInFormCollapsible({
-  known_tags,
-  is_pending,
-  on_submit,
-}: CheckInFormCollapsibleProps) {
+export const CheckInFormCollapsible = forwardRef<
+  CheckInFormCollapsibleHandle,
+  CheckInFormCollapsibleProps
+>(function CheckInFormCollapsible(
+  { known_tags, is_pending, on_submit },
+  ref,
+) {
   const should_collapse_by_default = use_check_in_form_collapsed()
   const [is_expanded, set_is_expanded] = useState(!should_collapse_by_default)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      expand_and_focus: () => {
+        set_is_expanded(true)
+        window.requestAnimationFrame(() => {
+          const input = document.getElementById('check-in-description')
+
+          if (input instanceof HTMLElement) {
+            input.focus()
+          }
+        })
+      },
+    }),
+    [],
+  )
 
   if (should_collapse_by_default && !is_expanded) {
     return (
@@ -49,4 +72,4 @@ export function CheckInFormCollapsible({
       }}
     />
   )
-}
+})
