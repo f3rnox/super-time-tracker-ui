@@ -15,7 +15,7 @@ export function parse_reporting_source_sheets(
       start: new Date(entry.start),
       end: entry.end === null ? null : new Date(entry.end),
       description: '',
-      tags: [],
+      tags: entry.tags,
       notes: [],
     })),
   }))

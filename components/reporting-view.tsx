@@ -2,9 +2,20 @@
 
 import { type ReactNode, useMemo, useState } from 'react'
 
+import { ReportingActivityHeatmap } from '@/components/reporting-activity-heatmap'
+import { ReportingDailyBarChart } from '@/components/reporting-daily-bar-chart'
 import { ReportingDateRangePicker } from '@/components/reporting-date-range-picker'
+import { ReportingMonthInReview } from '@/components/reporting-month-in-review'
 import { ReportingSortControls } from '@/components/reporting-sort-controls'
+import { ReportingTagPieChart } from '@/components/reporting-tag-pie-chart'
+import { ReportingTrendCard } from '@/components/reporting-trend-card'
+import {
+  ReportingViewTabs,
+  type ReportingViewTab,
+} from '@/components/reporting-view-tabs'
+import { ReportingWeekdayBars } from '@/components/reporting-weekday-bars'
 import { TrackerTopbar } from '@/components/tracker-topbar'
+import { build_reporting_analytics } from '@/lib/build_reporting_analytics'
 import { build_reporting_stats } from '@/lib/build_reporting_stats'
 import { default_reporting_sort_preference } from '@/lib/preferences/default_reporting_sort_preference'
 import { format_duration } from '@/lib/format_duration'
@@ -32,11 +43,12 @@ const empty_range: ReportingDateRangeInputs = {
 }
 
 /**
- * Renders per-sheet time-tracking statistics.
+ * Reporting dashboard with tag/time charts, trends, and a month-in-review summary.
  */
 export function ReportingView({ source_sheets }: ReportingViewProps) {
   const duration_format = use_duration_format()
   const week_starts_on = use_week_starts_on()
+  const [active_tab, set_active_tab] = useState<ReportingViewTab>('dashboard')
   const [sort, set_sort] = useState<SheetReportSort>(() =>
     default_reporting_sort_preference.read(),
   )
@@ -66,10 +78,23 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
       date_range === null)
 
   const week_starts_on_index = week_starts_on_to_index(week_starts_on)
-  const stats = useMemo(
-    () => build_reporting_stats(sheets, date_range, Date.now(), week_starts_on_index),
-    [sheets, date_range, week_starts_on_index],
-  )
+  const { stats, analytics } = useMemo(() => {
+    const now = Date.now()
+    return {
+      stats: build_reporting_stats(
+        sheets,
+        date_range,
+        now,
+        week_starts_on_index,
+      ),
+      analytics: build_reporting_analytics(
+        sheets,
+        date_range,
+        now,
+        week_starts_on_index,
+      ),
+    }
+  }, [sheets, date_range, week_starts_on_index])
 
   const {
     activeSheets,
@@ -91,20 +116,30 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
     [idleSheets, sort],
   )
 
+  const bar_chart_subtitle =
+    date_range === null
+      ? 'Last 30 days of activity.'
+      : `${analytics.dailyBuckets.length} days in the selected range.`
+
   return (
     <>
       <TrackerTopbar breadcrumb={{ current: 'Reporting' }} />
-      <main className="flex flex-col items-center gap-6 px-5 pb-10 pt-6">
+      <main className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-6 px-5 pb-12 pt-6">
         <header className="flex w-full max-w-2xl flex-col gap-3">
-          <h1 className="m-0 text-center text-[1.35rem] font-[650] tracking-tight">
+          <h1 className="m-0 text-center text-[1.5rem] font-[650] tracking-tight">
             Reporting
           </h1>
           <p className="m-0 max-w-md self-center text-center text-[0.9rem] leading-relaxed text-muted">
             {date_range === null
-              ? 'Time tracked across all sheets.'
+              ? 'A snapshot of where your time has been going.'
               : 'Metrics filtered to the selected date range.'}
           </p>
         </header>
+
+        <ReportingViewTabs
+          active_tab={active_tab}
+          on_change={set_active_tab}
+        />
 
         <ReportingDateRangePicker
           range={range_inputs}
@@ -114,7 +149,7 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
         />
 
         <section
-          className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid w-full max-w-5xl grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4"
           aria-label="Summary"
         >
           <SummaryCard
@@ -131,7 +166,7 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
 
         {show_period_totals ? (
           <section
-            className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-3"
+            className="grid w-full max-w-5xl grid-cols-1 gap-2 sm:grid-cols-3"
             aria-label="Period totals"
           >
             <SummaryCard
@@ -158,8 +193,53 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
             Choose both dates to filter metrics, or clear the range to see all
             time.
           </p>
+        ) : active_tab === 'dashboard' ? (
+          <DashboardLayout>
+            <ReportingMonthInReview
+              stats={analytics.monthInReview}
+              duration_format={duration_format}
+            />
+
+            <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2">
+              <ReportingTrendCard
+                trend={analytics.weekTrend}
+                duration_format={duration_format}
+                current_label="This week"
+                previous_label="Last week"
+              />
+              <ReportingTrendCard
+                trend={analytics.monthTrend}
+                duration_format={duration_format}
+                current_label="This month"
+                previous_label="Last month"
+              />
+            </div>
+
+            <ReportingDailyBarChart
+              daily_buckets={analytics.dailyBuckets}
+              duration_format={duration_format}
+              subtitle={bar_chart_subtitle}
+            />
+
+            <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2">
+              <ReportingTagPieChart
+                tag_breakdown={analytics.tagBreakdown}
+                duration_format={duration_format}
+              />
+              <ReportingWeekdayBars
+                weekday_distribution={analytics.weekdayDistribution}
+                duration_format={duration_format}
+              />
+            </div>
+
+            <ReportingActivityHeatmap
+              heatmap={analytics.heatmap}
+              duration_format={duration_format}
+              week_starts_on={week_starts_on}
+            />
+          </DashboardLayout>
         ) : (
-          <>
+          <SheetsLayout>
             <ReportingSortControls sort={sort} on_sort_change={set_sort} />
             {activeSheets.length === 0 ? (
               <p className="m-0 w-full max-w-2xl text-center text-[0.9rem] text-muted">
@@ -197,10 +277,38 @@ export function ReportingView({ source_sheets }: ReportingViewProps) {
                 ))}
               </SheetStatsSection>
             ) : null}
-          </>
+          </SheetsLayout>
         )}
       </main>
     </>
+  )
+}
+
+interface DashboardLayoutProps {
+  children: ReactNode
+}
+
+/**
+ * Vertical stack wrapper for the dashboard tab content.
+ */
+function DashboardLayout({ children }: DashboardLayoutProps) {
+  return (
+    <div className="flex w-full max-w-5xl flex-col gap-5">{children}</div>
+  )
+}
+
+interface SheetsLayoutProps {
+  children: ReactNode
+}
+
+/**
+ * Centered narrow column wrapper for the per-sheet breakdown tab.
+ */
+function SheetsLayout({ children }: SheetsLayoutProps) {
+  return (
+    <div className="flex w-full max-w-2xl flex-col items-center gap-4">
+      {children}
+    </div>
   )
 }
 

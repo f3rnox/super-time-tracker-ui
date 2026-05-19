@@ -14,6 +14,7 @@ export function serialize_reporting_source_sheets(
       id: entry.id,
       start: entry.start.toISOString(),
       end: entry.end === null ? null : entry.end.toISOString(),
+      tags: entry.tags,
     })),
   }))
 }
