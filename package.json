@@ -34,7 +34,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/stop-standalone-server.js",
     "build": "next build",
-    "postbuild": "node scripts/sync-standalone-assets.js",
+    "postbuild": "node scripts/sync-standalone-assets.js && node scripts/prune-standalone-dist.js",
     "start": "next start",
     "stt-ui": "node bin/stt-ui.js",
     "format": "pnpm format:prettier",
