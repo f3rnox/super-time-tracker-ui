@@ -1,3 +1,5 @@
+import { apply_ui_preferences_from_record } from '@/lib/apply_ui_preferences_from_record'
+import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
 import { mark_tracker_db_merged_this_browser_session } from '@/lib/has_tracker_db_merged_this_browser_session'
 import { notify_cloud_db_sync } from '@/lib/notify_cloud_db_sync'
 
@@ -23,14 +25,23 @@ export async function run_tracker_db_cloud_sync(
 
   try {
     if (options.merge_on_load === true) {
+      const local_preferences = collect_ui_preferences_from_window()
       const merge_response = await fetch('/api/sync/merge-on-load', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferences: local_preferences }),
       })
 
       if (!merge_response.ok) {
         const body = (await merge_response.json()) as { error?: string }
         throw new Error(body.error ?? 'Merge on load failed')
       }
+
+      const merge_payload = (await merge_response.json()) as {
+        preferences?: Record<string, string>
+      }
+
+      apply_ui_preferences_from_record(merge_payload.preferences ?? {})
     }
 
     const push_url =
