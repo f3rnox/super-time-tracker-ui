@@ -3,6 +3,7 @@
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
 import { get_reporting_date_range_shortcut_inputs } from '@/lib/get_reporting_date_range_shortcut_inputs'
+import { matches_reporting_date_range_shortcut } from '@/lib/matches_reporting_date_range_shortcut'
 import { use_week_starts_on } from '@/lib/use_week_starts_on'
 import { week_starts_on_to_index } from '@/lib/week_starts_on_to_index'
 import {
@@ -52,24 +53,38 @@ export function ReportingDateRangePicker({
         Date range
       </legend>
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Date range shortcuts">
-        {shortcut_options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            className={get_button_class_name('ghost', 'small')}
-            onClick={() =>
-              on_range_change(
-                get_reporting_date_range_shortcut_inputs(
-                  option.value,
-                  new Date(),
-                  week_starts_on_index,
-                ),
-              )
-            }
-          >
-            {option.label}
-          </button>
-        ))}
+        {shortcut_options.map((option) => {
+          const is_active = matches_reporting_date_range_shortcut(
+            range,
+            option.value,
+            new Date(),
+            week_starts_on_index,
+          )
+
+          return (
+            <button
+              key={option.value}
+              type="button"
+              className={
+                is_active
+                  ? get_button_class_name('primary', 'small')
+                  : get_button_class_name('ghost', 'small')
+              }
+              aria-pressed={is_active}
+              onClick={() =>
+                on_range_change(
+                  get_reporting_date_range_shortcut_inputs(
+                    option.value,
+                    new Date(),
+                    week_starts_on_index,
+                  ),
+                )
+              }
+            >
+              {option.label}
+            </button>
+          )
+        })}
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-[0.82rem] text-muted">

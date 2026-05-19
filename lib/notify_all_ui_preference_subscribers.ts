@@ -10,6 +10,7 @@ import { duration_format_preference } from '@/lib/preferences/duration_format_pr
 import { entry_list_sort_preference } from '@/lib/preferences/entry_list_sort_preference'
 import { greedy_cloud_sync_preference } from '@/lib/preferences/greedy_cloud_sync_preference'
 import { tag_filter_mode_preference } from '@/lib/preferences/tag_filter_mode_preference'
+import { today_scope_preference } from '@/lib/preferences/today_scope_preference'
 import { theme_mode_preference } from '@/lib/preferences/theme_mode_preference'
 import { time_format_preference } from '@/lib/preferences/time_format_preference'
 import { timer_in_title_preference } from '@/lib/preferences/timer_in_title_preference'
@@ -35,6 +36,7 @@ export function notify_all_ui_preference_subscribers(): void {
   entry_list_sort_preference.notify()
   greedy_cloud_sync_preference.notify()
   tag_filter_mode_preference.notify()
+  today_scope_preference.notify()
   theme_mode_preference.notify()
   time_format_preference.notify()
   timer_in_title_preference.notify()

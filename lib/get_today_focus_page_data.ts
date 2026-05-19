@@ -1,0 +1,32 @@
+import { collect_known_tags } from '@/lib/collect_known_tags'
+import { collect_today_focus_entries } from '@/lib/collect_today_focus_entries'
+import { find_all_serialized_active_entries } from '@/lib/find_all_serialized_active_entries'
+import { read_db } from '@/lib/read_db'
+import { type TodayFocusPageData } from '@/lib/types/today_focus'
+
+/**
+ * Loads today / focus view data from the tracker database.
+ */
+export async function get_today_focus_page_data(): Promise<TodayFocusPageData> {
+  const db = await read_db()
+  const today_entries = collect_today_focus_entries(db.sheets)
+  const today_total_ms = today_entries.reduce(
+    (total, entry) => total + entry.todayDurationMs,
+    0,
+  )
+
+  return {
+    runningEntries: find_all_serialized_active_entries(db),
+    todayEntries: today_entries,
+    todayTotalMs: today_total_ms,
+    sheetNames: db.sheets.map((sheet) => sheet.name),
+    sheets: db.sheets.map((sheet) => ({
+      name: sheet.name,
+      activeEntryID: sheet.activeEntryID,
+      entryCount: sheet.entries.length,
+      isActive: sheet.name === db.activeSheetName,
+      hasActiveEntry: sheet.activeEntryID !== null,
+    })),
+    knownTags: collect_known_tags(db),
+  }
+}

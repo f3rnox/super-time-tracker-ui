@@ -1,7 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-
+import { TrackerNavLinks } from '@/components/tracker-nav-links'
 import { TopbarCloudStatus } from '@/components/topbar-cloud-status'
 import { TopbarOverflowMenu } from '@/components/topbar-overflow-menu'
 import { TopbarSettingsLink } from '@/components/topbar-settings-link'
@@ -33,18 +32,7 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
           <TrackerBreadcrumb current={breadcrumb.current} parent={breadcrumb.parent} />
         ) : null}
         <div className="ml-auto flex shrink-0 items-center justify-end gap-2">
-          <Link
-            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
-            href="/"
-          >
-            Tracker
-          </Link>
-          <Link
-            className="rounded-full px-3 py-1.5 text-[0.85rem] font-semibold text-muted no-underline hover:bg-surface-hover hover:text-foreground"
-            href="/reporting"
-          >
-            Reporting
-          </Link>
+          <TrackerNavLinks />
           <TopbarCloudStatus />
           <TopbarSettingsLink />
           <TopbarOverflowMenu />
