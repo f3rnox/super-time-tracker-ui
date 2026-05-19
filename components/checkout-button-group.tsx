@@ -10,7 +10,7 @@ interface CheckoutButtonGroupProps {
   on_check_out: (at?: string) => void
 }
 
-const group_button_class = `${get_button_class_name('danger')} text-white rounded-none first:rounded-l-[0.65rem] last:rounded-r-[0.65rem] not-first:-ml-px not-first:min-w-12 not-first:border-l not-first:border-l-[color-mix(in_srgb,var(--danger-text)_30%,var(--background))] max-[860px]:flex-1 max-[860px]:basis-1/2`
+const group_button_class = `${get_button_class_name('danger-solid')} rounded-none first:rounded-l-[0.65rem] last:rounded-r-[0.65rem] not-first:-ml-px not-first:min-w-12 not-first:border-l not-first:border-l-[color-mix(in_srgb,#ffffff_30%,var(--danger-solid))] max-[860px]:flex-1 max-[860px]:basis-1/2`
 
 /**
  * Check out now or at a natural-language time in a joined button group.

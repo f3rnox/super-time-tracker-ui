@@ -17,6 +17,8 @@
   --accent-border: #2dd4bf55;
   --accent-text-on: #042f2e;
   --danger: #fb7185;
+  --danger-solid: #e11d48;
+  --danger-text-on: #ffffff;
   --danger-soft: #3a1520;
   --danger-border: #fb718544;
   --danger-text: #fecdd3;
@@ -49,6 +51,8 @@
   --accent-border: #99f6e455;
   --accent-text-on: #ffffff;
   --danger: #e11d48;
+  --danger-solid: #e11d48;
+  --danger-text-on: #ffffff;
   --danger-soft: #fff1f2;
   --danger-border: #fecdd3;
   --danger-text: #9f1239;
@@ -121,6 +125,8 @@ select option {
   --color-accent-border: var(--accent-border);
   --color-accent-text-on: var(--accent-text-on);
   --color-danger: var(--danger);
+  --color-danger-solid: var(--danger-solid);
+  --color-danger-text-on: var(--danger-text-on);
   --color-danger-soft: var(--danger-soft);
   --color-danger-border: var(--danger-border);
   --color-danger-text: var(--danger-text);
