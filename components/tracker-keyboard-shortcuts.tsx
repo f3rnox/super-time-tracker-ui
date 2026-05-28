@@ -28,6 +28,7 @@ interface TrackerKeyboardShortcutsProps {
   active_entry_panel_ref: RefObject<ActiveEntryPanelHandle | null>;
   on_select_sheet: (name: string) => void;
   on_check_out: (options?: CheckOutOptions) => void;
+  on_toggle_zen: () => void;
 }
 
 /**
@@ -42,6 +43,7 @@ export function TrackerKeyboardShortcuts({
   active_entry_panel_ref,
   on_select_sheet,
   on_check_out,
+  on_toggle_zen,
 }: Readonly<TrackerKeyboardShortcutsProps>) {
   const router = useRouter();
   const [is_help_open, setIs_help_open] = useState(false);
@@ -114,6 +116,16 @@ export function TrackerKeyboardShortcuts({
         },
       },
       {
+        id: "zen-mode",
+        label: shortcut_map["zen-mode"].toUpperCase(),
+        description: "Toggle Zen Mode focus engine",
+        key: shortcut_map["zen-mode"],
+        is_available: () => !is_pending,
+        action: () => {
+          on_toggle_zen();
+        },
+      },
+      {
         id: "pomodoro",
         label: shortcut_map.pomodoro.toUpperCase(),
         description: "Open Pomodoro",
@@ -168,6 +180,7 @@ export function TrackerKeyboardShortcuts({
     check_out,
     is_pending,
     on_select_sheet,
+    on_toggle_zen,
     router,
     help_key,
     help_label,

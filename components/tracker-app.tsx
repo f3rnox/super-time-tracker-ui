@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -23,6 +24,7 @@ import { TrackerActiveBar } from "@/components/tracker-active-bar";
 import { TrackerDocumentTitle } from "@/components/tracker-document-title";
 import { PomodoroQuickActionLink } from "@/components/pomodoro-quick-action-link";
 import { TrackerTopbar } from "@/components/tracker-topbar";
+import { ZenModeOverlay } from "@/components/zen-mode-overlay";
 import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { build_check_out_request_payload } from "@/lib/build_check_out_request_payload";
 import { get_archive_entry_confirm_dialog } from "@/lib/get_archive_entry_confirm_dialog";
@@ -94,6 +96,8 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
   const { confirm } = use_confirm_dialog();
   const confirm_destructive_actions = use_confirm_destructive_actions();
   const state_before_sheet_switch_ref = useRef<TrackerState>(initial_state);
+  const [is_zen_mode, setIs_zen_mode] = useState(false);
+  const toggle_zen = useCallback(() => setIs_zen_mode((prev) => !prev), []);
 
   useEffect(() => {
     sync_active_sheet_preference(initial_state);
@@ -326,6 +330,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
             ),
           )
         }
+        on_toggle_zen={toggle_zen}
       />
       <div className="relative z-1">
         <TrackerTopbar />
@@ -399,6 +404,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                 sheets={state.sheets}
                 known_tags={state.knownTags}
                 is_pending={is_pending}
+                on_enter_zen={() => setIs_zen_mode(true)}
                 on_check_out={(options) =>
                   run_action(() =>
                     post_tracker_action(
@@ -643,6 +649,39 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
           </div>
         </div>
       </div>
+      {is_zen_mode && (
+        <ZenModeOverlay
+          active_entry={state.activeEntry}
+          sheets={state.sheets}
+          known_tags={state.knownTags}
+          is_pending={is_pending}
+          on_check_in={(values) => {
+            void run_action(() => post_tracker_action("/api/in", values));
+          }}
+          on_check_out={() => {
+            void run_action(() =>
+              post_tracker_action(
+                "/api/out",
+                build_check_out_request_payload(active_sheet),
+              ),
+            );
+          }}
+          on_add_note={(text) => {
+            return run_action(() =>
+              post_tracker_action(
+                "/api/note",
+                build_add_note_request_payload(
+                  text,
+                  active_sheet,
+                  state.activeEntry?.id,
+                  undefined,
+                ),
+              ),
+            );
+          }}
+          on_close={() => setIs_zen_mode(false)}
+        />
+      )}
     </ConfirmDialogProvider>
   );
 }

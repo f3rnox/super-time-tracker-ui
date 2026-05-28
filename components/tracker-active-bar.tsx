@@ -34,6 +34,7 @@ interface TrackerActiveBarProps {
     text: string,
   ) => void;
   on_delete_note: (timestamp: string, text: string) => void;
+  on_enter_zen: () => void;
 }
 
 const section_label_class =
@@ -64,6 +65,7 @@ export const TrackerActiveBar = forwardRef<
     on_add_note,
     on_edit_note,
     on_delete_note,
+    on_enter_zen,
   },
   ref,
 ) {
@@ -94,7 +96,15 @@ export const TrackerActiveBar = forwardRef<
         {is_pomodoro_task_entry(active_entry) ? (
           <span className={pomodoro_pill_class}>Pomodoro</span>
         ) : null}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            className="inline-flex h-7 px-2.5 shrink-0 cursor-pointer items-center justify-center rounded-[0.35rem] border border-accent-border/30 bg-accent-soft px-3 text-[0.72rem] font-bold text-accent hover:bg-accent/15 hover:scale-105 active:scale-95 transition-all duration-150"
+            onClick={on_enter_zen}
+            title="🧘 Enter Zen Mode focus environment"
+          >
+            <span className="me-1">🧘</span> Zen Mode
+          </button>
           <EntryActionsMenu
             current_sheet_name={active_entry.sheetName}
             sheets={sheets}

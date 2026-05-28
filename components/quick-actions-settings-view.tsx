@@ -32,6 +32,7 @@ const shortcut_action_labels: Record<TrackerShortcutActionId, string> = {
   pomodoro: "Open Pomodoro",
   "previous-sheet": "Previous sheet",
   "next-sheet": "Next sheet",
+  "zen-mode": "Toggle Zen Mode focus engine",
 };
 
 const topbar_action_labels: Record<TopbarQuickActionId, string> = {

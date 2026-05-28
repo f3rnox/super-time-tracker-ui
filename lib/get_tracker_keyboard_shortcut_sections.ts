@@ -46,6 +46,10 @@ export function get_tracker_keyboard_shortcut_sections(
           label: shortcut_map["next-sheet"],
           description: "Next sheet",
         },
+        {
+          label: shortcut_map["zen-mode"].toUpperCase(),
+          description: "Toggle Zen Mode focus engine",
+        },
       ],
     },
   ];

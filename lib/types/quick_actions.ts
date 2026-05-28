@@ -7,6 +7,7 @@ export const tracker_shortcut_action_ids = [
   "pomodoro",
   "previous-sheet",
   "next-sheet",
+  "zen-mode",
 ] as const;
 
 export type TrackerShortcutActionId =
@@ -23,6 +24,7 @@ export const tracker_shortcut_defaults: TrackerShortcutMap = {
   pomodoro: "p",
   "previous-sheet": "[",
   "next-sheet": "]",
+  "zen-mode": "z",
 };
 
 export const topbar_quick_action_ids = [
