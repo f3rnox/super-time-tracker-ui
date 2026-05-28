@@ -21,6 +21,11 @@ const items: SettingsNavItem[] = [
     match: (pathname) => pathname.startsWith('/settings/display'),
   },
   {
+    href: '/settings/quick-actions',
+    label: 'Quick actions',
+    match: (pathname) => pathname.startsWith('/settings/quick-actions'),
+  },
+  {
     href: '/settings/goals',
     label: 'Goals',
     match: (pathname) => pathname.startsWith('/settings/goals'),

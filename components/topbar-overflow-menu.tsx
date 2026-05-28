@@ -7,16 +7,39 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { HamburgerIcon } from '@/components/hamburger-icon'
 import { build_auth_page_href } from '@/lib/build_auth_page_href'
 import { notify_settings_saved } from '@/lib/notify_settings_saved'
+import { parse_topbar_quick_actions } from '@/lib/parse_topbar_quick_actions'
+import { parse_tracker_shortcut_map } from '@/lib/parse_tracker_shortcut_map'
 import { cloud_sync_enabled_preference } from '@/lib/preferences/cloud_sync_enabled_preference'
+import { topbar_quick_actions_preference } from '@/lib/preferences/topbar_quick_actions_preference'
+import { tracker_shortcut_map_preference } from '@/lib/preferences/tracker_shortcut_map_preference'
 import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
 import { get_theme_server_snapshot, get_theme_snapshot } from '@/lib/get_theme_snapshot'
 import { subscribe_theme } from '@/lib/subscribe_theme'
 import { toggle_theme } from '@/lib/toggle_theme'
+import { topbar_quick_action_ids, type TopbarQuickActionId } from '@/lib/types/quick_actions'
 import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
 
 const menu_item_class =
   'block w-full cursor-pointer rounded-[0.45rem] border-0 bg-transparent px-2.5 py-1.5 text-left font-inherit text-[0.85rem] text-inherit no-underline hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-55'
+
+const topbar_shortcut_menu_items: Record<
+  TopbarQuickActionId,
+  { href: string; label: string }
+> = {
+  today: { href: '/today', label: 'Today' },
+  sheets: { href: '/sheets', label: 'Sheets' },
+  reporting: { href: '/reporting', label: 'Reporting' },
+  pomodoro: { href: '/pomodoro', label: 'Pomodoro' },
+  'manage-tags': { href: '/settings/tags', label: 'Manage tags' },
+  'sync-settings': { href: '/settings/cloud-sync', label: 'Sync settings' },
+}
+
+const always_visible_menu_actions = new Set<TopbarQuickActionId>([
+  'manage-tags',
+  'pomodoro',
+  'sync-settings',
+])
 
 /**
  * Hamburger menu containing theme, shortcuts help, and auth controls.
@@ -33,6 +56,29 @@ export function TopbarOverflowMenu(): React.ReactElement {
     cloud_sync_enabled_preference.subscribe,
     cloud_sync_enabled_preference.get_snapshot,
     cloud_sync_enabled_preference.get_server_snapshot,
+  )
+  const shortcut_map_json = useSyncExternalStore(
+    tracker_shortcut_map_preference.subscribe,
+    tracker_shortcut_map_preference.get_snapshot,
+    tracker_shortcut_map_preference.get_server_snapshot,
+  )
+  const topbar_quick_actions_json = useSyncExternalStore(
+    topbar_quick_actions_preference.subscribe,
+    topbar_quick_actions_preference.get_snapshot,
+    topbar_quick_actions_preference.get_server_snapshot,
+  )
+  const shortcut_map = parse_tracker_shortcut_map(shortcut_map_json)
+  const enabled_topbar_shortcuts = new Set<TopbarQuickActionId>(
+    parse_topbar_quick_actions(topbar_quick_actions_json),
+  )
+  const menu_shortcut_actions = topbar_quick_action_ids.filter(
+    (action_id) => !enabled_topbar_shortcuts.has(action_id),
+  )
+  const final_menu_shortcut_actions = Array.from(
+    new Set<TopbarQuickActionId>([
+      ...Array.from(always_visible_menu_actions),
+      ...menu_shortcut_actions,
+    ]),
   )
   const { email, is_configured, is_pending, sign_out } = use_supabase_auth_session()
 
@@ -69,10 +115,11 @@ export function TopbarOverflowMenu(): React.ReactElement {
   const active_theme_label = theme === 'dark' ? 'Dark' : 'Light'
 
   const open_shortcuts_dialog = (): void => {
+    const help_key = shortcut_map.help
     document.dispatchEvent(
       new KeyboardEvent('keydown', {
-        key: '?',
-        shiftKey: true,
+        key: help_key,
+        shiftKey: help_key === '?',
         bubbles: true,
       }),
     )
@@ -125,36 +172,22 @@ export function TopbarOverflowMenu(): React.ReactElement {
               </p>
             </li>
           ) : null}
-          <li role="none">
-            <Link
-              href="/settings/tags"
-              className={menu_item_class}
-              role="menuitem"
-              onClick={close_menu}
-            >
-              Manage tags
-            </Link>
-          </li>
-          <li role="none">
-            <Link
-              href="/pomodoro"
-              className={menu_item_class}
-              role="menuitem"
-              onClick={close_menu}
-            >
-              Pomodoro
-            </Link>
-          </li>
-          <li role="none">
-            <Link
-              href="/settings/cloud-sync"
-              className={menu_item_class}
-              role="menuitem"
-              onClick={close_menu}
-            >
-              Sync settings
-            </Link>
-          </li>
+          {final_menu_shortcut_actions.map((action_id) => {
+            const item = topbar_shortcut_menu_items[action_id]
+
+            return (
+              <li key={action_id} role="none">
+                <Link
+                  href={item.href}
+                  className={menu_item_class}
+                  role="menuitem"
+                  onClick={close_menu}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            )
+          })}
           {is_configured ? (
             <li role="none">
               <button

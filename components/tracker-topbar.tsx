@@ -3,6 +3,7 @@
 import { TrackerNavLinks } from '@/components/tracker-nav-links'
 import { TopbarCloudStatus } from '@/components/topbar-cloud-status'
 import { TopbarOverflowMenu } from '@/components/topbar-overflow-menu'
+import { TopbarQuickActions } from '@/components/topbar-quick-actions'
 import { TopbarSettingsLink } from '@/components/topbar-settings-link'
 import {
   TrackerBreadcrumb,
@@ -36,6 +37,7 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
         <div className="flex w-full items-center justify-between gap-2 min-[980px]:ml-auto min-[980px]:w-auto min-[980px]:justify-end">
           <TrackerNavLinks />
           <div className="flex shrink-0 items-center justify-end gap-2">
+            <TopbarQuickActions />
             <TopbarCloudStatus />
             <TopbarSettingsLink />
             <TopbarOverflowMenu />

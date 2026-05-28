@@ -9,6 +9,8 @@ import { default_reporting_sort_preference } from '@/lib/preferences/default_rep
 import { duration_format_preference } from '@/lib/preferences/duration_format_preference'
 import { entry_list_sort_preference } from '@/lib/preferences/entry_list_sort_preference'
 import { greedy_cloud_sync_preference } from '@/lib/preferences/greedy_cloud_sync_preference'
+import { topbar_quick_actions_preference } from '@/lib/preferences/topbar_quick_actions_preference'
+import { tracker_shortcut_map_preference } from '@/lib/preferences/tracker_shortcut_map_preference'
 import { tag_filter_mode_preference } from '@/lib/preferences/tag_filter_mode_preference'
 import { today_scope_preference } from '@/lib/preferences/today_scope_preference'
 import { theme_mode_preference } from '@/lib/preferences/theme_mode_preference'
@@ -35,6 +37,8 @@ export function notify_all_ui_preference_subscribers(): void {
   duration_format_preference.notify()
   entry_list_sort_preference.notify()
   greedy_cloud_sync_preference.notify()
+  topbar_quick_actions_preference.notify()
+  tracker_shortcut_map_preference.notify()
   tag_filter_mode_preference.notify()
   today_scope_preference.notify()
   theme_mode_preference.notify()

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
 import { AppKeyboardShortcuts } from '@/components/app-keyboard-shortcuts'
@@ -29,7 +29,6 @@ export const metadata: Metadata = {
   title: 'super-time-tracker',
   description: 'Web UI for the super-time-tracker CLI time sheets',
   manifest: '/manifest.webmanifest',
-  themeColor: '#14b8a6',
   icons: {
     icon: [
       { url: '/icons/favicon.ico', type: 'image/x-icon' },
@@ -45,6 +44,10 @@ export const metadata: Metadata = {
     title: 'super-time-tracker',
     statusBarStyle: 'default',
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#14b8a6',
 }
 
 export default async function RootLayout({

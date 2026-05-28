@@ -1,24 +1,29 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { useMemo } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 
 import { HelpIcon } from '@/components/help-icon'
 import { KeyboardShortcutsContent } from '@/components/keyboard-shortcuts-content'
-import { get_app_keyboard_shortcut_sections } from '@/lib/get_app_keyboard_shortcut_sections'
 import { get_tracker_keyboard_shortcut_sections } from '@/lib/get_tracker_keyboard_shortcut_sections'
+import { parse_tracker_shortcut_map } from '@/lib/parse_tracker_shortcut_map'
+import { tracker_shortcut_map_preference } from '@/lib/preferences/tracker_shortcut_map_preference'
 
 /**
  * Topbar help control with a hover tooltip listing keyboard shortcuts.
  */
 export function KeyboardShortcutsHelpButton() {
-  const pathname = usePathname()
+  const shortcut_map_json = useSyncExternalStore(
+    tracker_shortcut_map_preference.subscribe,
+    tracker_shortcut_map_preference.get_snapshot,
+    tracker_shortcut_map_preference.get_server_snapshot,
+  )
+  const shortcut_map = useMemo(
+    () => parse_tracker_shortcut_map(shortcut_map_json),
+    [shortcut_map_json],
+  )
   const sections = useMemo(
-    () =>
-      pathname === '/'
-        ? get_tracker_keyboard_shortcut_sections()
-        : get_app_keyboard_shortcut_sections(),
-    [pathname],
+    () => get_tracker_keyboard_shortcut_sections(shortcut_map),
+    [shortcut_map],
   )
 
   return (

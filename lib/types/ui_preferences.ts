@@ -194,6 +194,18 @@ export const ENTRY_SUGGESTION_PROVIDER_STORAGE_KEY =
   'super-time-tracker-entry-suggestion-provider'
 export const ENTRY_SUGGESTION_PROVIDER_DEFAULT: EntrySuggestionProvider = 'none'
 
+export type TrackerShortcutMapJson = string
+export const TRACKER_SHORTCUT_MAP_STORAGE_KEY =
+  'super-time-tracker-shortcut-map'
+export const TRACKER_SHORTCUT_MAP_DEFAULT: TrackerShortcutMapJson =
+  '{"help":"?","check-in":"c","check-out":"o","edit-entry":"e","add-note":"n","pomodoro":"p","previous-sheet":"[","next-sheet":"]"}'
+
+export type TopbarQuickActionsJson = string
+export const TOPBAR_QUICK_ACTIONS_STORAGE_KEY =
+  'super-time-tracker-topbar-quick-actions'
+export const TOPBAR_QUICK_ACTIONS_DEFAULT: TopbarQuickActionsJson =
+  '["today","reporting","pomodoro"]'
+
 export type OpenAiApiKey = string
 export const OPENAI_API_KEY_STORAGE_KEY = 'super-time-tracker-openai-api-key'
 export const OPENAI_API_KEY_DEFAULT: OpenAiApiKey = ''
