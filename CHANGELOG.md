@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.33](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.32...v0.1.33) (2026-05-28)
+
+
+### Features
+
+* added search, command palette, scoped export ([cd1d83f](https://github.com/f3rnox/super-time-tracker-ui/commit/cd1d83ffaa665c6d5c9cc5cee07cef5d3a7e8519))
+
+
+### Bug Fixes
+
+* lint only readme ([1fdbedb](https://github.com/f3rnox/super-time-tracker-ui/commit/1fdbedb7a3acadbbb551752cf0c19a9f435322cf))
+* sonarqube, linter and tsc errors/warnings ([f46a25f](https://github.com/f3rnox/super-time-tracker-ui/commit/f46a25f16540dcf349bc96c39769aa08630f5c72))
+
 ### [0.1.32](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.31...v0.1.32) (2026-05-28)
 
 
