@@ -3,7 +3,6 @@ import { CheckInFormCollapsedSetting } from '@/components/check-in-form-collapse
 import { CompactListsSetting } from '@/components/compact-lists-setting'
 import { DefaultReportingRangeSetting } from '@/components/default-reporting-range-setting'
 import { DefaultReportingSortSetting } from '@/components/default-reporting-sort-setting'
-import { DesktopNotificationsSetting } from '@/components/desktop-notifications-setting'
 import { DurationFormatSetting } from '@/components/duration-format-setting'
 import { EntryListSortSetting } from '@/components/entry-list-sort-setting'
 import { SettingsPageLayout } from '@/components/settings-page-layout'
@@ -59,9 +58,6 @@ export function DisplaySettingsView() {
         </li>
         <li className={setting_card_class}>
           <TimerInTitleSetting />
-        </li>
-        <li className={setting_card_wide_class}>
-          <DesktopNotificationsSetting />
         </li>
         <li className={setting_card_wide_class}>
           <EntryListSortSetting />

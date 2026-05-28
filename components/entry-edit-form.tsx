@@ -23,6 +23,7 @@ interface EntryEditFormProps {
   initial_description_override?: string
   in_active_panel?: boolean
   times_only?: boolean
+  start_only?: boolean
   on_save: (values: EntryEditFormValues) => void
   on_cancel: () => void
 }
@@ -37,6 +38,7 @@ export function EntryEditForm({
   initial_description_override,
   in_active_panel = false,
   times_only = false,
+  start_only = false,
   on_save,
   on_cancel,
 }: EntryEditFormProps) {
@@ -86,7 +88,7 @@ export function EntryEditForm({
       values.start = trimmed_start
     }
 
-    if (trimmed_end.length > 0) {
+    if (!start_only && trimmed_end.length > 0) {
       values.end = trimmed_end
     }
 
@@ -106,10 +108,10 @@ export function EntryEditForm({
     : format_datetime_hint(entry.end ?? entry.start)
 
   const has_changes = times_only
-    ? start.trim().length > 0 || end.trim().length > 0
+    ? start.trim().length > 0 || (!start_only && end.trim().length > 0)
     : description.trim() !== initial_description.trim() ||
       start.trim().length > 0 ||
-      end.trim().length > 0
+      (!start_only && end.trim().length > 0)
 
   return (
     <form
@@ -135,7 +137,11 @@ export function EntryEditForm({
       ) : null}
       <div className="flex flex-col gap-2">
         <p className="m-0 text-[0.8rem] font-semibold text-muted">Times (optional)</p>
-        <div className="grid grid-cols-2 gap-2.5 max-[860px]:grid-cols-1">
+        <div
+          className={`grid gap-2.5 max-[860px]:grid-cols-1 ${
+            start_only ? 'grid-cols-1' : 'grid-cols-2'
+          }`}
+        >
           <label className="flex flex-col gap-1" htmlFor={`entry-start-${entry.id}`}>
             <span className="text-[0.8rem] font-semibold">Start</span>
             <span className="text-[0.72rem] text-muted">
@@ -151,20 +157,22 @@ export function EntryEditForm({
             autoFocus={times_only && in_active_panel}
           />
           </label>
-          <label className="flex flex-col gap-1" htmlFor={`entry-end-${entry.id}`}>
-            <span className="text-[0.8rem] font-semibold">End</span>
-            <span className="text-[0.72rem] text-muted">Current: {end_hint}</span>
-            <input
-              id={`entry-end-${entry.id}`}
-              className={get_input_class_name('compact')}
-              value={end}
-              onChange={(event) => set_end(event.target.value)}
-              placeholder={
-                entry.isActive ? 'e.g. now, 5 minutes ago' : 'e.g. 11:30am'
-              }
-              disabled={is_pending}
-            />
-          </label>
+          {!start_only ? (
+            <label className="flex flex-col gap-1" htmlFor={`entry-end-${entry.id}`}>
+              <span className="text-[0.8rem] font-semibold">End</span>
+              <span className="text-[0.72rem] text-muted">Current: {end_hint}</span>
+              <input
+                id={`entry-end-${entry.id}`}
+                className={get_input_class_name('compact')}
+                value={end}
+                onChange={(event) => set_end(event.target.value)}
+                placeholder={
+                  entry.isActive ? 'e.g. now, 5 minutes ago' : 'e.g. 11:30am'
+                }
+                disabled={is_pending}
+              />
+            </label>
+          ) : null}
         </div>
       </div>
       <div className="flex flex-wrap gap-2">

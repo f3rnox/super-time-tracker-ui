@@ -31,6 +31,11 @@ const items: SettingsNavItem[] = [
     match: (pathname) => pathname.startsWith('/settings/pomodoro'),
   },
   {
+    href: '/settings/notifications',
+    label: 'Notifications',
+    match: (pathname) => pathname.startsWith('/settings/notifications'),
+  },
+  {
     href: '/settings/ai-suggestions',
     label: 'AI suggestions',
     match: (pathname) => pathname.startsWith('/settings/ai-suggestions'),

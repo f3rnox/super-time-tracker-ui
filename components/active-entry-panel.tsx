@@ -222,6 +222,7 @@ export const ActiveEntryPanel = forwardRef<
           is_pending={is_pending}
           in_active_panel
           times_only
+          start_only
           on_cancel={() => set_is_editing_times(false)}
           on_save={(values) => {
             on_edit(values)
