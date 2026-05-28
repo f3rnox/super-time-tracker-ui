@@ -128,7 +128,7 @@ export function ActiveEntryDescriptionInline({
       className="flex min-w-0 flex-1 flex-col gap-2"
       onSubmit={handle_submit}
     >
-      <div className="flex min-w-0 items-start gap-2 max-[700px]:flex-col">
+      <div className="flex min-w-0 items-center gap-2 max-[700px]:flex-col max-[700px]:items-start">
         <div className="min-w-0 flex-1">
           <TagAutocompleteInput
             id={`active-entry-description-${entry.id}`}
