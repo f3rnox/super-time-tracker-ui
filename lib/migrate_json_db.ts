@@ -26,7 +26,7 @@ export function migrate_json_db(
 ): MigrateJsonDbResult {
   let json_db = json_db_input;
   let did_migrate = false;
-  let current_version = json_db.version === undefined ? 1 : json_db.version;
+  let current_version = json_db.version ?? 1;
 
   if (current_version > DB_VERSION || current_version < 1) {
     throw new Error(`Unknown DB version ${json_db.version}, cannot load.`);

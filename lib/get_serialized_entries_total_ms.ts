@@ -1,4 +1,4 @@
-import { type SerializedEntry } from '@/lib/types/tracker_state'
+import { type SerializedEntry } from "@/lib/types/tracker_state";
 
 /**
  * Sums duration milliseconds across serialized entries.
@@ -6,5 +6,5 @@ import { type SerializedEntry } from '@/lib/types/tracker_state'
 export function get_serialized_entries_total_ms(
   entries: SerializedEntry[],
 ): number {
-  return entries.reduce((total, entry) => total + entry.durationMs, 0)
+  return entries.reduce((total, entry) => total + entry.durationMs, 0);
 }

@@ -6,8 +6,8 @@ export function get_average_entry_ms(
   entry_count: number,
 ): number {
   if (entry_count === 0) {
-    return 0
+    return 0;
   }
 
-  return total_ms / entry_count
+  return total_ms / entry_count;
 }

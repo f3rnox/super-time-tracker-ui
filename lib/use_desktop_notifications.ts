@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { desktop_notifications_preference } from '@/lib/preferences/desktop_notifications_preference'
+import { desktop_notifications_preference } from "@/lib/preferences/desktop_notifications_preference";
 
 /**
  * Subscribes to the desktop-notifications preference.
@@ -12,7 +12,7 @@ export function useDesktopNotifications(): boolean {
     desktop_notifications_preference.subscribe,
     desktop_notifications_preference.get_snapshot,
     desktop_notifications_preference.get_server_snapshot,
-  )
+  );
 
-  return value === 'true'
+  return value === "true";
 }

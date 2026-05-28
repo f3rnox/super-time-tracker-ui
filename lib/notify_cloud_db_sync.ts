@@ -1,13 +1,15 @@
-export type CloudDbSyncPhase = 'syncing' | 'success' | 'error'
+export type CloudDbSyncPhase = "syncing" | "success" | "error";
 
 export interface CloudDbSyncNotification {
-  phase: CloudDbSyncPhase
-  message: string
+  phase: CloudDbSyncPhase;
+  message: string;
 }
 
-type CloudDbSyncListener = (notification: CloudDbSyncNotification | null) => void
+type CloudDbSyncListener = (
+  notification: CloudDbSyncNotification | null,
+) => void;
 
-const listeners = new Set<CloudDbSyncListener>()
+const listeners = new Set<CloudDbSyncListener>();
 
 /**
  * Subscribes to cloud database sync toast updates.
@@ -15,11 +17,11 @@ const listeners = new Set<CloudDbSyncListener>()
 export function subscribe_cloud_db_sync(
   listener: CloudDbSyncListener,
 ): () => void {
-  listeners.add(listener)
+  listeners.add(listener);
 
   return () => {
-    listeners.delete(listener)
-  }
+    listeners.delete(listener);
+  };
 }
 
 /**
@@ -28,11 +30,11 @@ export function subscribe_cloud_db_sync(
 export function notify_cloud_db_sync(
   notification: CloudDbSyncNotification | null,
 ): void {
-  if (typeof window === 'undefined') {
-    return
+  if (typeof window === "undefined") {
+    return;
   }
 
   listeners.forEach((listener) => {
-    listener(notification)
-  })
+    listener(notification);
+  });
 }

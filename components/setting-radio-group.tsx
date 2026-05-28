@@ -1,23 +1,23 @@
-'use client'
+"use client";
 
-import { type ReactNode } from 'react'
+import { type ReactNode } from "react";
 
-import { get_setting_radio_options_grid_class } from '@/lib/get_setting_radio_options_grid_class'
+import { get_setting_radio_options_grid_class } from "@/lib/get_setting_radio_options_grid_class";
 
 interface SettingRadioGroupOption<T extends string> {
-  value: T
-  label: string
-  description?: string
+  value: T;
+  label: string;
+  description?: string;
 }
 
 interface SettingRadioGroupProps<T extends string> {
-  name: string
-  legend: ReactNode
-  description?: ReactNode
-  value: T
-  options: SettingRadioGroupOption<T>[]
-  disabled?: boolean
-  on_change: (value: T) => void
+  name: string;
+  legend: ReactNode;
+  description?: ReactNode;
+  value: T;
+  options: SettingRadioGroupOption<T>[];
+  disabled?: boolean;
+  on_change: (value: T) => void;
 }
 
 /**
@@ -44,15 +44,15 @@ export function SettingRadioGroup<T extends string>({
       ) : null}
       <div className={get_setting_radio_options_grid_class(options.length)}>
         {options.map((option) => {
-          const is_selected = option.value === value
+          const is_selected = option.value === value;
 
           return (
             <label
               key={option.value}
               className={`flex h-full cursor-pointer flex-col gap-2 rounded-md border px-2.5 py-2 transition-colors duration-150 ${
                 is_selected
-                  ? 'border-accent-border bg-accent-soft'
-                  : 'border-panel-border hover:bg-surface-hover'
+                  ? "border-accent-border bg-accent-soft"
+                  : "border-panel-border hover:bg-surface-hover"
               }`}
             >
               <span className="flex items-start gap-2">
@@ -75,9 +75,9 @@ export function SettingRadioGroup<T extends string>({
                 </span>
               ) : null}
             </label>
-          )
+          );
         })}
       </div>
     </fieldset>
-  )
+  );
 }

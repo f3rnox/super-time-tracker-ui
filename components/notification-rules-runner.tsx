@@ -7,6 +7,8 @@ import { no_log_reminder_minutes_preference } from "@/lib/preferences/no_log_rem
 import { overwork_alert_hours_preference } from "@/lib/preferences/overwork_alert_hours_preference";
 import { work_hours_end_preference } from "@/lib/preferences/work_hours_end_preference";
 import { work_hours_start_preference } from "@/lib/preferences/work_hours_start_preference";
+import { is_browser_notification_available } from "@/lib/is_browser_notification_available";
+import { show_browser_notification } from "@/lib/show_browser_notification";
 import {
   get_tracker_running_entry_snapshot,
   subscribe_tracker_running_entry,
@@ -90,22 +92,20 @@ export function NotificationRulesRunner() {
 
   useEffect(() => {
     if (
-      typeof window === "undefined" ||
-      !("Notification" in window) ||
+      !is_browser_notification_available() ||
       focus_nudges_enabled !== "true"
     ) {
       return;
     }
 
-    if (window.Notification.permission === "default") {
-      void window.Notification.requestPermission();
+    if (globalThis.window.Notification.permission === "default") {
+      globalThis.window.Notification.requestPermission().catch(() => {});
     }
   }, [focus_nudges_enabled]);
 
   useEffect(() => {
     if (
-      typeof window === "undefined" ||
-      !("Notification" in window) ||
+      !is_browser_notification_available() ||
       focus_nudges_enabled !== "true"
     ) {
       return;
@@ -122,11 +122,7 @@ export function NotificationRulesRunner() {
       1000;
 
     const notify = (title: string, body: string): void => {
-      if (window.Notification.permission !== "granted") {
-        return;
-      }
-
-      void new window.Notification(title, { body });
+      show_browser_notification(title, body);
     };
 
     const check_rules = (): void => {
@@ -149,34 +145,40 @@ export function NotificationRulesRunner() {
         }
       }
 
-      if (running_entry !== null) {
-        const running_since_ms = Date.parse(running_entry.start);
-
-        if (Number.isFinite(running_since_ms)) {
-          const elapsed_ms = now_ms - running_since_ms;
-          const entry_key = `${running_entry.sheetName}-${running_entry.id}`;
-
-          if (
-            elapsed_ms >= overwork_threshold_ms &&
-            notified_overwork_entry_key_ref.current !== entry_key
-          ) {
-            notify(
-              "Long-running timer detected",
-              `Timer has been running for over ${overwork_alert_hours}h. Consider splitting: ${running_entry.description}`,
-            );
-            notified_overwork_entry_key_ref.current = entry_key;
-          }
-        }
-      } else {
+      if (running_entry === null) {
         notified_overwork_entry_key_ref.current = null;
+        return;
+      }
+
+      const running_since_ms = Date.parse(running_entry.start);
+
+      if (!Number.isFinite(running_since_ms)) {
+        return;
+      }
+
+      const elapsed_ms = now_ms - running_since_ms;
+      const entry_key = `${running_entry.sheetName}-${running_entry.id}`;
+
+      if (
+        elapsed_ms >= overwork_threshold_ms &&
+        notified_overwork_entry_key_ref.current !== entry_key
+      ) {
+        notify(
+          "Long-running timer detected",
+          `Timer has been running for over ${overwork_alert_hours}h. Consider splitting: ${running_entry.description}`,
+        );
+        notified_overwork_entry_key_ref.current = entry_key;
       }
     };
 
     check_rules();
-    const interval_id = window.setInterval(check_rules, check_interval_ms);
+    const interval_id = globalThis.window.setInterval(
+      check_rules,
+      check_interval_ms,
+    );
 
     return () => {
-      window.clearInterval(interval_id);
+      globalThis.window.clearInterval(interval_id);
     };
   }, [
     focus_nudges_enabled,

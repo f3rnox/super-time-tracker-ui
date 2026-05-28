@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { CloudIcon } from '@/components/cloud-icon'
-import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
+import { CloudIcon } from "@/components/cloud-icon";
+import { use_supabase_auth_session } from "@/lib/use_supabase_auth_session";
 
 /**
  * Topbar indicator shown when the user is signed in to cloud sync.
  */
 export function TopbarCloudStatus(): React.ReactElement | null {
-  const { email, is_configured } = use_supabase_auth_session()
+  const { email, is_configured } = use_supabase_auth_session();
 
   if (!is_configured || email === null) {
-    return null
+    return null;
   }
 
   return (
@@ -39,5 +39,5 @@ export function TopbarCloudStatus(): React.ReactElement | null {
         </div>
       </div>
     </div>
-  )
+  );
 }

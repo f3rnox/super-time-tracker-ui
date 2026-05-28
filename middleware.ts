@@ -20,6 +20,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/focus-nudges|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    String.raw`/((?!_next/static|_next/image|favicon.ico|api/focus-nudges|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)`,
   ],
 };

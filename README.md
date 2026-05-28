@@ -29,7 +29,7 @@ On start, the default browser opens at the server URL. Pass `--no-open` or set
 ## Configuration
 
 | Variable | Default | Description |
-| --- | --- | --- |
+| -------- | ------- | ----------- |
 | `PORT` | `3000` | HTTP port |
 | `STT_UI_HOSTNAME` | `127.0.0.1` | Bind address and URL shown in the terminal |
 | `STT_UI_OPEN_BROWSER` | enabled | Set to `0` or `false` to disable auto-open |

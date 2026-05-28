@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
-import { is_modal_dialog_open } from '@/lib/is_modal_dialog_open'
-import { keyboard_event_matches_binding } from '@/lib/keyboard_event_matches_binding'
-import { should_ignore_keyboard_shortcut } from '@/lib/should_ignore_keyboard_shortcut'
-import { type KeyboardShortcutBinding } from '@/lib/types/keyboard_shortcut'
+import { is_modal_dialog_open } from "@/lib/is_modal_dialog_open";
+import { keyboard_event_matches_binding } from "@/lib/keyboard_event_matches_binding";
+import { should_ignore_keyboard_shortcut } from "@/lib/should_ignore_keyboard_shortcut";
+import { type KeyboardShortcutBinding } from "@/lib/types/keyboard_shortcut";
 
 /**
  * Registers document-level keyboard shortcuts for the lifetime of the component.
@@ -13,38 +13,38 @@ import { type KeyboardShortcutBinding } from '@/lib/types/keyboard_shortcut'
 export function use_document_keyboard_shortcuts(
   bindings: KeyboardShortcutBinding[],
 ): void {
-  const bindings_ref = useRef(bindings)
-  bindings_ref.current = bindings
+  const bindings_ref = useRef(bindings);
+  bindings_ref.current = bindings;
 
   useEffect(() => {
     const handle_key_down = (event: KeyboardEvent): void => {
       if (should_ignore_keyboard_shortcut(event)) {
-        return
+        return;
       }
 
       if (is_modal_dialog_open()) {
-        return
+        return;
       }
 
       for (const binding of bindings_ref.current) {
         if (binding.is_available?.() === false) {
-          continue
+          continue;
         }
 
         if (!keyboard_event_matches_binding(event, binding)) {
-          continue
+          continue;
         }
 
-        event.preventDefault()
-        binding.action()
-        return
+        event.preventDefault();
+        binding.action();
+        return;
       }
-    }
+    };
 
-    document.addEventListener('keydown', handle_key_down)
+    document.addEventListener("keydown", handle_key_down);
 
     return () => {
-      document.removeEventListener('keydown', handle_key_down)
-    }
-  }, [])
+      document.removeEventListener("keydown", handle_key_down);
+    };
+  }, []);
 }

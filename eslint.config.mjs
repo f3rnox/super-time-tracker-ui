@@ -8,10 +8,10 @@ const eslintConfig = defineConfig([
   {
     rules: {
       // Custom hooks use snake_case (use_foo); the stock rule expects useFoo.
-      'react-hooks/rules-of-hooks': 'off',
+      "react-hooks/rules-of-hooks": "off",
       // Many client components sync props/storage in effects; refactor incrementally.
-      'react-hooks/set-state-in-effect': 'off',
-      'react-hooks/purity': 'off',
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/purity": "off",
     },
   },
   // Override default ignores of eslint-config-next.

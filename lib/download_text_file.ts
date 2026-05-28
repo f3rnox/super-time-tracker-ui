@@ -6,13 +6,13 @@ export function download_text_file(
   content: string,
   mime_type: string,
 ): void {
-  const blob = new Blob([content], { type: mime_type })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
+  const blob = new Blob([content], { type: mime_type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
-  link.href = url
-  link.download = file_name
-  link.click()
+  link.href = url;
+  link.download = file_name;
+  link.click();
 
-  URL.revokeObjectURL(url)
+  URL.revokeObjectURL(url);
 }

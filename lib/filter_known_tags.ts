@@ -6,15 +6,13 @@ export function filter_known_tags(
   query: string,
   limit: number = 10,
 ): string[] {
-  const normalized_query = query.toLowerCase()
+  const normalized_query = query.toLowerCase();
 
   return known_tags
     .filter((tag) => {
-      const name = tag.replace(/^@/, '').toLowerCase()
+      const name = tag.replace(/^@/, "").toLowerCase();
 
-      return (
-        normalized_query.length === 0 || name.startsWith(normalized_query)
-      )
+      return normalized_query.length === 0 || name.startsWith(normalized_query);
     })
-    .slice(0, limit)
+    .slice(0, limit);
 }

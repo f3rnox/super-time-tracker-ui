@@ -1,9 +1,9 @@
-@import 'tailwindcss';
-@import './color-palettes.css';
+@import "tailwindcss";
+@import "./color-palettes.css";
 
 @custom-variant compact (&:is([data-compact-lists='true'], [data-compact-lists='true'] *));
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   color-scheme: dark;
   --background: #090b10;
   --foreground: #e8edf5;
@@ -28,7 +28,11 @@
   --tag-text: #b9c7de;
   --overlay: #00000080;
   --active-panel-bg: linear-gradient(160deg, #0f2420 0%, #12161f 55%);
-  --body-gradient: radial-gradient(ellipse 80% 50% at 50% -10%, #1a2a40 0%, transparent 70%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #1a2a40 0%,
+    transparent 70%
+  );
   --input-focus-border: #2dd4bf88;
   --shadow-sm: 0 1px 2px #00000040;
   --shadow-md: 0 8px 24px #00000055;
@@ -37,7 +41,7 @@
   --radius-lg: 1rem;
 }
 
-[data-theme='light'] {
+[data-theme="light"] {
   color-scheme: light;
   --background: #eef1f6;
   --foreground: #0f1729;
@@ -62,7 +66,11 @@
   --tag-text: #3d4f66;
   --overlay: #0f172966;
   --active-panel-bg: linear-gradient(160deg, #ecfdf5 0%, #ffffff 50%);
-  --body-gradient: radial-gradient(ellipse 80% 50% at 50% -10%, #dbeafe 0%, transparent 70%);
+  --body-gradient: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    #dbeafe 0%,
+    transparent 70%
+  );
   --input-focus-border: #0d948888;
   --shadow-sm: 0 1px 2px #0f172912;
   --shadow-md: 0 10px 30px #0f172918;
@@ -71,8 +79,8 @@
   --radius-lg: 1rem;
 }
 
-html[data-theme='dark'],
-html[data-theme='light'] {
+html[data-theme="dark"],
+html[data-theme="light"] {
   min-height: 100%;
   background-color: var(--background);
   background-image: var(--body-gradient);

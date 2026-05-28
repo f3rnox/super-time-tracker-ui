@@ -20,5 +20,5 @@ export function AiSparklesIcon() {
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }

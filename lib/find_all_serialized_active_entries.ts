@@ -9,15 +9,9 @@ import { type TimeTrackerDB } from "@/lib/types";
 export function find_all_serialized_active_entries(
   db: TimeTrackerDB,
 ): SerializedEntry[] {
-  const results: SerializedEntry[] = [];
-
-  for (const sheet of db.sheets) {
+  return db.sheets.flatMap((sheet) => {
     const entry = find_running_entry_on_sheet(sheet);
 
-    if (entry !== null) {
-      results.push(serialize_entry(entry, sheet.name, true));
-    }
-  }
-
-  return results;
+    return entry == null ? [] : [serialize_entry(entry, sheet.name, true)];
+  });
 }

@@ -1,21 +1,26 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { SettingRadioGroup } from '@/components/setting-radio-group'
-import { duration_format_preference } from '@/lib/preferences/duration_format_preference'
-import { persist_ui_preference } from '@/lib/persist_ui_preference'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
+import { SettingRadioGroup } from "@/components/setting-radio-group";
+import { duration_format_preference } from "@/lib/preferences/duration_format_preference";
+import { persist_ui_preference } from "@/lib/persist_ui_preference";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
 
-const options: { value: DurationFormat; label: string; description: string }[] = [
-  { value: 'humanized', label: 'Humanized', description: 'e.g. 1 hour 25 minutes' },
-  { value: 'clock', label: 'Clock', description: 'e.g. 01:25:00' },
-  { value: 'decimal', label: 'Decimal hours', description: 'e.g. 1.42h' },
-]
+const options: { value: DurationFormat; label: string; description: string }[] =
+  [
+    {
+      value: "humanized",
+      label: "Humanized",
+      description: "e.g. 1 hour 25 minutes",
+    },
+    { value: "clock", label: "Clock", description: "e.g. 01:25:00" },
+    { value: "decimal", label: "Decimal hours", description: "e.g. 1.42h" },
+  ];
 
 const set_duration_format = (value: DurationFormat): void => {
-  persist_ui_preference(duration_format_preference, value)
-}
+  persist_ui_preference(duration_format_preference, value);
+};
 
 /**
  * Setting: how to display durations across the app.
@@ -25,7 +30,7 @@ export function DurationFormatSetting() {
     duration_format_preference.subscribe,
     duration_format_preference.get_snapshot,
     duration_format_preference.get_server_snapshot,
-  )
+  );
 
   return (
     <SettingRadioGroup<DurationFormat>
@@ -36,5 +41,5 @@ export function DurationFormatSetting() {
       options={options}
       on_change={set_duration_format}
     />
-  )
+  );
 }

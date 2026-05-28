@@ -33,16 +33,16 @@ import {
   WEEK_STARTS_ON_STORAGE_KEY,
   WORK_HOURS_END_STORAGE_KEY,
   WORK_HOURS_START_STORAGE_KEY,
-} from '@/lib/types/ui_preferences'
-import { POMODORO_STORAGE_KEY } from '@/lib/types/pomodoro'
+} from "@/lib/types/ui_preferences";
+import { POMODORO_STORAGE_KEY } from "@/lib/types/pomodoro";
 import {
   ACTIVE_SHEET_STORAGE_KEY,
   COMPACT_LISTS_STORAGE_KEY,
   DEFAULT_SHEET_FIXED_NAME_STORAGE_KEY,
   DEFAULT_SHEET_SESSION_MODE_STORAGE_KEY,
   SHEET_TAG_FILTERS_STORAGE_KEY,
-} from '@/lib/types/ui_settings'
-import { THEME_STORAGE_KEY } from '@/lib/types/theme'
+} from "@/lib/types/ui_settings";
+import { THEME_STORAGE_KEY } from "@/lib/types/theme";
 
 /**
  * Returns every localStorage key synced to Supabase when signed in.
@@ -90,5 +90,5 @@ export function list_ui_preference_storage_keys(): string[] {
     WEEK_STARTS_ON_STORAGE_KEY,
     WORK_HOURS_END_STORAGE_KEY,
     WORK_HOURS_START_STORAGE_KEY,
-  ]
+  ];
 }

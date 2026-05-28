@@ -5,13 +5,13 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
-} from 'date-fns'
+} from "date-fns";
 
-export type ReportingPeriod = 'today' | 'week' | 'month'
+export type ReportingPeriod = "today" | "week" | "month";
 
 export interface PeriodRangeMs {
-  startMs: number
-  endMs: number
+  startMs: number;
+  endMs: number;
 }
 
 /**
@@ -23,21 +23,21 @@ export function get_period_range_ms(
   week_starts_on: 0 | 1 = 1,
 ): PeriodRangeMs {
   switch (period) {
-    case 'week':
+    case "week":
       return {
         startMs: +startOfWeek(reference, { weekStartsOn: week_starts_on }),
         endMs: +endOfWeek(reference, { weekStartsOn: week_starts_on }),
-      }
-    case 'month':
+      };
+    case "month":
       return {
         startMs: +startOfMonth(reference),
         endMs: +endOfMonth(reference),
-      }
-    case 'today':
+      };
+    case "today":
     default:
       return {
         startMs: +startOfDay(reference),
         endMs: +endOfDay(reference),
-      }
+      };
   }
 }

@@ -17,5 +17,5 @@ export function HamburgerIcon() {
       <path d="M4 12h16" />
       <path d="M4 17h16" />
     </svg>
-  )
+  );
 }

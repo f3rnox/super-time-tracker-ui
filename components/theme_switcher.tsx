@@ -1,10 +1,13 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { get_theme_server_snapshot, get_theme_snapshot } from '@/lib/get_theme_snapshot'
-import { subscribe_theme } from '@/lib/subscribe_theme'
-import { toggle_theme } from '@/lib/toggle_theme'
+import {
+  get_theme_server_snapshot,
+  get_theme_snapshot,
+} from "@/lib/get_theme_snapshot";
+import { subscribe_theme } from "@/lib/subscribe_theme";
+import { toggle_theme } from "@/lib/toggle_theme";
 
 /**
  * Toggles between light and dark themes.
@@ -14,11 +17,11 @@ export function ThemeSwitcher() {
     subscribe_theme,
     get_theme_snapshot,
     get_theme_server_snapshot,
-  )
+  );
 
-  const active_label = theme === 'dark' ? 'Dark' : 'Light'
+  const active_label = theme === "dark" ? "Dark" : "Light";
   const switch_label =
-    theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+    theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
 
   return (
     <button
@@ -31,8 +34,8 @@ export function ThemeSwitcher() {
     >
       <span suppressHydrationWarning>{active_label}</span>
       <span className="text-base leading-none" aria-hidden="true">
-        {theme === 'dark' ? '☾' : '☀'}
+        {theme === "dark" ? "☾" : "☀"}
       </span>
     </button>
-  )
+  );
 }

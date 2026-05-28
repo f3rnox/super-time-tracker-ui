@@ -1,4 +1,4 @@
-import { type TrackerState } from '@/lib/types/tracker_state'
+import { type TrackerState } from "@/lib/types/tracker_state";
 
 /**
  * Updates tracker UI state immediately when the user selects a different sheet.
@@ -8,7 +8,8 @@ export function apply_optimistic_sheet_switch(
   sheet_name: string,
 ): TrackerState {
   const active_entry =
-    state.runningEntries.find((entry) => entry.sheetName === sheet_name) ?? null
+    state.runningEntries.find((entry) => entry.sheetName === sheet_name) ??
+    null;
 
   return {
     ...state,
@@ -20,5 +21,5 @@ export function apply_optimistic_sheet_switch(
     activeEntry: active_entry,
     activeSheetEntries: state.activeSheetEntries,
     activeSheetTotalMs: state.activeSheetTotalMs,
-  }
+  };
 }

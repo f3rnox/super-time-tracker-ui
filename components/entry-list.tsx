@@ -2,20 +2,15 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
-import { Checkbox } from "@/components/checkbox";
 import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { EntryListItem } from "@/components/entry-list-item";
 import { type EntryEditFormValues } from "@/components/entry-edit-form";
 import { EntryListBulkBar } from "@/components/entry-list-bulk-bar";
-import { EntryListSortControls } from "@/components/entry-list-sort-controls";
+import { EntryListIdleHeader } from "@/components/entry-list-idle-header";
 import { get_delete_entries_confirm_dialog } from "@/lib/get_delete_entries_confirm_dialog";
-import { format_duration } from "@/lib/format_duration";
-import {
-  get_mergeable_entry_neighbors,
-  type MergeEntryDirection,
-} from "@/lib/get_mergeable_entry_neighbors";
-import { format_entry_count_label } from "@/lib/format_entry_count_label";
-import { get_button_class_name } from "@/lib/get_button_class_name";
+import { format_unknown_error } from "@/lib/format_unknown_error";
+import { build_entry_list_merge_neighbors_by_key } from "@/lib/build_entry_list_merge_neighbors_by_key";
+import { type MergeEntryDirection } from "@/lib/get_mergeable_entry_neighbors";
 import { omit_record_key } from "@/lib/omit_record_key";
 import { get_api_key_for_suggestion_provider } from "@/lib/get_api_key_for_suggestion_provider";
 import { get_entry_row_key } from "@/lib/get_entry_row_key";
@@ -141,20 +136,11 @@ export function EntryList({
     },
   );
 
-  const merge_neighbors_by_key = useMemo(() => {
-    const merge_source = merge_context_entries ?? entries;
-    const map = new Map<
-      string,
-      ReturnType<typeof get_mergeable_entry_neighbors>
-    >();
-
-    for (const entry of entries) {
-      const key = get_entry_row_key(entry);
-      map.set(key, get_mergeable_entry_neighbors(entry, merge_source));
-    }
-
-    return map;
-  }, [entries, merge_context_entries]);
+  const merge_neighbors_by_key = useMemo(
+    () =>
+      build_entry_list_merge_neighbors_by_key(entries, merge_context_entries),
+    [entries, merge_context_entries],
+  );
   const can_revise_description_ai =
     suggestion_provider !== "none" && selected_api_key.trim().length > 0;
 
@@ -253,9 +239,7 @@ export function EntryList({
       }));
       setEditing_key(row_key);
     } catch (error: unknown) {
-      setAi_revise_error(
-        error instanceof Error ? error.message : String(error),
-      );
+      setAi_revise_error(format_unknown_error(error));
     } finally {
       setAi_revise_pending_key(null);
     }
@@ -277,55 +261,27 @@ export function EntryList({
             is_pending={is_pending}
             on_toggle_all={toggle_all}
             on_move={handle_bulk_move}
-            on_delete={() => void handle_bulk_delete()}
+            on_delete={() => {
+              handle_bulk_delete().catch(() => {});
+            }}
             on_clear={clear_selection}
           />
         ) : (
-          <>
-            {header_extra}
-            <div className="flex flex-wrap items-center justify-between gap-2.5">
-              <div className="flex min-w-0 items-center gap-2">
-                {entries.length > 0 ? (
-                  <Checkbox
-                    className="shrink-0"
-                    checked={all_selected}
-                    indeterminate={some_selected}
-                    disabled={is_pending}
-                    aria_label="Select all entries"
-                    on_change={toggle_all}
-                  />
-                ) : null}
-                <h2 className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em]">
-                  {title}
-                </h2>
-                <span className="text-[0.8rem] text-muted">
-                  {format_entry_count_label(entries.length)}
-                </span>
-              </div>
-              <p className="m-0 font-mono text-[0.85rem] text-muted max-[640px]:w-full">
-                {format_duration(total_ms, duration_format)} total
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <EntryListSortControls is_pending={is_pending} />
-              {archived_entry_count > 0 &&
-              on_toggle_show_archived !== undefined ? (
-                <button
-                  type="button"
-                  className={get_button_class_name("ghost", "small")}
-                  disabled={is_pending}
-                  onClick={on_toggle_show_archived}
-                >
-                  {show_archived_entries
-                    ? "Hide archived"
-                    : `Show archived (${archived_entry_count})`}
-                </button>
-              ) : null}
-            </div>
-            {ai_revise_error === null ? null : (
-              <p className="m-0 text-[0.8rem] text-danger">{ai_revise_error}</p>
-            )}
-          </>
+          <EntryListIdleHeader
+            header_extra={header_extra}
+            title={title}
+            entries_length={entries.length}
+            all_selected={all_selected}
+            some_selected={some_selected}
+            is_pending={is_pending}
+            total_ms={total_ms}
+            duration_format={duration_format}
+            archived_entry_count={archived_entry_count}
+            show_archived_entries={show_archived_entries}
+            on_toggle_show_archived={on_toggle_show_archived}
+            on_toggle_all={toggle_all}
+            ai_revise_error={ai_revise_error}
+          />
         )}
       </header>
       {entries.length === 0 ? (
@@ -379,7 +335,7 @@ export function EntryList({
                 on_split={on_split}
                 on_merge={on_merge}
                 on_revise_description_ai={(target) => {
-                  void revise_entry_description_with_ai(target);
+                  revise_entry_description_with_ai(target).catch(() => {});
                 }}
               />
             );

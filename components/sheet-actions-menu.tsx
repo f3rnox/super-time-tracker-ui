@@ -73,11 +73,11 @@ export function SheetActionsMenu({
         <HamburgerIcon />
       </button>
       {is_open ? (
-        <ul
-          className="absolute right-0 top-full z-10 mt-1.5 min-w-56 list-none rounded-md border border-panel-border bg-panel p-1.5 shadow-md"
+        <div
+          className="absolute right-0 top-full z-10 mt-1.5 min-w-56 rounded-md border border-panel-border bg-panel p-1.5 shadow-md"
           role="menu"
         >
-          <li role="none">
+          <div role="none">
             <button
               type="button"
               className={menu_item_class}
@@ -90,9 +90,9 @@ export function SheetActionsMenu({
             >
               Rename
             </button>
-          </li>
+          </div>
           {is_archived ? (
-            <li role="none">
+            <div role="none">
               <button
                 type="button"
                 className={menu_item_class}
@@ -105,9 +105,9 @@ export function SheetActionsMenu({
               >
                 Restore sheet
               </button>
-            </li>
+            </div>
           ) : (
-            <li role="none">
+            <div role="none">
               <button
                 type="button"
                 className={menu_item_class}
@@ -120,14 +120,15 @@ export function SheetActionsMenu({
               >
                 Archive sheet
               </button>
-            </li>
+            </div>
           )}
-          <li
-            className="my-1 border-t border-panel-border"
-            role="separator"
-            aria-hidden="true"
-          />
-          <li role="none">
+          <div role="none">
+            <hr
+              className="my-1 border-0 border-t border-panel-border"
+              aria-hidden="true"
+            />
+          </div>
+          <div role="none">
             <button
               type="button"
               className={`${menu_item_class} text-danger`}
@@ -141,8 +142,8 @@ export function SheetActionsMenu({
             >
               Delete sheet
             </button>
-          </li>
-        </ul>
+          </div>
+        </div>
       ) : null}
     </div>
   );

@@ -42,7 +42,7 @@ export async function add_note_to_entry(
   }
   const { name: sheet_name } = resolved_sheet;
   const entry = has_target
-    ? find_sheet_entry_by_id(resolved_sheet, input_entry_id!)
+    ? find_sheet_entry_by_id(resolved_sheet, input_entry_id)
     : find_running_entry_on_sheet(resolved_sheet);
 
   if (entry === undefined || entry === null) {

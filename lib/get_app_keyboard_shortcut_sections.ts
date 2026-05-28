@@ -1,24 +1,24 @@
-import { type KeyboardShortcutSection } from '@/lib/types/keyboard_shortcut'
+import { type KeyboardShortcutSection } from "@/lib/types/keyboard_shortcut";
 
 /**
  * Returns help sections for shortcuts available on every page.
  */
 export function get_app_keyboard_shortcut_sections(
-  help_key_label = '?',
+  help_key_label = "?",
 ): KeyboardShortcutSection[] {
   return [
     {
-      title: 'General',
+      title: "General",
       entries: [
         {
-          label: 'Ctrl+P',
-          description: 'Open command palette',
+          label: "Ctrl+P",
+          description: "Open command palette",
         },
         {
           label: help_key_label,
-          description: 'Show keyboard shortcuts',
+          description: "Show keyboard shortcuts",
         },
       ],
     },
-  ]
+  ];
 }

@@ -1,5 +1,5 @@
-import { type ReportingSourceSheet } from '@/lib/types/reporting'
-import { type TimeSheet } from '@/lib/types'
+import { type ReportingSourceSheet } from "@/lib/types/reporting";
+import { type TimeSheet } from "@/lib/types";
 
 /**
  * Restores time sheets from reporting source payloads.
@@ -14,9 +14,9 @@ export function parse_reporting_source_sheets(
       id: entry.id,
       start: new Date(entry.start),
       end: entry.end === null ? null : new Date(entry.end),
-      description: '',
+      description: "",
       tags: entry.tags,
       notes: [],
     })),
-  }))
+  }));
 }

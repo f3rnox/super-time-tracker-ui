@@ -7,12 +7,12 @@ const entry_templates_storage_key = "super-time-tracker-entry-templates";
  * Persists check-in entry templates to local storage.
  */
 export function write_entry_templates(templates: EntryTemplate[]): void {
-  if (typeof window === "undefined") {
+  if (globalThis.window === undefined) {
     return;
   }
 
   try {
-    window.localStorage.setItem(
+    globalThis.window.localStorage.setItem(
       entry_templates_storage_key,
       JSON.stringify(templates),
     );

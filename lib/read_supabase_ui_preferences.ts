@@ -1,5 +1,5 @@
-import { create_server_supabase_client } from '@/lib/create_server_supabase_client'
-import { type UiPreferencesRecord } from '@/lib/collect_ui_preferences_from_window'
+import { create_server_supabase_client } from "@/lib/create_server_supabase_client";
+import { type UiPreferencesRecord } from "@/lib/collect_ui_preferences_from_window";
 
 /**
  * Loads UI preferences for the signed-in user from Supabase.
@@ -7,35 +7,35 @@ import { type UiPreferencesRecord } from '@/lib/collect_ui_preferences_from_wind
 export async function read_supabase_ui_preferences(
   user_id: string,
 ): Promise<UiPreferencesRecord> {
-  const supabase = await create_server_supabase_client()
+  const supabase = await create_server_supabase_client();
 
   const { data, error } = await supabase
-    .from('tracker_accounts')
-    .select('ui_preferences')
-    .eq('user_id', user_id)
-    .maybeSingle()
+    .from("tracker_accounts")
+    .select("ui_preferences")
+    .eq("user_id", user_id)
+    .maybeSingle();
 
   if (error !== null) {
-    throw new Error(`Failed to load UI preferences: ${error.message}`)
+    throw new Error(`Failed to load UI preferences: ${error.message}`);
   }
 
   if (data === null) {
-    return {}
+    return {};
   }
 
-  const raw = (data as { ui_preferences: unknown }).ui_preferences
+  const raw = (data as { ui_preferences: unknown }).ui_preferences;
 
-  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
-    return {}
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+    return {};
   }
 
-  const record: UiPreferencesRecord = {}
+  const record: UiPreferencesRecord = {};
 
   for (const [key, value] of Object.entries(raw)) {
-    if (typeof value === 'string') {
-      record[key] = value
+    if (typeof value === "string") {
+      record[key] = value;
     }
   }
 
-  return record
+  return record;
 }

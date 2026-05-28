@@ -1,5 +1,5 @@
 /* Midnight — cool, deep */
-[data-theme='dark'][data-palette='midnight'] {
+[data-theme="dark"][data-palette="midnight"] {
   --background: #05070b;
   --foreground: #e4eaf4;
   --panel: #0c1018;
@@ -25,7 +25,7 @@
   );
 }
 
-[data-theme='light'][data-palette='midnight'] {
+[data-theme="light"][data-palette="midnight"] {
   --background: #e4e9f2;
   --foreground: #0c1424;
   --panel: #f8fafc;
@@ -52,7 +52,7 @@
 }
 
 /* Warm — stone / sepia */
-[data-theme='dark'][data-palette='warm'] {
+[data-theme="dark"][data-palette="warm"] {
   --background: #100e0c;
   --foreground: #f0ebe3;
   --panel: #1a1714;
@@ -78,7 +78,7 @@
   );
 }
 
-[data-theme='light'][data-palette='warm'] {
+[data-theme="light"][data-palette="warm"] {
   --background: #f3ede4;
   --foreground: #1c1814;
   --panel: #fffdf9;
@@ -105,7 +105,7 @@
 }
 
 /* Ocean — blue-tinted */
-[data-theme='dark'][data-palette='ocean'] {
+[data-theme="dark"][data-palette="ocean"] {
   --background: #061018;
   --foreground: #e2edf5;
   --panel: #0c1620;
@@ -131,7 +131,7 @@
   );
 }
 
-[data-theme='light'][data-palette='ocean'] {
+[data-theme="light"][data-palette="ocean"] {
   --background: #e2eff8;
   --foreground: #0a1828;
   --panel: #f8fcff;
@@ -158,7 +158,7 @@
 }
 
 /* Forest — green-gray */
-[data-theme='dark'][data-palette='forest'] {
+[data-theme="dark"][data-palette="forest"] {
   --background: #080e0a;
   --foreground: #e4ede6;
   --panel: #101814;
@@ -184,7 +184,7 @@
   );
 }
 
-[data-theme='light'][data-palette='forest'] {
+[data-theme="light"][data-palette="forest"] {
   --background: #eaf2ec;
   --foreground: #0e1a12;
   --panel: #f9fbf9;
@@ -211,7 +211,7 @@
 }
 
 /* High contrast */
-[data-theme='dark'][data-palette='contrast'] {
+[data-theme="dark"][data-palette="contrast"] {
   --background: #000000;
   --foreground: #ffffff;
   --panel: #121212;
@@ -235,7 +235,7 @@
   --body-gradient: none;
 }
 
-[data-theme='light'][data-palette='contrast'] {
+[data-theme="light"][data-palette="contrast"] {
   --background: #ffffff;
   --foreground: #000000;
   --panel: #f5f5f5;
@@ -260,7 +260,7 @@
 }
 
 /* Sunset — warm orange/pink fading into plum */
-[data-theme='dark'][data-palette='sunset'] {
+[data-theme="dark"][data-palette="sunset"] {
   --background: #150a14;
   --foreground: #fbe8df;
   --panel: #1f1018;
@@ -286,7 +286,7 @@
   );
 }
 
-[data-theme='light'][data-palette='sunset'] {
+[data-theme="light"][data-palette="sunset"] {
   --background: #fdece4;
   --foreground: #2a1410;
   --panel: #fff8f2;
@@ -313,7 +313,7 @@
 }
 
 /* Lavender — soft violets */
-[data-theme='dark'][data-palette='lavender'] {
+[data-theme="dark"][data-palette="lavender"] {
   --background: #0e0b16;
   --foreground: #ece6f8;
   --panel: #16121f;
@@ -339,7 +339,7 @@
   );
 }
 
-[data-theme='light'][data-palette='lavender'] {
+[data-theme="light"][data-palette="lavender"] {
   --background: #ece6f6;
   --foreground: #1a1226;
   --panel: #fbf8ff;
@@ -366,7 +366,7 @@
 }
 
 /* Rose — blush pinks */
-[data-theme='dark'][data-palette='rose'] {
+[data-theme="dark"][data-palette="rose"] {
   --background: #14080d;
   --foreground: #f8e2e8;
   --panel: #1d0e15;
@@ -392,7 +392,7 @@
   );
 }
 
-[data-theme='light'][data-palette='rose'] {
+[data-theme="light"][data-palette="rose"] {
   --background: #fce5ec;
   --foreground: #2a0c18;
   --panel: #fff5f8;
@@ -419,7 +419,7 @@
 }
 
 /* Slate — neutral cool gray */
-[data-theme='dark'][data-palette='slate'] {
+[data-theme="dark"][data-palette="slate"] {
   --background: #0b0d10;
   --foreground: #e6ecf2;
   --panel: #14171c;
@@ -445,7 +445,7 @@
   );
 }
 
-[data-theme='light'][data-palette='slate'] {
+[data-theme="light"][data-palette="slate"] {
   --background: #e6e9ee;
   --foreground: #0d1118;
   --panel: #f8f9fb;
@@ -472,7 +472,7 @@
 }
 
 /* Nord — frosty arctic blues */
-[data-theme='dark'][data-palette='nord'] {
+[data-theme="dark"][data-palette="nord"] {
   --background: #1a1f29;
   --foreground: #eceff4;
   --panel: #232936;
@@ -498,7 +498,7 @@
   );
 }
 
-[data-theme='light'][data-palette='nord'] {
+[data-theme="light"][data-palette="nord"] {
   --background: #eceff4;
   --foreground: #2e3440;
   --panel: #f9fafc;
@@ -525,7 +525,7 @@
 }
 
 /* Dracula — purple and magenta on deep night */
-[data-theme='dark'][data-palette='dracula'] {
+[data-theme="dark"][data-palette="dracula"] {
   --background: #1e1f29;
   --foreground: #f8f8f2;
   --panel: #282a36;
@@ -551,7 +551,7 @@
   );
 }
 
-[data-theme='light'][data-palette='dracula'] {
+[data-theme="light"][data-palette="dracula"] {
   --background: #f4eef8;
   --foreground: #281a3e;
   --panel: #fbf6ff;

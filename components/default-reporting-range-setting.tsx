@@ -1,37 +1,37 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { SettingRadioGroup } from '@/components/setting-radio-group'
-import { default_reporting_range_preference } from '@/lib/preferences/default_reporting_range_preference'
-import { persist_ui_preference } from '@/lib/persist_ui_preference'
-import { type DefaultReportingRange } from '@/lib/types/ui_preferences'
+import { SettingRadioGroup } from "@/components/setting-radio-group";
+import { default_reporting_range_preference } from "@/lib/preferences/default_reporting_range_preference";
+import { persist_ui_preference } from "@/lib/persist_ui_preference";
+import { type DefaultReportingRange } from "@/lib/types/ui_preferences";
 
 const options: {
-  value: DefaultReportingRange
-  label: string
-  description: string
+  value: DefaultReportingRange;
+  label: string;
+  description: string;
 }[] = [
   {
-    value: 'none',
-    label: 'All time',
-    description: 'Open with no date filter applied.',
+    value: "none",
+    label: "All time",
+    description: "Open with no date filter applied.",
   },
   {
-    value: 'today',
-    label: 'Today',
-    description: 'Pre-select today’s date range.',
+    value: "today",
+    label: "Today",
+    description: "Pre-select today’s date range.",
   },
   {
-    value: 'week',
-    label: 'This week',
-    description: 'Pre-select the current week (respects week starts on).',
+    value: "week",
+    label: "This week",
+    description: "Pre-select the current week (respects week starts on).",
   },
-]
+];
 
 const set_default_reporting_range = (value: DefaultReportingRange): void => {
-  persist_ui_preference(default_reporting_range_preference, value)
-}
+  persist_ui_preference(default_reporting_range_preference, value);
+};
 
 /**
  * Setting: initial date range when opening reporting.
@@ -41,7 +41,7 @@ export function DefaultReportingRangeSetting() {
     default_reporting_range_preference.subscribe,
     default_reporting_range_preference.get_snapshot,
     default_reporting_range_preference.get_server_snapshot,
-  )
+  );
 
   return (
     <SettingRadioGroup<DefaultReportingRange>
@@ -52,5 +52,5 @@ export function DefaultReportingRangeSetting() {
       options={options}
       on_change={set_default_reporting_range}
     />
-  )
+  );
 }

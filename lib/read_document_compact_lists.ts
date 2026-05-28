@@ -6,7 +6,5 @@ export function read_document_compact_lists(): boolean {
     return false;
   }
 
-  return (
-    document.documentElement.getAttribute("data-compact-lists") === "true"
-  );
+  return document.documentElement.getAttribute("data-compact-lists") === "true";
 }

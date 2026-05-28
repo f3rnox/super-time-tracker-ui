@@ -1,6 +1,4 @@
-import {
-  COMPACT_LISTS_STORAGE_KEY,
-} from "@/lib/types/ui_settings";
+import { COMPACT_LISTS_STORAGE_KEY } from "@/lib/types/ui_settings";
 
 /**
  * Reads the persisted compact lists setting from localStorage.

@@ -90,7 +90,7 @@ export function TrackerKeyboardShortcuts({
         key: shortcut_map["check-out"],
         is_available: () => !is_pending && is_tracking,
         action: () => {
-          void check_out();
+          check_out().catch(() => {});
         },
       },
       {

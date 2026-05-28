@@ -1,7 +1,7 @@
-import { CloudAccountSetting } from '@/components/cloud-account-setting'
-import { CloudSyncActions } from '@/components/cloud-sync-actions'
-import { GreedyCloudSyncSetting } from '@/components/greedy-cloud-sync-setting'
-import { SettingsPageLayout } from '@/components/settings-page-layout'
+import { CloudAccountSetting } from "@/components/cloud-account-setting";
+import { CloudSyncActions } from "@/components/cloud-sync-actions";
+import { GreedyCloudSyncSetting } from "@/components/greedy-cloud-sync-setting";
+import { SettingsPageLayout } from "@/components/settings-page-layout";
 
 /**
  * Settings page: Supabase cloud sync account and sync behavior.
@@ -10,8 +10,8 @@ export function CloudSyncSettingsView() {
   return (
     <SettingsPageLayout
       breadcrumb={{
-        current: 'Cloud sync',
-        parent: { label: 'Settings', href: '/settings' },
+        current: "Cloud sync",
+        parent: { label: "Settings", href: "/settings" },
       }}
       title="Cloud sync"
       description="Sign in, automatic sync, and manual push or pull with Supabase."
@@ -31,5 +31,5 @@ export function CloudSyncSettingsView() {
         </li>
       </ul>
     </SettingsPageLayout>
-  )
+  );
 }

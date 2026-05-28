@@ -12,9 +12,9 @@ export function find_running_entry_on_sheet(
 
   const entry = sheet.entries.find(({ id }) => id === sheet.activeEntryID);
 
-  if (entry === undefined || entry.end !== null) {
+  if (entry?.end != null) {
     return null;
   }
 
-  return entry;
+  return entry ?? null;
 }

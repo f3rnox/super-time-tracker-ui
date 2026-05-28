@@ -32,10 +32,12 @@ export function find_sheet_entry_by_id(
     return running;
   }
 
-  return matches.reduce((latest, entry) => {
+  const [first_match, ...other_matches] = matches;
+
+  return other_matches.reduce((latest, entry) => {
     const latest_end = latest.end?.getTime() ?? 0;
     const entry_end = entry.end?.getTime() ?? 0;
 
     return entry_end >= latest_end ? entry : latest;
-  });
+  }, first_match);
 }

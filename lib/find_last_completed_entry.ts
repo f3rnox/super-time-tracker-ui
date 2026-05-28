@@ -1,8 +1,8 @@
-import { type TimeSheetEntry, type TimeTrackerDB } from '@/lib/types'
+import { type TimeSheetEntry, type TimeTrackerDB } from "@/lib/types";
 
 interface LastCompletedEntryResult {
-  sheetName: string
-  entry: TimeSheetEntry
+  sheetName: string;
+  entry: TimeSheetEntry;
 }
 
 /**
@@ -11,23 +11,23 @@ interface LastCompletedEntryResult {
 export function find_last_completed_entry(
   db: TimeTrackerDB,
 ): LastCompletedEntryResult | null {
-  let best: LastCompletedEntryResult | null = null
-  let best_end_ms = -1
+  let best: LastCompletedEntryResult | null = null;
+  let best_end_ms = -1;
 
   for (const sheet of db.sheets) {
     for (const entry of sheet.entries) {
       if (entry.end === null) {
-        continue
+        continue;
       }
 
-      const end_ms = entry.end.getTime()
+      const end_ms = entry.end.getTime();
 
       if (end_ms > best_end_ms) {
-        best_end_ms = end_ms
-        best = { sheetName: sheet.name, entry }
+        best_end_ms = end_ms;
+        best = { sheetName: sheet.name, entry };
       }
     }
   }
 
-  return best
+  return best;
 }

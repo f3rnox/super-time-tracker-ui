@@ -29,23 +29,23 @@ import { get_archive_entry_confirm_dialog } from "@/lib/get_archive_entry_confir
 import { use_confirm_destructive_actions } from "@/lib/use_confirm_destructive_actions";
 import { build_resume_description } from "@/lib/build_resume_description";
 import { collect_tags_from_entries } from "@/lib/collect_tags_from_entries";
-import { filter_entries_by_tags } from "@/lib/filter_entries_by_tags";
-import { filter_serialized_entries_by_search_query } from "@/lib/filter_serialized_entries_by_search_query";
+import { build_add_note_request_payload } from "@/lib/build_add_note_request_payload";
+import { filter_tracker_sheet_entries } from "@/lib/filter_tracker_sheet_entries";
+import { get_tracker_entries_empty_message } from "@/lib/get_tracker_entries_empty_message";
+import { notify_tracker_running_entry_change } from "@/lib/notify_tracker_running_entry_change";
 import { finish_running_pomodoro_timer } from "@/lib/finish_running_pomodoro_timer";
-import { get_running_entry_key } from "@/lib/get_running_entry_key";
 import {
   get_sheet_tag_filter_server_snapshot,
   get_sheet_tag_filter_snapshot,
 } from "@/lib/get_sheet_tag_filter_snapshot";
 import { get_serialized_entries_total_ms } from "@/lib/get_serialized_entries_total_ms";
-import { notify_desktop } from "@/lib/notify_desktop";
 import { fetch_tracker_state } from "@/lib/fetch_tracker_state";
+import { format_unknown_error } from "@/lib/format_unknown_error";
 import { subscribe_tracker_state_sync } from "@/lib/notify_tracker_state_sync";
 import { patch_tracker_action } from "@/lib/patch_tracker_action";
 import { publish_tracker_running_entry } from "@/lib/tracker_state_client_store";
 import { post_tracker_action } from "@/lib/post_tracker_action";
 import { set_sheet_tag_filter } from "@/lib/set_sheet_tag_filter";
-import { sort_serialized_entries } from "@/lib/sort_serialized_entries";
 import { subscribe_sheet_tag_filters } from "@/lib/subscribe_sheet_tag_filters";
 import { apply_optimistic_sheet_switch } from "@/lib/apply_optimistic_sheet_switch";
 import { sync_active_sheet_preference } from "@/lib/sync_active_sheet_preference";
@@ -141,46 +141,14 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
         finish_running_pomodoro_timer();
       }
 
-      if (!desktop_notifications_enabled) {
-        return;
-      }
-
-      if (previous_running_entry === null && next_running_entry !== null) {
-        notify_desktop({
-          title: "Tracking started",
-          body: `${next_running_entry.description || "Untitled entry"} (${next_running_entry.sheetName})`,
-          tag: "tracker-running-entry",
-        });
-        return;
-      }
-
-      if (previous_running_entry !== null && next_running_entry === null) {
-        notify_desktop({
-          title: "Tracking stopped",
-          body: `${previous_running_entry.description || "Untitled entry"} (${previous_running_entry.sheetName})`,
-          tag: "tracker-running-entry",
-        });
-        return;
-      }
-
-      if (
-        previous_running_entry !== null &&
-        next_running_entry !== null &&
-        get_running_entry_key(previous_running_entry) !==
-          get_running_entry_key(next_running_entry)
-      ) {
-        notify_desktop({
-          title: "Tracking switched",
-          body: `${next_running_entry.description || "Untitled entry"} (${next_running_entry.sheetName})`,
-          tag: "tracker-running-entry",
-        });
+      if (desktop_notifications_enabled) {
+        notify_tracker_running_entry_change(
+          previous_running_entry,
+          next_running_entry,
+        );
       }
     } catch (action_error: unknown) {
-      setError(
-        action_error instanceof Error
-          ? action_error.message
-          : String(action_error),
-      );
+      setError(format_unknown_error(action_error));
     } finally {
       setIs_pending(false);
     }
@@ -235,22 +203,14 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
       return [];
     }
 
-    const visibility_filtered = state.activeSheetEntries.filter((entry) =>
-      show_archived_entries ? entry.archived === true : entry.archived !== true,
-    );
-
-    const matching = filter_entries_by_tags(
-      visibility_filtered,
+    return filter_tracker_sheet_entries({
+      entries: state.activeSheetEntries,
+      show_archived_entries,
       filter_tags,
       tag_filter_mode,
-    );
-
-    const searched = filter_serialized_entries_by_search_query(
-      matching,
       entry_search_query,
-    );
-
-    return sort_serialized_entries(searched, entry_list_sort);
+      entry_list_sort,
+    });
   }, [
     state.activeSheetEntries,
     filter_tags,
@@ -298,20 +258,15 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
     return subscribe_tracker_state_sync(refresh_state_after_sync);
   }, [is_pending, is_switching_sheet]);
 
-  const entries_empty_message =
-    is_switching_sheet || is_loading_entries
-      ? `Loading entries for "${active_sheet}"…`
-      : show_archived_entries
-        ? `No archived entries on sheet "${active_sheet}".`
-        : entry_search_query.trim().length > 0
-          ? filter_tags.length > 0
-            ? `No entries on sheet "${active_sheet}" match your search and selected tags.`
-            : `No entries on sheet "${active_sheet}" match your search.`
-          : filter_tags.length > 0
-            ? tag_filter_mode === "any"
-              ? `No entries on sheet "${active_sheet}" match any selected tag.`
-              : `No entries on sheet "${active_sheet}" match all selected tags.`
-            : `No entries on sheet "${active_sheet}".`;
+  const entries_empty_message = get_tracker_entries_empty_message({
+    active_sheet,
+    is_switching_sheet,
+    is_loading_entries,
+    show_archived_entries,
+    entry_search_query,
+    filter_tags,
+    tag_filter_mode,
+  });
 
   const select_sheet = (name: string): void => {
     if (name === active_sheet && !is_switching_sheet) {
@@ -333,11 +288,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
         setState(next_state);
       })
       .catch((action_error: unknown) => {
-        setError(
-          action_error instanceof Error
-            ? action_error.message
-            : String(action_error),
-        );
+        setError(format_unknown_error(action_error));
         setState(state_before_sheet_switch_ref.current);
       })
       .finally(() => {
@@ -380,11 +331,11 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
         <TrackerTopbar />
       </div>
       <div className="mx-auto max-w-[1120px] px-4 pb-10 pt-4 sm:px-5 sm:pt-5">
-        {error !== null ? (
+        {error === null ? null : (
           <p className="mb-4 border border-danger-border bg-danger-soft px-3 py-2.5 text-danger-text">
             {error}
           </p>
-        ) : null}
+        )}
         <FocusGoalsNudgesBanner
           has_running_timer={state.runningEntry !== null}
           initial_focus_nudges_status={state.focusNudgesStatusGlobal}
@@ -484,12 +435,15 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                 }
                 on_add_note={(text, at) =>
                   run_action(() =>
-                    post_tracker_action("/api/note", {
-                      text,
-                      ...(at !== undefined ? { at } : {}),
-                      sheetName: active_sheet,
-                      entryId: state.activeEntry?.id,
-                    }),
+                    post_tracker_action(
+                      "/api/note",
+                      build_add_note_request_payload(
+                        text,
+                        active_sheet,
+                        state.activeEntry?.id,
+                        at,
+                      ),
+                    ),
                   )
                 }
                 on_edit_note={(timestamp, original_text, text) =>

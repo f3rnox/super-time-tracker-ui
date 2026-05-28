@@ -1,6 +1,8 @@
+import { entry_matches_focus_goal_scope } from "@/lib/entry_matches_focus_goal_scope";
 import { get_clipped_entry_duration_ms } from "@/lib/get_clipped_entry_duration_ms";
 import { get_period_range_ms } from "@/lib/get_period_range_ms";
 import { read_db } from "@/lib/read_db";
+import { update_focus_nudges_entry_aggregates } from "@/lib/update_focus_nudges_entry_aggregates";
 import { type TimeTrackerDB } from "@/lib/types";
 import { type FocusGoalScope } from "@/lib/types/ui_preferences";
 import { type FocusNudgesStatus } from "@/lib/types/focus_nudges_status";
@@ -29,21 +31,22 @@ export async function get_focus_nudges_status({
 
   let today_tracked_ms = 0;
   let week_tracked_ms = 0;
-  let active_timer_duration_ms: number | null = null;
-  let last_log_ms: number | null = null;
+  let aggregates = {
+    last_log_ms: null as number | null,
+    active_timer_duration_ms: null as number | null,
+  };
 
   for (const sheet of db.sheets) {
     for (const entry of sheet.entries) {
-      const matches_scope =
-        scope === "global" ||
-        (scope === "sheet" &&
-          sheet_name !== undefined &&
-          sheet.name === sheet_name) ||
-        (scope === "tag" &&
-          tag_name !== undefined &&
-          entry.tags.some((tag) => tag === tag_name));
-
-      if (matches_scope) {
+      if (
+        entry_matches_focus_goal_scope({
+          scope,
+          sheet_name,
+          tag_name,
+          sheet_name_on_entry: sheet.name,
+          entry,
+        })
+      ) {
         today_tracked_ms += get_clipped_entry_duration_ms(
           entry,
           today_range.startMs,
@@ -58,39 +61,24 @@ export async function get_focus_nudges_status({
         );
       }
 
-      const entry_start_ms = +entry.start;
-      const entry_end_ms = entry.end === null ? null : +entry.end;
-      const entry_last_log_ms =
-        entry_end_ms === null
-          ? entry_start_ms
-          : Math.max(entry_start_ms, entry_end_ms);
-
-      if (last_log_ms === null || entry_last_log_ms > last_log_ms) {
-        last_log_ms = entry_last_log_ms;
-      }
-
-      if (entry.end === null) {
-        const duration_ms = Math.max(0, now_ms - entry_start_ms);
-
-        if (
-          active_timer_duration_ms === null ||
-          duration_ms > active_timer_duration_ms
-        ) {
-          active_timer_duration_ms = duration_ms;
-        }
-      }
+      aggregates = update_focus_nudges_entry_aggregates(
+        entry,
+        now_ms,
+        aggregates,
+      );
     }
   }
 
   const minutes_since_last_log =
-    active_timer_duration_ms !== null || last_log_ms === null
+    aggregates.active_timer_duration_ms !== null ||
+    aggregates.last_log_ms === null
       ? null
-      : Math.floor((now_ms - last_log_ms) / 60000);
+      : Math.floor((now_ms - aggregates.last_log_ms) / 60000);
 
   return {
     todayTrackedMs: today_tracked_ms,
     weekTrackedMs: week_tracked_ms,
-    activeTimerDurationMs: active_timer_duration_ms,
+    activeTimerDurationMs: aggregates.active_timer_duration_ms,
     minutesSinceLastLog: minutes_since_last_log,
   };
 }

@@ -1,22 +1,22 @@
-'use client'
+"use client";
 
-import { TrackerNavLinks } from '@/components/tracker-nav-links'
-import { TopbarCloudStatus } from '@/components/topbar-cloud-status'
-import { TopbarOverflowMenu } from '@/components/topbar-overflow-menu'
-import { TopbarQuickActions } from '@/components/topbar-quick-actions'
-import { TopbarSettingsLink } from '@/components/topbar-settings-link'
+import { TrackerNavLinks } from "@/components/tracker-nav-links";
+import { TopbarCloudStatus } from "@/components/topbar-cloud-status";
+import { TopbarOverflowMenu } from "@/components/topbar-overflow-menu";
+import { TopbarQuickActions } from "@/components/topbar-quick-actions";
+import { TopbarSettingsLink } from "@/components/topbar-settings-link";
 import {
   TrackerBreadcrumb,
   type TrackerBreadcrumbSegment,
-} from '@/components/tracker-breadcrumb'
+} from "@/components/tracker-breadcrumb";
 
 export interface TrackerTopbarBreadcrumb {
-  current: string
-  parent?: TrackerBreadcrumbSegment
+  current: string;
+  parent?: TrackerBreadcrumbSegment;
 }
 
 interface TrackerTopbarProps {
-  breadcrumb?: TrackerTopbarBreadcrumb
+  breadcrumb?: TrackerTopbarBreadcrumb;
 }
 
 /**
@@ -31,7 +31,10 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
         </span>
         {breadcrumb !== undefined ? (
           <div className="min-w-0 flex-1">
-            <TrackerBreadcrumb current={breadcrumb.current} parent={breadcrumb.parent} />
+            <TrackerBreadcrumb
+              current={breadcrumb.current}
+              parent={breadcrumb.parent}
+            />
           </div>
         ) : null}
         <div className="flex w-full items-center justify-between gap-2 min-[980px]:ml-auto min-[980px]:w-auto min-[980px]:justify-end">
@@ -45,5 +48,5 @@ export function TrackerTopbar({ breadcrumb }: TrackerTopbarProps = {}) {
         </div>
       </div>
     </header>
-  )
+  );
 }

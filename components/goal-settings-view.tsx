@@ -22,17 +22,15 @@ export function GoalSettingsView({
       title="Goals"
       description="Configure focus targets globally, per-sheet, or per-tag."
     >
-      <ul
-        className="m-0 flex w-full list-none flex-col gap-2 p-0"
+      <div
+        className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm"
         aria-label="Goal settings"
       >
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <FocusGoalsNudgesSetting
-            sheet_names={sheet_names}
-            tag_names={tag_names}
-          />
-        </li>
-      </ul>
+        <FocusGoalsNudgesSetting
+          sheet_names={sheet_names}
+          tag_names={tag_names}
+        />
+      </div>
     </SettingsPageLayout>
   );
 }

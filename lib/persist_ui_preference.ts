@@ -1,5 +1,5 @@
-import { notify_settings_saved } from '@/lib/notify_settings_saved'
-import { type UiPreferenceStore } from '@/lib/ui_preference_store'
+import { notify_settings_saved } from "@/lib/notify_settings_saved";
+import { type UiPreferenceStore } from "@/lib/ui_preference_store";
 
 /**
  * Writes a UI preference, notifies subscribers, and shows the saved toast.
@@ -9,10 +9,10 @@ export function persist_ui_preference<T extends string>(
   value: T,
 ): void {
   if (store.read() === value) {
-    return
+    return;
   }
 
-  store.write(value)
-  store.notify()
-  notify_settings_saved()
+  store.write(value);
+  store.notify();
+  notify_settings_saved();
 }

@@ -1,5 +1,5 @@
-import { type ReportingSourceSheet } from '@/lib/types/reporting'
-import { type TimeSheet } from '@/lib/types'
+import { type ReportingSourceSheet } from "@/lib/types/reporting";
+import { type TimeSheet } from "@/lib/types";
 
 /**
  * Serializes time sheets for client-side reporting calculations.
@@ -16,5 +16,5 @@ export function serialize_reporting_source_sheets(
       end: entry.end === null ? null : entry.end.toISOString(),
       tags: entry.tags,
     })),
-  }))
+  }));
 }

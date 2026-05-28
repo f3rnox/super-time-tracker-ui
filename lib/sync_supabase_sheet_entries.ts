@@ -29,7 +29,7 @@ export async function sync_supabase_sheet_entries(
   sheet: TimeSheet,
   include_archived: boolean = true,
 ): Promise<void> {
-  const desired_entry_ids = sheet.entries.map((entry) => entry.id);
+  const desired_entry_ids = new Set(sheet.entries.map((entry) => entry.id));
 
   const { data: existing_entry_rows, error: list_entries_error } =
     await supabase.from("entries").select("id").eq("sheet_id", sheet_id);
@@ -44,7 +44,7 @@ export async function sync_supabase_sheet_entries(
     (row) => (row as { id: number }).id,
   );
   const entry_ids_to_delete = existing_entry_ids.filter(
-    (id) => !desired_entry_ids.includes(id),
+    (id) => !desired_entry_ids.has(id),
   );
 
   if (entry_ids_to_delete.length > 0) {
