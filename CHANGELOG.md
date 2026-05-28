@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.32](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.31...v0.1.32) (2026-05-28)
+
+
+### Bug Fixes
+
+* sheets link render in topbar ([9135733](https://github.com/f3rnox/super-time-tracker-ui/commit/9135733d16924878e39f56229ef2cb54c8789682))
+
 ### [0.1.31](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.30...v0.1.31) (2026-05-28)
 
 
