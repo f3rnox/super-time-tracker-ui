@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { TagAutocompleteInput } from '@/components/tag-autocomplete-input'
+import { schedule_ui_preferences_cloud_sync } from '@/lib/schedule_ui_preferences_cloud_sync'
 import { SettingsPageLayout } from '@/components/settings-page-layout'
 import {
   POMODORO_DEFAULT_SETTINGS,
@@ -66,9 +67,8 @@ export function PomodoroSettingsView({ known_tags }: { known_tags: string[] }) {
                 ? stored_settings.check_in_on_work_start
                 : POMODORO_DEFAULT_SETTINGS.check_in_on_work_start,
             work_entry_description:
-              typeof stored_settings.work_entry_description === 'string' &&
-              stored_settings.work_entry_description.trim().length > 0
-                ? stored_settings.work_entry_description.trim()
+              typeof stored_settings.work_entry_description === 'string'
+                ? stored_settings.work_entry_description
                 : POMODORO_DEFAULT_SETTINGS.work_entry_description,
           })
         }
@@ -98,6 +98,7 @@ export function PomodoroSettingsView({ known_tags }: { known_tags: string[] }) {
       }
 
       window.localStorage.setItem(POMODORO_STORAGE_KEY, JSON.stringify(next_record))
+      schedule_ui_preferences_cloud_sync()
     } catch {
       // Ignore storage write failures.
     }

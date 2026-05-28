@@ -38,6 +38,25 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   const [has_running_tracker_entry, set_has_running_tracker_entry] = useState(false)
   const original_title_ref = useRef<string | null>(null)
 
+  const notify_pomodoro_event = useCallback((title: string, body: string): void => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return
+    }
+
+    if (window.Notification.permission === 'granted') {
+      void new window.Notification(title, { body })
+      return
+    }
+
+    if (window.Notification.permission === 'default') {
+      void window.Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          void new window.Notification(title, { body })
+        }
+      })
+    }
+  }, [])
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return
@@ -89,9 +108,8 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
                   ? stored_settings.check_in_on_work_start
                   : POMODORO_DEFAULT_SETTINGS.check_in_on_work_start,
               work_entry_description:
-                typeof stored_settings.work_entry_description === 'string' &&
-                stored_settings.work_entry_description.trim().length > 0
-                  ? stored_settings.work_entry_description.trim()
+                typeof stored_settings.work_entry_description === 'string'
+                  ? stored_settings.work_entry_description
                   : POMODORO_DEFAULT_SETTINGS.work_entry_description,
             })
           }
@@ -305,11 +323,22 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     })
 
     const is_resuming = timer_state.status === 'paused'
+    const is_break_phase =
+      timer_state.phase === 'short_break' || timer_state.phase === 'long_break'
     const should_check_in =
       is_resuming ||
       (timer_state.status !== 'running' &&
         timer_state.phase === 'work' &&
         settings.check_in_on_work_start)
+
+    if (!is_resuming && timer_state.status !== 'running') {
+      notify_pomodoro_event(
+        is_break_phase ? 'Pomodoro break started' : 'Pomodoro focus started',
+        is_break_phase
+          ? 'Break timer is running.'
+          : 'Focus timer is running.',
+      )
+    }
 
     if (!should_check_in) {
       return
@@ -390,6 +419,8 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   }
 
   const advance_phase = useCallback((): void => {
+    const is_completed_focus_session = timer_state.phase === 'work'
+    const completed_session_index = timer_state.completed_work_sessions + 1
     set_timer_state((current) => {
       const completed_work_sessions =
         current.phase === 'work'
@@ -421,8 +452,34 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
         paused_remaining_ms: null,
       }
     })
+
+    if (is_completed_focus_session) {
+      notify_pomodoro_event(
+        'Pomodoro focus session complete',
+        `Completed focus session ${completed_session_index}.`,
+      )
+    }
+
+    if (settings.auto_start_next_phase) {
+      const next_phase_label =
+        timer_state.phase === 'work'
+          ? timer_state.completed_work_sessions % settings.rounds_before_long_break ===
+            settings.rounds_before_long_break - 1
+            ? 'long break'
+            : 'short break'
+          : 'focus'
+      notify_pomodoro_event(
+        timer_state.phase === 'work'
+          ? 'Pomodoro break started'
+          : 'Pomodoro focus started',
+        `Auto-started ${next_phase_label} timer.`,
+      )
+    }
   }, [
     get_phase_duration_ms,
+    notify_pomodoro_event,
+    timer_state.completed_work_sessions,
+    timer_state.phase,
     settings.auto_start_next_phase,
     settings.rounds_before_long_break,
   ])
