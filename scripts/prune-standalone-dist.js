@@ -20,7 +20,6 @@ const NEXT_DEV_RELATIVE_PATHS = [
   'node_modules/next/dist/docs',
   'node_modules/next/dist/bundle-analyzer',
   'node_modules/next/dist/next-devtools',
-  'node_modules/next/dist/cli',
   'node_modules/next/dist/compiled/next-devtools',
   'node_modules/next/dist/compiled/react-dom-experimental',
   'node_modules/next/dist/compiled/react-dom',

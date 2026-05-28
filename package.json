@@ -34,7 +34,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/stop-standalone-server.js",
     "build": "next build",
-    "postbuild": "node scripts/sync-standalone-assets.js && node scripts/prune-standalone-dist.js",
+    "postbuild": "node scripts/sync-standalone-assets.js && node scripts/ensure-standalone-runtime-deps.js && node scripts/prune-standalone-dist.js",
     "start": "next start",
     "stt-ui": "node bin/stt-ui.js",
     "format": "pnpm format:prettier",
@@ -59,8 +59,10 @@
     "update-version": "standard-version -a"
   },
   "dependencies": {
+    "@next/env": "16.2.6",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.0",
+    "@swc/helpers": "0.5.15",
     "date-fns": "^4.2.1",
     "humanize-duration": "^3.33.2",
     "next": "16.2.6",

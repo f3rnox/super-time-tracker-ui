@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  outputFileTracingIncludes: {
+    "/*": ["node_modules/@swc/helpers/**/*"],
+  },
   outputFileTracingExcludes: {
     "/*": [
       "node_modules/sharp/**",
@@ -13,7 +16,6 @@ const nextConfig: NextConfig = {
       "node_modules/next/dist/docs/**",
       "node_modules/next/dist/bundle-analyzer/**",
       "node_modules/next/dist/next-devtools/**",
-      "node_modules/next/dist/cli/**",
       "node_modules/next/dist/compiled/next-devtools/**",
       "node_modules/next/dist/compiled/react-dom-experimental/**",
       "node_modules/next/dist/compiled/react-dom/**",
