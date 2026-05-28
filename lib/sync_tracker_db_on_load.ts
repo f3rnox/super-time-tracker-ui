@@ -14,12 +14,17 @@ export interface SyncTrackerDbOnLoadResult {
 /**
  * Merges local db.json with cloud data on load and persists the result locally.
  */
-export async function sync_tracker_db_on_load(): Promise<SyncTrackerDbOnLoadResult> {
+export async function sync_tracker_db_on_load(
+  authenticated_user_id?: string | null,
+): Promise<SyncTrackerDbOnLoadResult> {
   if (!is_supabase_configured()) {
     return { synced: false, merged: null }
   }
 
-  const user_id = await get_authenticated_user_id()
+  const user_id =
+    authenticated_user_id === undefined
+      ? await get_authenticated_user_id()
+      : authenticated_user_id
 
   if (user_id === null) {
     return { synced: false, merged: null }

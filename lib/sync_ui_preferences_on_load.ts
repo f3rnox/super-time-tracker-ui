@@ -15,12 +15,16 @@ export interface SyncUiPreferencesOnLoadResult {
  */
 export async function sync_ui_preferences_on_load(
   local: UiPreferencesRecord,
+  authenticated_user_id?: string | null,
 ): Promise<SyncUiPreferencesOnLoadResult> {
   if (!is_supabase_configured()) {
     return { synced: false, merged: local }
   }
 
-  const user_id = await get_authenticated_user_id()
+  const user_id =
+    authenticated_user_id === undefined
+      ? await get_authenticated_user_id()
+      : authenticated_user_id
 
   if (user_id === null) {
     return { synced: false, merged: local }

@@ -8,6 +8,7 @@ import { HamburgerIcon } from '@/components/hamburger-icon'
 import { build_auth_page_href } from '@/lib/build_auth_page_href'
 import { notify_settings_saved } from '@/lib/notify_settings_saved'
 import { cloud_sync_enabled_preference } from '@/lib/preferences/cloud_sync_enabled_preference'
+import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
 import { get_theme_server_snapshot, get_theme_snapshot } from '@/lib/get_theme_snapshot'
 import { subscribe_theme } from '@/lib/subscribe_theme'
 import { toggle_theme } from '@/lib/toggle_theme'
@@ -89,6 +90,12 @@ export function TopbarOverflowMenu(): React.ReactElement {
     notify_settings_saved(
       next_value === 'true' ? 'Cloud sync enabled' : 'Cloud sync disabled',
     )
+
+    if (next_value === 'true' && email !== null) {
+      void run_tracker_db_cloud_sync({ merge_on_load: true }).catch(() => {
+        // Sync toast already shows the error.
+      })
+    }
   }
 
   return (
