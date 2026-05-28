@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { type ActiveEntryPanelHandle } from '@/components/active-entry-panel'
@@ -30,6 +31,7 @@ import { set_sheet_tag_filter } from '@/lib/set_sheet_tag_filter'
 import { sort_serialized_entries } from '@/lib/sort_serialized_entries'
 import { subscribe_sheet_tag_filters } from '@/lib/subscribe_sheet_tag_filters'
 import { apply_optimistic_sheet_switch } from '@/lib/apply_optimistic_sheet_switch'
+import { get_button_class_name } from '@/lib/get_button_class_name'
 import { sync_active_sheet_preference } from '@/lib/sync_active_sheet_preference'
 import { use_clear_tag_filters_on_sheet_change } from '@/lib/use_clear_tag_filters_on_sheet_change'
 import { use_entry_list_sort } from '@/lib/use_entry_list_sort'
@@ -244,6 +246,28 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
           <div className="flex min-w-0 flex-col">
             <section className="flex min-w-0 flex-col gap-4 border-b border-panel-border border-l-4 border-l-accent p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-panel-border bg-background px-3 py-2">
+                <div className="min-w-0">
+                  <p className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
+                    Quick action
+                  </p>
+                  <p className="m-0 mt-1 text-[0.9rem] font-medium">
+                    Jump into Pomodoro without leaving the tracker.
+                  </p>
+                </div>
+                <Link
+                  href="/pomodoro"
+                  className={`${get_button_class_name(
+                    'primary',
+                  )} inline-flex min-w-40 flex-col items-center justify-center whitespace-nowrap text-center`}
+                  aria-label="Open Pomodoro timer"
+                >
+                  <span className="text-[0.9rem] leading-none">Start Pomodoro</span>
+                  <span className="mt-1 text-[0.72rem] font-medium leading-none opacity-85">
+                    Focus timer
+                  </span>
+                </Link>
+              </div>
               <TrackerActiveBar
                 ref={active_entry_panel_ref}
                 active_entry={state.activeEntry}

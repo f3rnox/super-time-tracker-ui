@@ -27,6 +27,10 @@ export function get_tracker_keyboard_shortcut_sections(): KeyboardShortcutSectio
           description: 'Add note to active entry',
         },
         {
+          label: 'P',
+          description: 'Open Pomodoro',
+        },
+        {
           label: '[',
           description: 'Previous sheet',
         },

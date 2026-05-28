@@ -21,6 +21,11 @@ const nav_items: NavItem[] = [
     match: (pathname) => pathname.startsWith('/today'),
   },
   {
+    href: '/pomodoro',
+    label: 'Pomodoro',
+    match: (pathname) => pathname.startsWith('/pomodoro'),
+  },
+  {
     href: '/sheets',
     label: 'Sheets',
     match: (pathname) => pathname.startsWith('/sheets'),

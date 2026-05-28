@@ -130,6 +130,16 @@ export function TopbarOverflowMenu(): React.ReactElement {
           </li>
           <li role="none">
             <Link
+              href="/pomodoro"
+              className={menu_item_class}
+              role="menuitem"
+              onClick={close_menu}
+            >
+              Pomodoro
+            </Link>
+          </li>
+          <li role="none">
+            <Link
               href="/settings/cloud-sync"
               className={menu_item_class}
               role="menuitem"
@@ -150,8 +160,8 @@ export function TopbarOverflowMenu(): React.ReactElement {
                 <span className="inline-flex w-full items-center justify-between gap-2">
                   <span>
                     {cloud_sync_enabled === 'true'
-                      ? 'Disable cloud sync'
-                      : 'Enable cloud sync'}
+                      ? 'Pause cloud sync'
+                      : 'Resume cloud sync'}
                   </span>
                   <span className="text-muted" aria-hidden="true">
                     {cloud_sync_enabled === 'true' ? 'On' : 'Off'}
