@@ -147,57 +147,9 @@ export function build_command_palette_items({
     items.push(build_resume_last_item(snapshot.lastCompletedEntry));
   }
 
-  if (include_templates && typeof window !== "undefined") {
-    for (const template of read_entry_templates()) {
-      const description = build_entry_template_description(template);
-      items.push({
-        id: `template-${template.id}`,
-        kind: "template_check_in",
-        group: template.favorite === true ? "Favorite templates" : "Templates",
-        title: `Check in: ${template.name}`,
-        subtitle:
-          template.defaultSheetName === undefined
-            ? description
-            : `${template.defaultSheetName} · ${description}`,
-        keywords: [
-          "check in",
-          "template",
-          template.name,
-          description,
-          template.shortcutKey ?? "",
-        ],
-        description,
-        sheetName:
-          template.defaultSheetName ?? snapshot.activeSheetName ?? undefined,
-        templateId: template.id,
-      });
-    }
-  }
-
-  for (const sheet of snapshot.sheets) {
-    items.push({
-      id: `sheet-${sheet.name}`,
-      kind: "sheet",
-      group: "Sheets",
-      title: `Open sheet: ${sheet.name}`,
-      subtitle: sheet.hasActiveEntry ? "Timer running" : undefined,
-      keywords: ["sheet", sheet.name, "project"],
-      sheetName: sheet.name,
-    });
-  }
-
-  const seen_entry_keys = new Set<string>();
-
-  for (const entry of snapshot.matchingEntries) {
-    const key = `${entry.sheetName}:${entry.id}`;
-
-    if (seen_entry_keys.has(key)) {
-      continue;
-    }
-
-    seen_entry_keys.add(key);
-    items.push(build_resume_entry_item(entry));
-  }
+  items.push(...build_template_palette_items(snapshot, include_templates));
+  items.push(...build_sheet_palette_items(snapshot));
+  items.push(...build_entry_palette_items(snapshot));
 
   return items;
 }
@@ -235,6 +187,75 @@ function build_resume_last_item(
     description: entry.description,
     tags: entry.tags,
   };
+}
+
+function build_template_palette_items(
+  snapshot: CommandPaletteSnapshot,
+  include_templates: boolean,
+): CommandPaletteItem[] {
+  if (!include_templates || typeof globalThis.window === "undefined") {
+    return [];
+  }
+
+  return read_entry_templates().map((template) => {
+    const description = build_entry_template_description(template);
+
+    return {
+      id: `template-${template.id}`,
+      kind: "template_check_in",
+      group: template.favorite === true ? "Favorite templates" : "Templates",
+      title: `Check in: ${template.name}`,
+      subtitle:
+        template.defaultSheetName === undefined
+          ? description
+          : `${template.defaultSheetName} · ${description}`,
+      keywords: [
+        "check in",
+        "template",
+        template.name,
+        description,
+        template.shortcutKey ?? "",
+      ],
+      description,
+      sheetName:
+        template.defaultSheetName ?? snapshot.activeSheetName ?? undefined,
+      templateId: template.id,
+    };
+  });
+}
+
+function build_sheet_palette_items(
+  snapshot: CommandPaletteSnapshot,
+): CommandPaletteItem[] {
+  return snapshot.sheets.map((sheet) => ({
+    id: `sheet-${sheet.name}`,
+    kind: "sheet",
+    group: "Sheets",
+    title: `Open sheet: ${sheet.name}`,
+    subtitle: sheet.hasActiveEntry ? "Timer running" : undefined,
+    keywords: ["sheet", sheet.name, "project"],
+    sheetName: sheet.name,
+  }));
+}
+
+function build_entry_palette_items(
+  snapshot: CommandPaletteSnapshot,
+): CommandPaletteItem[] {
+  const seen_entry_keys = new Set<string>();
+  const items: CommandPaletteItem[] = [];
+
+  for (const entry of snapshot.matchingEntries) {
+    const key = `${entry.sheetName}:${entry.id}`;
+
+    if (seen_entry_keys.has(key)) {
+      continue;
+    }
+
+    seen_entry_keys.add(key);
+    items.push(build_resume_entry_item(entry));
+  }
+
+  return items;
 }
 
 function build_resume_entry_item(

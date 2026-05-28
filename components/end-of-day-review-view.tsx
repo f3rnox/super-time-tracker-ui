@@ -290,12 +290,7 @@ function SummaryCard({
   value,
   tone = "default",
 }: Readonly<SummaryCardProps>) {
-  const value_class =
-    tone === "accent"
-      ? "text-accent"
-      : tone === "danger"
-        ? "text-danger"
-        : "text-foreground";
+  const value_class = get_summary_card_value_class(tone);
 
   return (
     <article className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
@@ -307,6 +302,18 @@ function SummaryCard({
       </p>
     </article>
   );
+}
+
+function get_summary_card_value_class(tone: SummaryCardProps["tone"]): string {
+  if (tone === "accent") {
+    return "text-accent";
+  }
+
+  if (tone === "danger") {
+    return "text-danger";
+  }
+
+  return "text-foreground";
 }
 
 interface PanelButtonProps {

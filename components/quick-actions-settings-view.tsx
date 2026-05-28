@@ -138,7 +138,7 @@ export function QuickActionsSettingsView() {
     }
 
     const candidate_key = event.key.toLowerCase();
-    const is_valid = /^[a-z\[\]\?]$/.test(candidate_key);
+    const is_valid = "abcdefghijklmnopqrstuvwxyz[]?".includes(candidate_key);
 
     if (!is_valid) {
       return;
@@ -202,6 +202,14 @@ export function QuickActionsSettingsView() {
               const draft_value = draft_shortcuts[action_id] ?? value;
               const is_duplicate = duplicate_keys.has(value);
               const has_unsaved_change = draft_value !== value;
+              const status_class = get_shortcut_status_class(
+                is_duplicate,
+                has_unsaved_change,
+              );
+              const status_text = get_shortcut_status_text(
+                is_duplicate,
+                has_unsaved_change,
+              );
 
               return (
                 <div
@@ -222,20 +230,8 @@ export function QuickActionsSettingsView() {
                     onFocus={(event) => event.currentTarget.select()}
                     aria-label={`${shortcut_action_labels[action_id]} shortcut`}
                   />
-                  <span
-                    className={`col-span-2 text-[0.72rem] ${
-                      is_duplicate
-                        ? "text-danger"
-                        : has_unsaved_change
-                          ? "text-muted"
-                          : "text-transparent"
-                    }`}
-                  >
-                    {is_duplicate
-                      ? "Duplicate"
-                      : has_unsaved_change
-                        ? "Press Enter to save"
-                        : "Ready"}
+                  <span className={`col-span-2 text-[0.72rem] ${status_class}`}>
+                    {status_text}
                   </span>
                 </div>
               );
@@ -262,4 +258,34 @@ export function QuickActionsSettingsView() {
       </div>
     </SettingsPageLayout>
   );
+}
+
+function get_shortcut_status_class(
+  is_duplicate: boolean,
+  has_unsaved_change: boolean,
+): string {
+  if (is_duplicate) {
+    return "text-danger";
+  }
+
+  if (has_unsaved_change) {
+    return "text-muted";
+  }
+
+  return "text-transparent";
+}
+
+function get_shortcut_status_text(
+  is_duplicate: boolean,
+  has_unsaved_change: boolean,
+): string {
+  if (is_duplicate) {
+    return "Duplicate";
+  }
+
+  if (has_unsaved_change) {
+    return "Press Enter to save";
+  }
+
+  return "Ready";
 }
