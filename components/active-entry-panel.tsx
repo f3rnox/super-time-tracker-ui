@@ -210,7 +210,7 @@ export const ActiveEntryPanel = forwardRef<
       </div>
       <div
         className={`flex shrink-0 items-end justify-between gap-4 max-[860px]:flex-col max-[860px]:items-stretch ${
-          in_bar ? 'px-1' : ''
+          in_bar ? 'px-3' : ''
         }`}
       >
         <div className="flex min-w-0 flex-col gap-2">
