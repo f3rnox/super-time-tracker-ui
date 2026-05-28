@@ -1,6 +1,7 @@
 'use client'
 
 import { CloudDbSyncToast } from '@/components/cloud-db-sync-toast'
+import { InAppNotificationsToast } from '@/components/in-app-notifications-toast'
 import { SettingsSavedToast } from '@/components/settings-saved-toast'
 
 const toast_stack_class =
@@ -12,6 +13,7 @@ const toast_stack_class =
 export function ToastNotifications() {
   return (
     <div className={toast_stack_class}>
+      <InAppNotificationsToast />
       <CloudDbSyncToast />
       <SettingsSavedToast />
     </div>

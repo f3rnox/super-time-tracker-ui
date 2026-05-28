@@ -158,12 +158,15 @@ export function FocusGoalsNudgesBanner({
       }
     }
 
-    set_active_pomodoro(read_active_pomodoro())
+    const initial_refresh_timeout = window.setTimeout(() => {
+      set_active_pomodoro(read_active_pomodoro())
+    }, 0)
     const interval_id = window.setInterval(() => {
       set_active_pomodoro(read_active_pomodoro())
     }, pomodoro_refresh_interval_ms)
 
     return () => {
+      window.clearTimeout(initial_refresh_timeout)
       window.clearInterval(interval_id)
     }
   }, [])
@@ -474,53 +477,65 @@ function FocusProgressCard({
       aria-label={title}
       aria-live="polite"
     >
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
-          {title}
-        </p>
-        <div className="flex items-center gap-3">
-          {active_pomodoro !== null ? (
-            <p className="m-0 rounded border border-panel-border bg-surface-raised px-2 py-1 font-mono text-[0.72rem] font-semibold text-accent">
-              Pomodoro {active_pomodoro.phase_label} · {active_pomodoro.remaining_label}
+      <div className="flex flex-wrap items-stretch justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
+              {title}
             </p>
-          ) : null}
-          {scope === 'daily' ? (
-            <Link
-              href="/settings/goals#focus-goals-nudges"
-              className="inline-flex h-6 w-6 items-center justify-center rounded border border-panel-border text-muted no-underline hover:bg-surface-hover hover:text-foreground"
-              aria-label="Open daily focus target settings"
-              title="Daily focus target settings"
-            >
-              <SettingsIcon />
-            </Link>
-          ) : null}
-          <p className="m-0 font-mono text-[0.78rem] font-semibold text-accent">
-            {Math.round(percent)}%
-          </p>
+            <div className="flex items-center gap-3">
+              {scope === 'daily' ? (
+                <Link
+                  href="/settings/goals#focus-goals-nudges"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded border border-panel-border text-muted no-underline hover:bg-surface-hover hover:text-foreground"
+                  aria-label="Open daily focus target settings"
+                  title="Daily focus target settings"
+                >
+                  <SettingsIcon />
+                </Link>
+              ) : null}
+              <p className="m-0 font-mono text-[0.78rem] font-semibold text-accent">
+                {Math.round(percent)}%
+              </p>
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between gap-3">
+            <p className="m-0 font-mono text-[1.35rem] font-semibold leading-none text-foreground">
+              {format_duration(tracked_ms, duration_format)}
+              <span className="ml-1 text-[0.85rem] font-medium text-muted">
+                / {format_duration(target_ms, duration_format)}
+              </span>
+            </p>
+            <p className="m-0 text-[0.78rem] text-muted">
+              {format_duration(remaining_ms, duration_format)} left {scope_label}
+            </p>
+          </div>
+          <div
+            className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-accent-soft"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(percent)}
+          >
+            <div
+              className="h-full rounded-full bg-accent transition-[width] duration-300"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
         </div>
-      </div>
-      <div className="mt-2 flex items-baseline justify-between gap-3">
-        <p className="m-0 font-mono text-[1.35rem] font-semibold leading-none text-foreground">
-          {format_duration(tracked_ms, duration_format)}
-          <span className="ml-1 text-[0.85rem] font-medium text-muted">
-            / {format_duration(target_ms, duration_format)}
-          </span>
-        </p>
-        <p className="m-0 text-[0.78rem] text-muted">
-          {format_duration(remaining_ms, duration_format)} left {scope_label}
-        </p>
-      </div>
-      <div
-        className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-accent-soft"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(percent)}
-      >
-        <div
-          className="h-full rounded-full bg-accent transition-[width] duration-300"
-          style={{ width: `${percent}%` }}
-        />
+        {active_pomodoro !== null ? (
+          <aside className="min-w-52 rounded-md border border-panel-border bg-surface-raised px-3 py-2.5">
+            <p className="m-0 text-[0.68rem] font-semibold uppercase tracking-[0.06em] text-muted">
+              Active Pomodoro
+            </p>
+            <p className="m-0 mt-1 text-[0.82rem] font-semibold text-foreground">
+              {active_pomodoro.phase_label}
+            </p>
+            <p className="m-0 mt-1 font-mono text-[1.25rem] font-semibold leading-none text-accent">
+              {active_pomodoro.remaining_label}
+            </p>
+          </aside>
+        ) : null}
       </div>
     </section>
   )

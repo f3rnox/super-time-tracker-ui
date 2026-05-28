@@ -20,11 +20,13 @@ import { build_resume_description } from '@/lib/build_resume_description'
 import { collect_tags_from_entries } from '@/lib/collect_tags_from_entries'
 import { filter_entries_by_tags } from '@/lib/filter_entries_by_tags'
 import { finish_running_pomodoro_timer } from '@/lib/finish_running_pomodoro_timer'
+import { get_running_entry_key } from '@/lib/get_running_entry_key'
 import {
   get_sheet_tag_filter_server_snapshot,
   get_sheet_tag_filter_snapshot,
 } from '@/lib/get_sheet_tag_filter_snapshot'
 import { get_serialized_entries_total_ms } from '@/lib/get_serialized_entries_total_ms'
+import { notify_desktop } from '@/lib/notify_desktop'
 import { delete_tracker_action } from '@/lib/delete_tracker_action'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
@@ -35,6 +37,7 @@ import { apply_optimistic_sheet_switch } from '@/lib/apply_optimistic_sheet_swit
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { sync_active_sheet_preference } from '@/lib/sync_active_sheet_preference'
 import { use_clear_tag_filters_on_sheet_change } from '@/lib/use_clear_tag_filters_on_sheet_change'
+import { useDesktopNotifications } from '@/lib/use_desktop_notifications'
 import { use_entry_list_sort } from '@/lib/use_entry_list_sort'
 import { use_tag_filter_mode } from '@/lib/use_tag_filter_mode'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
@@ -68,12 +71,49 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
       const next_state = await action()
       const should_finish_pomodoro =
         state.activeEntry !== null && next_state.activeEntry === null
+      const previous_running_entry = state.runningEntry
+      const next_running_entry = next_state.runningEntry
 
       sync_active_sheet_preference(next_state)
       set_state(next_state)
 
       if (should_finish_pomodoro) {
         finish_running_pomodoro_timer()
+      }
+
+      if (!desktop_notifications_enabled) {
+        return
+      }
+
+      if (previous_running_entry === null && next_running_entry !== null) {
+        notify_desktop({
+          title: 'Tracking started',
+          body: `${next_running_entry.description || 'Untitled entry'} (${next_running_entry.sheetName})`,
+          tag: 'tracker-running-entry',
+        })
+        return
+      }
+
+      if (previous_running_entry !== null && next_running_entry === null) {
+        notify_desktop({
+          title: 'Tracking stopped',
+          body: `${previous_running_entry.description || 'Untitled entry'} (${previous_running_entry.sheetName})`,
+          tag: 'tracker-running-entry',
+        })
+        return
+      }
+
+      if (
+        previous_running_entry !== null &&
+        next_running_entry !== null &&
+        get_running_entry_key(previous_running_entry) !==
+          get_running_entry_key(next_running_entry)
+      ) {
+        notify_desktop({
+          title: 'Tracking switched',
+          body: `${next_running_entry.description || 'Untitled entry'} (${next_running_entry.sheetName})`,
+          tag: 'tracker-running-entry',
+        })
       }
     } catch (action_error: unknown) {
       set_error(
@@ -93,6 +133,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
   const tag_filter_mode = use_tag_filter_mode()
   const entry_list_sort = use_entry_list_sort()
+  const desktop_notifications_enabled = useDesktopNotifications()
   const clear_tag_filters_on_sheet_change = use_clear_tag_filters_on_sheet_change()
   const previous_active_sheet_ref = useRef<string | null>(null)
   const check_in_form_ref = useRef<CheckInFormCollapsibleHandle>(null)

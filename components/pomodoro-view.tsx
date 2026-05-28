@@ -7,6 +7,7 @@ import { SettingsIcon } from '@/components/settings-icon'
 import { TagAutocompleteInput } from '@/components/tag-autocomplete-input'
 import { TrackerTopbar } from '@/components/tracker-topbar'
 import { get_button_class_name } from '@/lib/get_button_class_name'
+import { notify_desktop } from '@/lib/notify_desktop'
 import {
   clear_pomodoro_task_entry_marker,
   mark_pomodoro_task_entry,
@@ -37,24 +38,11 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   const [sync_error, set_sync_error] = useState<string | null>(null)
   const [has_running_tracker_entry, set_has_running_tracker_entry] = useState(false)
   const original_title_ref = useRef<string | null>(null)
+  const settings_ref = useRef<PomodoroSettings>(POMODORO_DEFAULT_SETTINGS)
+  const timer_state_ref = useRef<PomodoroTimerState>(POMODORO_DEFAULT_STATE)
 
   const notify_pomodoro_event = useCallback((title: string, body: string): void => {
-    if (typeof window === 'undefined' || !('Notification' in window)) {
-      return
-    }
-
-    if (window.Notification.permission === 'granted') {
-      void new window.Notification(title, { body })
-      return
-    }
-
-    if (window.Notification.permission === 'default') {
-      void window.Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          void new window.Notification(title, { body })
-        }
-      })
-    }
+    notify_desktop({ title, body, tag: 'pomodoro-phase-event' })
   }, [])
 
   useEffect(() => {
@@ -118,7 +106,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
             const stored_phase = stored_state.phase
             const stored_status = stored_state.status
 
-            set_timer_state({
+            const restored_timer_state: PomodoroTimerState = {
               phase:
                 stored_phase === 'short_break' ||
                 stored_phase === 'long_break' ||
@@ -148,7 +136,9 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
                 stored_state.paused_remaining_ms >= 0
                   ? Math.round(stored_state.paused_remaining_ms)
                   : null,
-            })
+            }
+            timer_state_ref.current = restored_timer_state
+            set_timer_state(restored_timer_state)
           }
         }
       } catch {
@@ -164,21 +154,77 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   }, [])
 
   useEffect(() => {
+    settings_ref.current = settings
+  }, [settings])
+
+  useEffect(() => {
+    timer_state_ref.current = timer_state
+  }, [timer_state])
+
+  const persist_pomodoro_record = useCallback(
+    (next_settings: PomodoroSettings, next_state: PomodoroTimerState): void => {
+      if (typeof window === 'undefined') {
+        return
+      }
+
+      try {
+        const record: PomodoroStorageRecord = {
+          settings: next_settings,
+          state: next_state,
+        }
+
+        window.localStorage.setItem(POMODORO_STORAGE_KEY, JSON.stringify(record))
+      } catch {
+        // Ignore storage failures in private browsing.
+      }
+    },
+    [],
+  )
+
+  const update_timer_state = useCallback(
+    (
+      updater:
+        | PomodoroTimerState
+        | ((current: PomodoroTimerState) => PomodoroTimerState),
+    ): void => {
+      set_timer_state((current) => {
+        const next_state =
+          typeof updater === 'function'
+            ? updater(current)
+            : updater
+        timer_state_ref.current = next_state
+        persist_pomodoro_record(settings_ref.current, next_state)
+        return next_state
+      })
+    },
+    [persist_pomodoro_record],
+  )
+
+  useEffect(() => {
     if (!is_hydrated || typeof window === 'undefined') {
       return
     }
 
-    try {
-      const record: PomodoroStorageRecord = {
-        settings,
-        state: timer_state,
-      }
+    persist_pomodoro_record(settings, timer_state)
+  }, [is_hydrated, persist_pomodoro_record, settings, timer_state])
 
-      window.localStorage.setItem(POMODORO_STORAGE_KEY, JSON.stringify(record))
-    } catch {
-      // Ignore storage failures in private browsing.
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
     }
-  }, [is_hydrated, settings, timer_state])
+
+    const persist_latest_snapshot = (): void => {
+      persist_pomodoro_record(settings_ref.current, timer_state_ref.current)
+    }
+
+    window.addEventListener('pagehide', persist_latest_snapshot)
+    window.addEventListener('beforeunload', persist_latest_snapshot)
+
+    return () => {
+      window.removeEventListener('pagehide', persist_latest_snapshot)
+      window.removeEventListener('beforeunload', persist_latest_snapshot)
+    }
+  }, [persist_pomodoro_record])
 
   useEffect(() => {
     if (timer_state.status !== 'running') {
@@ -215,7 +261,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   const build_pomodoro_entry_description = (): string =>
     settings.work_entry_description.trim()
 
-  const has_any_running_tracker_entry = async (): Promise<boolean> => {
+  const has_any_running_tracker_entry = useCallback(async (): Promise<boolean> => {
     const response = await fetch('/api/state', {
       method: 'GET',
       cache: 'no-store',
@@ -230,15 +276,15 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
       | { runningEntry?: { id: number } | null }
       | null
     return payload?.runningEntry !== null && payload?.runningEntry !== undefined
-  }
+  }, [])
 
-  const refresh_running_tracker_entry_status = async (): Promise<void> => {
+  const refresh_running_tracker_entry_status = useCallback(async (): Promise<void> => {
     try {
       set_has_running_tracker_entry(await has_any_running_tracker_entry())
     } catch {
       // Ignore transient polling failures on the Pomodoro page.
     }
-  }
+  }, [has_any_running_tracker_entry])
 
   const start_tracker_entry_for_pomodoro = async (): Promise<void> => {
     const description = build_pomodoro_entry_description()
@@ -308,7 +354,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
 
   const start_timer = (): void => {
     set_sync_error(null)
-    set_timer_state((current) => {
+    update_timer_state((current) => {
       const duration_ms =
         current.status === 'paused' && current.paused_remaining_ms !== null
           ? current.paused_remaining_ms
@@ -382,7 +428,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
       const duration_ms = get_phase_duration_ms(timer_state.phase)
       const remaining_ms = Math.max(0, duration_ms - elapsed_ms)
 
-      set_timer_state((current) => ({
+      update_timer_state((current) => ({
         ...current,
         status: 'running',
         deadline_at_ms: Date.now() + remaining_ms,
@@ -395,7 +441,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
 
   const pause_timer = (): void => {
     set_sync_error(null)
-    set_timer_state((current) => {
+    update_timer_state((current) => {
       if (current.status !== 'running' || current.deadline_at_ms === null) {
         return current
       }
@@ -414,14 +460,14 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   }
 
   const reset_timer = (): void => {
-    set_timer_state(POMODORO_DEFAULT_STATE)
+    update_timer_state(POMODORO_DEFAULT_STATE)
     set_now_ms(Date.now())
   }
 
   const advance_phase = useCallback((): void => {
     const is_completed_focus_session = timer_state.phase === 'work'
     const completed_session_index = timer_state.completed_work_sessions + 1
-    set_timer_state((current) => {
+    update_timer_state((current) => {
       const completed_work_sessions =
         current.phase === 'work'
           ? current.completed_work_sessions + 1
@@ -478,6 +524,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   }, [
     get_phase_duration_ms,
     notify_pomodoro_event,
+    update_timer_state,
     timer_state.completed_work_sessions,
     timer_state.phase,
     settings.auto_start_next_phase,
@@ -485,8 +532,14 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   ])
 
   useEffect(() => {
-    void refresh_running_tracker_entry_status()
-  }, [])
+    const initial_refresh_timeout = window.setTimeout(() => {
+      void refresh_running_tracker_entry_status()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(initial_refresh_timeout)
+    }
+  }, [refresh_running_tracker_entry_status])
 
   useEffect(() => {
     const interval_id = window.setInterval(() => {
@@ -496,7 +549,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     return () => {
       window.clearInterval(interval_id)
     }
-  }, [])
+  }, [refresh_running_tracker_entry_status])
 
   useEffect(() => {
     if (

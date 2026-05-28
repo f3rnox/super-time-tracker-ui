@@ -96,6 +96,11 @@ export type TimerInTitle = 'true' | 'false'
 export const TIMER_IN_TITLE_STORAGE_KEY = 'super-time-tracker-timer-in-title'
 export const TIMER_IN_TITLE_DEFAULT: TimerInTitle = 'true'
 
+export type DesktopNotifications = 'true' | 'false'
+export const DESKTOP_NOTIFICATIONS_STORAGE_KEY =
+  'super-time-tracker-desktop-notifications'
+export const DESKTOP_NOTIFICATIONS_DEFAULT: DesktopNotifications = 'false'
+
 export type TagFilterMode = 'all' | 'any'
 export const TAG_FILTER_MODE_STORAGE_KEY = 'super-time-tracker-tag-filter-mode'
 export const TAG_FILTER_MODE_DEFAULT: TagFilterMode = 'all'
