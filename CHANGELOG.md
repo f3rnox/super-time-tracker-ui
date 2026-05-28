@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.36](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.35...v0.1.36) (2026-05-28)
+
+
+### Bug Fixes
+
+* various ([0f00757](https://github.com/f3rnox/super-time-tracker-ui/commit/0f007579c53a5bd2231364c13e22fe0f6e7b9f46))
+* vertically center active entry description editor buttons ([420961a](https://github.com/f3rnox/super-time-tracker-ui/commit/420961a1dc3bc3a32fa9a6e2a37856caa051c7fb))
+
 ### [0.1.35](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.34...v0.1.35) (2026-05-28)
 
 
