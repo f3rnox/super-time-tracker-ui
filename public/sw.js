@@ -1,6 +1,13 @@
-const CACHE_NAME = 'super-time-tracker-cache-v1'
+const CACHE_NAME = 'super-time-tracker-cache-v2'
 const OFFLINE_URL = '/offline'
-const PRECACHE_URLS = ['/', OFFLINE_URL, '/manifest.webmanifest', '/favicon.ico']
+const PRECACHE_URLS = [
+  '/',
+  OFFLINE_URL,
+  '/manifest.webmanifest',
+  '/favicon.ico',
+  '/icons/pwa-icon-192.svg',
+  '/icons/pwa-icon-512.svg',
+]
 const APP_ROUTES = [
   '/',
   '/today',
@@ -19,6 +26,18 @@ const APP_ROUTES = [
   '/register',
   OFFLINE_URL,
 ]
+
+const is_next_static_asset_request = (url) => url.pathname.startsWith('/_next/static/')
+
+const get_cache_key = (request) => {
+  const url = new URL(request.url)
+
+  if (is_next_static_asset_request(url)) {
+    return `${url.origin}${url.pathname}`
+  }
+
+  return request
+}
 
 const warm_app_routes_cache = async () => {
   const cache = await caches.open(CACHE_NAME)
@@ -80,13 +99,13 @@ self.addEventListener('fetch', (event) => {
         .then(async (network_response) => {
           if (network_response.ok) {
             const cache = await caches.open(CACHE_NAME)
-            await cache.put(request, network_response.clone())
+            await cache.put(get_cache_key(request), network_response.clone())
           }
           return network_response
         })
         .catch(async () => {
           const cache = await caches.open(CACHE_NAME)
-          const cached_route = await cache.match(request)
+          const cached_route = await cache.match(get_cache_key(request))
 
           if (cached_route !== undefined) {
             return cached_route
@@ -104,7 +123,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then((cached_response) => {
+    caches.match(get_cache_key(request)).then((cached_response) => {
       if (cached_response !== undefined) {
         return cached_response
       }
@@ -113,7 +132,9 @@ self.addEventListener('fetch', (event) => {
         .then((network_response) => {
           if (network_response.ok) {
             const copy = network_response.clone()
-            void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy))
+            void caches
+              .open(CACHE_NAME)
+              .then((cache) => cache.put(get_cache_key(request), copy))
           }
           return network_response
         })

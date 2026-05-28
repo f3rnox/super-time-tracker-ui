@@ -6,6 +6,7 @@ import { CloudSyncProvider } from '@/components/cloud-sync-provider'
 import { ToastNotifications } from '@/components/toast-notifications'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
 import { DocumentPreferencesInit } from '@/components/document-preferences-init'
+import { PwaInstallNotice } from '@/components/pwa-install-notice'
 import { PwaRegister } from '@/components/pwa-register'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { UiPreferencesDocumentSync } from '@/components/ui-preferences-document-sync'
@@ -28,6 +29,13 @@ export const metadata: Metadata = {
   description: 'Web UI for the super-time-tracker CLI time sheets',
   manifest: '/manifest.webmanifest',
   themeColor: '#14b8a6',
+  icons: {
+    icon: [
+      { url: '/icons/pwa-icon-192.svg', type: 'image/svg+xml', sizes: '192x192' },
+      { url: '/icons/pwa-icon-512.svg', type: 'image/svg+xml', sizes: '512x512' },
+    ],
+    apple: [{ url: '/icons/pwa-icon-192.svg', type: 'image/svg+xml' }],
+  },
   appleWebApp: {
     capable: true,
     title: 'super-time-tracker',
@@ -61,6 +69,7 @@ export default async function RootLayout({
             <AppKeyboardShortcuts />
             {children}
             <ToastNotifications />
+            <PwaInstallNotice />
           </CloudSyncProvider>
         </ConfirmDialogProvider>
       </body>
