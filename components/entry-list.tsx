@@ -52,6 +52,7 @@ interface EntryListProps {
   on_edit_note: (
     entry: SerializedEntry,
     timestamp: string,
+    original_text: string,
     text: string,
   ) => void;
   on_add_note: (entry: SerializedEntry, text: string) => void;

@@ -1,3 +1,4 @@
+import { find_entry_note_index } from "@/lib/find_entry_note_index";
 import { get_sheet } from "@/lib/get_sheet";
 import { read_db } from "@/lib/read_db";
 import { write_db } from "@/lib/write_db";
@@ -7,6 +8,7 @@ export interface EditNoteOnEntryArgs {
   note_timestamp: string;
   sheet_name: string;
   entry_id: number;
+  original_text?: string;
 }
 
 /**
@@ -15,7 +17,7 @@ export interface EditNoteOnEntryArgs {
 export async function edit_note_on_entry(
   args: EditNoteOnEntryArgs,
 ): Promise<void> {
-  const { entry_id, note_timestamp, sheet_name, text } = args;
+  const { entry_id, note_timestamp, sheet_name, text, original_text } = args;
   const trimmed = text.trim();
 
   if (trimmed.length === 0) {
@@ -30,20 +32,20 @@ export async function edit_note_on_entry(
     throw new Error(`Entry ${entry_id} not found in sheet ${sheet_name}`);
   }
 
-  const target_ms = new Date(note_timestamp).getTime();
+  const note_index = find_entry_note_index({
+    notes: entry.notes,
+    note_timestamp,
+    text: original_text,
+  });
 
-  if (Number.isNaN(target_ms)) {
-    throw new Error("Invalid note timestamp");
+  if (note_index === -1) {
+    throw new Error(
+      original_text === undefined
+        ? "Note not found on entry (duplicate timestamps require originalText)"
+        : "Note not found on entry",
+    );
   }
 
-  const note = entry.notes.find(
-    ({ timestamp }) => timestamp.getTime() === target_ms,
-  );
-
-  if (note === undefined) {
-    throw new Error("Note not found on entry");
-  }
-
-  note.text = trimmed;
+  entry.notes[note_index].text = trimmed;
   await write_db(db);
 }

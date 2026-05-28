@@ -46,8 +46,12 @@ interface ActiveEntryPanelProps {
   on_edit: (values: EntryEditFormValues) => void;
   on_move: (target_sheet_name: string) => void;
   on_add_note: (text: string, at?: string) => void;
-  on_edit_note: (timestamp: string, text: string) => void;
-  on_delete_note: (timestamp: string) => void;
+  on_edit_note: (
+    timestamp: string,
+    original_text: string,
+    text: string,
+  ) => void;
+  on_delete_note: (timestamp: string, text: string) => void;
   is_pending: boolean;
 }
 
@@ -168,14 +172,16 @@ export const ActiveEntryPanel = forwardRef<
     is_editing_description || is_editing_times || is_checking_out;
   const panel_class = get_active_panel_class_name(in_bar, is_panel_editing);
 
-  const handle_delete_note = async (timestamp: string): Promise<void> => {
-    const note = entry.notes.find((item) => item.timestamp === timestamp);
+  const handle_delete_note = async (
+    timestamp: string,
+    text: string,
+  ): Promise<void> => {
     const confirmed = confirm_destructive_actions
-      ? await confirm(get_delete_note_confirm_dialog(note?.text ?? ""))
+      ? await confirm(get_delete_note_confirm_dialog(text))
       : true;
 
     if (confirmed) {
-      on_delete_note(timestamp);
+      on_delete_note(timestamp, text);
     }
   };
 

@@ -28,8 +28,12 @@ interface TrackerActiveBarProps {
   on_edit: (values: EntryEditFormValues) => void;
   on_move: (target_sheet_name: string) => void;
   on_add_note: (text: string, at?: string) => void;
-  on_edit_note: (timestamp: string, text: string) => void;
-  on_delete_note: (timestamp: string) => void;
+  on_edit_note: (
+    timestamp: string,
+    original_text: string,
+    text: string,
+  ) => void;
+  on_delete_note: (timestamp: string, text: string) => void;
 }
 
 const section_label_class =

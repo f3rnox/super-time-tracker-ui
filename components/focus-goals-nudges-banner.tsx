@@ -53,6 +53,8 @@ type BannerContent =
 interface FocusGoalsNudgesBannerProps {
   on_check_in_shortcut?: () => void;
   has_running_timer?: boolean;
+  /** Global metrics from SSR; avoids an extra fetch when scope is global. */
+  initial_focus_nudges_status?: FocusNudgesStatus;
 }
 
 interface ActivePomodoroDetails {
@@ -66,6 +68,7 @@ interface ActivePomodoroDetails {
 export function FocusGoalsNudgesBanner({
   on_check_in_shortcut,
   has_running_timer = false,
+  initial_focus_nudges_status,
 }: Readonly<FocusGoalsNudgesBannerProps>) {
   const duration_format = use_duration_format();
   const nudges_enabled = useSyncExternalStore(
@@ -118,7 +121,9 @@ export function FocusGoalsNudgesBanner({
     focus_goals_per_tag_preference.get_snapshot,
     focus_goals_per_tag_preference.get_server_snapshot,
   );
-  const [status, setStatus] = useState<FocusNudgesStatus | null>(null);
+  const [status, setStatus] = useState<FocusNudgesStatus | null>(
+    initial_focus_nudges_status ?? null,
+  );
   const [activePomodoro, setActivePomodoro] =
     useState<ActivePomodoroDetails | null>(null);
 
@@ -210,7 +215,18 @@ export function FocusGoalsNudgesBanner({
       }
     };
 
-    void refresh_status();
+    const resolved_scope = resolve_goal_scope(
+      goal_scope,
+      goal_sheet_name,
+      goal_tag_name,
+    );
+    const skip_initial_fetch =
+      resolved_scope === "global" && initial_focus_nudges_status !== undefined;
+
+    if (!skip_initial_fetch) {
+      void refresh_status();
+    }
+
     const interval_id = globalThis.setInterval(() => {
       void refresh_status();
     }, refresh_interval_ms);
@@ -219,7 +235,13 @@ export function FocusGoalsNudgesBanner({
       is_cancelled = true;
       globalThis.clearInterval(interval_id);
     };
-  }, [nudges_enabled, goal_scope, goal_sheet_name, goal_tag_name]);
+  }, [
+    nudges_enabled,
+    goal_scope,
+    goal_sheet_name,
+    goal_tag_name,
+    initial_focus_nudges_status,
+  ]);
 
   const content = useMemo<BannerContent | null>(() => {
     if (nudges_enabled !== "true" || status === null) {

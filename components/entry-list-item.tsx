@@ -58,6 +58,7 @@ type EntryListItemProps = Readonly<{
   on_edit_note: (
     entry: SerializedEntry,
     timestamp: string,
+    original_text: string,
     text: string,
   ) => void;
   on_split?: (entry: SerializedEntry, at: string) => void;
@@ -217,8 +218,8 @@ export function EntryListItem({
             notes={entry.notes}
             variant="inline"
             is_pending={is_pending}
-            on_edit_note={(timestamp, text) =>
-              on_edit_note(entry, timestamp, text)
+            on_edit_note={(timestamp, original_text, text) =>
+              on_edit_note(entry, timestamp, original_text, text)
             }
           />
         </div>

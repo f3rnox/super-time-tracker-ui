@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   useEffect,
@@ -15,11 +16,9 @@ import {
   type CheckInFormCollapsibleHandle,
 } from "@/components/check-in-form-collapsible";
 import { ConfirmDialogProvider } from "@/components/confirm-dialog-provider";
-import { FocusGoalsNudgesBanner } from "@/components/focus-goals-nudges-banner";
 import { TrackerKeyboardShortcuts } from "@/components/tracker-keyboard-shortcuts";
 import { EntryTagFilter } from "@/components/entry-tag-filter";
 import { TrackerEntrySearchBar } from "@/components/tracker-entry-search-bar";
-import { EntryList } from "@/components/entry-list";
 import { SheetSidebar } from "@/components/sheet-sidebar";
 import { TrackerActiveBar } from "@/components/tracker-active-bar";
 import { TrackerDocumentTitle } from "@/components/tracker-document-title";
@@ -37,9 +36,10 @@ import {
 } from "@/lib/get_sheet_tag_filter_snapshot";
 import { get_serialized_entries_total_ms } from "@/lib/get_serialized_entries_total_ms";
 import { notify_desktop } from "@/lib/notify_desktop";
+import { fetch_tracker_state } from "@/lib/fetch_tracker_state";
 import { subscribe_tracker_state_sync } from "@/lib/notify_tracker_state_sync";
-import { delete_tracker_action } from "@/lib/delete_tracker_action";
 import { patch_tracker_action } from "@/lib/patch_tracker_action";
+import { publish_tracker_running_entry } from "@/lib/tracker_state_client_store";
 import { post_tracker_action } from "@/lib/post_tracker_action";
 import { set_sheet_tag_filter } from "@/lib/set_sheet_tag_filter";
 import { sort_serialized_entries } from "@/lib/sort_serialized_entries";
@@ -54,6 +54,24 @@ import { use_tag_filter_mode } from "@/lib/use_tag_filter_mode";
 import { type EntryEditFormValues } from "@/components/entry-edit-form";
 import { type TrackerState } from "@/lib/types/tracker_state";
 
+const EntryList = dynamic(
+  () =>
+    import("@/components/entry-list").then((module) => ({
+      default: module.EntryList,
+    })),
+  {
+    loading: () => (
+      <p className="m-0 text-[0.9rem] text-muted">Loading entry list…</p>
+    ),
+  },
+);
+
+const FocusGoalsNudgesBanner = dynamic(() =>
+  import("@/components/focus-goals-nudges-banner").then((module) => ({
+    default: module.FocusGoalsNudgesBanner,
+  })),
+);
+
 interface TrackerAppProps {
   initial_state: TrackerState;
 }
@@ -66,12 +84,37 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
   const [error, setError] = useState<string | null>(null);
   const [is_pending, setIs_pending] = useState(false);
   const [is_switching_sheet, setIs_switching_sheet] = useState(false);
+  const [is_loading_entries, setIs_loading_entries] = useState(
+    initial_state.activeSheetEntriesLoaded === false,
+  );
   const [entry_search_query, setEntry_search_query] = useState("");
   const state_before_sheet_switch_ref = useRef<TrackerState>(initial_state);
 
   useEffect(() => {
     sync_active_sheet_preference(initial_state);
   }, [initial_state]);
+
+  useEffect(() => {
+    publish_tracker_running_entry(state.runningEntry);
+  }, [state.runningEntry]);
+
+  useEffect(() => {
+    if (initial_state.activeSheetEntriesLoaded !== false) {
+      return;
+    }
+
+    void fetch_tracker_state()
+      .then((next_state) => {
+        sync_active_sheet_preference(next_state);
+        setState(next_state);
+      })
+      .catch(() => {
+        // Errors surface on the next user action or sync toast.
+      })
+      .finally(() => {
+        setIs_loading_entries(false);
+      });
+  }, [initial_state.activeSheetEntriesLoaded]);
 
   const run_action = async (
     action: () => Promise<TrackerState>,
@@ -182,7 +225,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
   );
 
   const filtered_entries = useMemo(() => {
-    if (is_switching_sheet) {
+    if (is_switching_sheet || is_loading_entries) {
       return [];
     }
 
@@ -205,6 +248,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
     entry_list_sort,
     entry_search_query,
     is_switching_sheet,
+    is_loading_entries,
   ]);
 
   const filtered_total_ms = useMemo(
@@ -218,32 +262,10 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
         return;
       }
 
-      void fetch("/api/state")
-        .then(async (response) => {
-          if (!response.ok) {
-            throw new Error("Failed to refresh tracker state");
-          }
-
-          return (await response.json()) as TrackerState;
-        })
+      void fetch_tracker_state()
         .then((next_state) => {
           sync_active_sheet_preference(next_state);
-          setState((current_state) => {
-            const current_active_key =
-              current_state.activeEntry === null
-                ? null
-                : `${current_state.activeEntry.sheetName}:${current_state.activeEntry.id}`;
-            const next_active_key =
-              next_state.activeEntry === null
-                ? null
-                : `${next_state.activeEntry.sheetName}:${next_state.activeEntry.id}`;
-
-            if (current_active_key === next_active_key) {
-              return current_state;
-            }
-
-            return next_state;
-          });
+          setState(next_state);
         })
         .catch(() => {
           // Sync toasts already communicate failures.
@@ -253,17 +275,18 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
     return subscribe_tracker_state_sync(refresh_state_after_sync);
   }, [is_pending, is_switching_sheet]);
 
-  const entries_empty_message = is_switching_sheet
-    ? `Loading entries for "${active_sheet}"…`
-    : entry_search_query.trim().length > 0
-      ? filter_tags.length > 0
-        ? `No entries on sheet "${active_sheet}" match your search and selected tags.`
-        : `No entries on sheet "${active_sheet}" match your search.`
-      : filter_tags.length > 0
-        ? tag_filter_mode === "any"
-          ? `No entries on sheet "${active_sheet}" match any selected tag.`
-          : `No entries on sheet "${active_sheet}" match all selected tags.`
-        : `No entries on sheet "${active_sheet}".`;
+  const entries_empty_message =
+    is_switching_sheet || is_loading_entries
+      ? `Loading entries for "${active_sheet}"…`
+      : entry_search_query.trim().length > 0
+        ? filter_tags.length > 0
+          ? `No entries on sheet "${active_sheet}" match your search and selected tags.`
+          : `No entries on sheet "${active_sheet}" match your search.`
+        : filter_tags.length > 0
+          ? tag_filter_mode === "any"
+            ? `No entries on sheet "${active_sheet}" match any selected tag.`
+            : `No entries on sheet "${active_sheet}" match all selected tags.`
+          : `No entries on sheet "${active_sheet}".`;
 
   const select_sheet = (name: string): void => {
     if (name === active_sheet && !is_switching_sheet) {
@@ -339,6 +362,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
         ) : null}
         <FocusGoalsNudgesBanner
           has_running_timer={state.runningEntry !== null}
+          initial_focus_nudges_status={state.focusNudgesStatusGlobal}
           on_check_in_shortcut={() => {
             check_in_form_ref.current?.expand_and_focus();
           }}
@@ -448,22 +472,24 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                     }),
                   )
                 }
-                on_edit_note={(timestamp, text) =>
+                on_edit_note={(timestamp, original_text, text) =>
                   run_action(() =>
                     patch_tracker_action("/api/note", {
                       sheetName: active_sheet,
                       entryId: state.activeEntry?.id,
                       timestamp,
+                      originalText: original_text,
                       text,
                     }),
                   )
                 }
-                on_delete_note={(timestamp) =>
+                on_delete_note={(timestamp, text) =>
                   run_action(() =>
-                    delete_tracker_action("/api/note", {
+                    post_tracker_action("/api/note/delete", {
                       sheetName: active_sheet,
                       entryId: state.activeEntry?.id,
                       timestamp,
+                      noteText: text,
                     }),
                   )
                 }
@@ -558,12 +584,13 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                     }),
                   )
                 }
-                on_edit_note={(entry, timestamp, text) =>
+                on_edit_note={(entry, timestamp, original_text, text) =>
                   run_action(() =>
                     patch_tracker_action("/api/note", {
                       sheetName: entry.sheetName,
                       entryId: entry.id,
                       timestamp,
+                      originalText: original_text,
                       text,
                     }),
                   )

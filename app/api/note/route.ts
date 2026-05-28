@@ -15,6 +15,7 @@ interface NoteBody {
 
 interface EditNoteBody extends NoteBody {
   timestamp?: string;
+  originalText?: string;
 }
 
 /**
@@ -75,6 +76,7 @@ export async function PATCH(request: Request): Promise<NextResponse> {
       entry_id,
       note_timestamp: timestamp,
       text,
+      original_text: body.originalText,
     });
 
     const state = await get_tracker_state();
@@ -106,10 +108,13 @@ export async function DELETE(request: Request): Promise<NextResponse> {
       return api_error_response(new Error("Note timestamp is required"));
     }
 
+    const note_text = body.text?.trim();
+
     await delete_note_on_entry({
       sheet_name,
       entry_id,
       note_timestamp: timestamp,
+      text: note_text,
     });
 
     const state = await get_tracker_state();

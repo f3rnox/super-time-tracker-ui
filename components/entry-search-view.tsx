@@ -258,12 +258,13 @@ export function EntrySearchView({
                 }),
               )
             }
-            on_edit_note={(entry, timestamp, text) =>
+            on_edit_note={(entry, timestamp, original_text, text) =>
               run_action(() =>
                 patch_tracker_action("/api/note", {
                   sheetName: entry.sheetName,
                   entryId: entry.id,
                   timestamp,
+                  originalText: original_text,
                   text,
                 }),
               )

@@ -12,6 +12,7 @@ import {
 import { is_cloud_sync_enabled } from "@/lib/is_cloud_sync_enabled";
 import { is_supabase_configured } from "@/lib/is_supabase_configured";
 import { run_tracker_db_cloud_sync } from "@/lib/run_tracker_db_cloud_sync";
+import { schedule_when_idle } from "@/lib/schedule_when_idle";
 import { should_merge_tracker_db_on_navigation } from "@/lib/should_merge_tracker_db_on_navigation";
 
 /**
@@ -77,7 +78,9 @@ export function CloudSyncProvider({
         initial_session_user_id_ref.current = session?.user.id ?? null;
 
         if (session !== null) {
-          start_session_sync(false);
+          schedule_when_idle(() => {
+            start_session_sync(false);
+          });
         }
       })
       .catch(() => {
@@ -100,7 +103,9 @@ export function CloudSyncProvider({
         }
 
         initial_session_user_id_ref.current = user_id;
-        handle_new_sign_in();
+        schedule_when_idle(() => {
+          handle_new_sign_in();
+        });
         return;
       }
 
@@ -139,8 +144,10 @@ export function CloudSyncProvider({
 
     last_greedy_merged_pathname_ref.current = pathname;
 
-    void run_tracker_db_cloud_sync({ merge_on_load: true }).catch(() => {
-      // Toast shows the error.
+    schedule_when_idle(() => {
+      void run_tracker_db_cloud_sync({ merge_on_load: true }).catch(() => {
+        // Toast shows the error.
+      });
     });
   }, [pathname]);
 

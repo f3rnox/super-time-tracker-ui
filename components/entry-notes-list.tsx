@@ -21,8 +21,12 @@ interface EntryNotesListProps {
   variant?: EntryNotesListVariant;
   in_bar?: boolean;
   is_pending?: boolean;
-  on_edit_note?: (timestamp: string, text: string) => void;
-  on_delete_note?: (timestamp: string) => void;
+  on_edit_note?: (
+    timestamp: string,
+    original_text: string,
+    text: string,
+  ) => void;
+  on_delete_note?: (timestamp: string, text: string) => void;
 }
 
 const edit_button_class =
@@ -77,8 +81,12 @@ export function EntryNotesList({
     is_list_visible,
   );
 
-  const handle_save = (timestamp: string, text: string): void => {
-    on_edit_note?.(timestamp, text);
+  const handle_save = (
+    timestamp: string,
+    original_text: string,
+    text: string,
+  ): void => {
+    on_edit_note?.(timestamp, original_text, text);
     setEditing_timestamp(null);
   };
 
@@ -87,12 +95,12 @@ export function EntryNotesList({
     setEditing_timestamp(timestamp);
   };
 
-  const handle_delete = (timestamp: string): void => {
+  const handle_delete = (timestamp: string, text: string): void => {
     if (editing_timestamp === timestamp) {
       setEditing_timestamp(null);
     }
 
-    on_delete_note?.(timestamp);
+    on_delete_note?.(timestamp, text);
   };
 
   const handle_toggle = (event: MouseEvent<HTMLButtonElement>): void => {
@@ -127,9 +135,9 @@ export function EntryNotesList({
             is_editing={editing_timestamp === note.timestamp}
             time_format={time_format}
             on_cancel_edit={() => setEditing_timestamp(null)}
-            on_save={(text) => handle_save(note.timestamp, text)}
+            on_save={(text) => handle_save(note.timestamp, note.text, text)}
             on_start_edit={() => start_editing(note.timestamp)}
-            on_delete={() => handle_delete(note.timestamp)}
+            on_delete={() => handle_delete(note.timestamp, note.text)}
             on_edit_note={on_edit_note}
             on_delete_note={on_delete_note}
           />
@@ -150,8 +158,12 @@ interface EntryNoteListItemProps {
   on_save: (text: string) => void;
   on_start_edit: () => void;
   on_delete: () => void;
-  on_edit_note?: (timestamp: string, text: string) => void;
-  on_delete_note?: (timestamp: string) => void;
+  on_edit_note?: (
+    timestamp: string,
+    original_text: string,
+    text: string,
+  ) => void;
+  on_delete_note?: (timestamp: string, text: string) => void;
 }
 
 function EntryNoteListItem({
@@ -236,8 +248,12 @@ interface RenderNoteActionsParams {
   is_pending: boolean;
   on_start_edit: () => void;
   on_delete: () => void;
-  on_edit_note?: (timestamp: string, text: string) => void;
-  on_delete_note?: (timestamp: string) => void;
+  on_edit_note?: (
+    timestamp: string,
+    original_text: string,
+    text: string,
+  ) => void;
+  on_delete_note?: (timestamp: string, text: string) => void;
 }
 
 function render_note_actions({
