@@ -1,0 +1,17 @@
+{
+  "name": "Super Time Tracker",
+  "short_name": "Time Tracker",
+  "description": "Track time, focus sessions, and Pomodoro cycles offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#14b8a6",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
