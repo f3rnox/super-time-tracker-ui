@@ -34,6 +34,8 @@ const topbar_shortcut_menu_items: Record<
   { href: string; label: string }
 > = {
   today: { href: "/today", label: "Today" },
+  review: { href: "/review", label: "Review" },
+  templates: { href: "/templates", label: "Templates" },
   search: { href: "/search", label: "Search" },
   sheets: { href: "/sheets", label: "Sheets" },
   reporting: { href: "/reporting", label: "Reporting" },
@@ -45,6 +47,7 @@ const topbar_shortcut_menu_items: Record<
 const always_visible_menu_actions = new Set<TopbarQuickActionId>([
   "manage-tags",
   "pomodoro",
+  "templates",
   "sync-settings",
 ]);
 

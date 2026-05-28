@@ -6,6 +6,8 @@ import {
 const topbar_quick_action_set = new Set<string>(topbar_quick_action_ids);
 const topbar_quick_action_defaults: TopbarQuickActionId[] = [
   "today",
+  "review",
+  "templates",
   "search",
   "reporting",
   "pomodoro",

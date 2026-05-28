@@ -26,8 +26,20 @@ export function get_stable_entry_templates_snapshot(
   templates: EntryTemplate[],
 ): readonly EntryTemplate[] {
   const templates_key = templates
-    .map(
-      (template) => `${template.id}\0${template.name}\0${template.description}`,
+    .map((template) =>
+      [
+        template.id,
+        template.name,
+        template.description,
+        template.defaultSheetName ?? "",
+        template.tags?.join(" ") ?? "",
+        template.favorite === true ? "1" : "0",
+        template.shortcutKey ?? "",
+        template.pomodoroLinked === true ? "1" : "0",
+        template.createdAt ?? "",
+        template.lastUsedAt ?? "",
+        String(template.useCount ?? 0),
+      ].join("\0"),
     )
     .join("\n");
 

@@ -10,6 +10,7 @@ import {
 import { SaveIcon } from "@/components/save-icon";
 import { TagAutocompleteInput } from "@/components/tag-autocomplete-input";
 import { TrashIcon } from "@/components/trash-icon";
+import { build_entry_template_description } from "@/lib/build_entry_template_description";
 import { get_api_key_for_suggestion_provider } from "@/lib/get_api_key_for_suggestion_provider";
 import { get_button_class_name } from "@/lib/get_button_class_name";
 import { get_input_class_name } from "@/lib/get_input_class_name";
@@ -18,6 +19,7 @@ import { claude_api_key_preference } from "@/lib/preferences/claude_api_key_pref
 import { entry_suggestion_provider_preference } from "@/lib/preferences/entry_suggestion_provider_preference";
 import { google_ai_api_key_preference } from "@/lib/preferences/google_ai_api_key_preference";
 import { openai_api_key_preference } from "@/lib/preferences/openai_api_key_preference";
+import { record_entry_template_usage } from "@/lib/record_entry_template_usage";
 import { request_ai_entry_description_suggestion } from "@/lib/request_ai_entry_description_suggestion";
 import { use_entry_templates } from "@/lib/use_entry_templates";
 import { write_entry_templates } from "@/lib/write_entry_templates";
@@ -104,6 +106,11 @@ export function CheckInForm({
       description: trimmed_description,
       ...(trimmed_at.length > 0 ? { at: trimmed_at } : {}),
     });
+
+    if (selected_template !== null) {
+      record_entry_template_usage(selected_template.id);
+    }
+
     setDescription("");
     setAt("");
   };
@@ -142,6 +149,7 @@ export function CheckInForm({
         id: template_id,
         name: template_name,
         description: template_description,
+        createdAt: new Date().toISOString(),
       },
     ];
 
@@ -211,7 +219,7 @@ export function CheckInForm({
               templates.find((template) => template.id === next_template_id) ??
               null;
             if (next_template !== null) {
-              setDescription(next_template.description);
+              setDescription(build_entry_template_description(next_template));
             }
           }}
         >

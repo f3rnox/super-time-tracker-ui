@@ -19,6 +19,7 @@ export interface CommandPaletteItem {
   sheetName?: string;
   description?: string;
   entryId?: number;
+  templateId?: string;
   tags?: string[];
   reportingRange?: ReportingDateRangeShortcut;
 }

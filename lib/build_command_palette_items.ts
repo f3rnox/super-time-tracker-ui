@@ -1,4 +1,5 @@
 import { build_command_palette_reporting_href } from "@/lib/build_command_palette_reporting_href";
+import { build_entry_template_description } from "@/lib/build_entry_template_description";
 import { format_display_tag } from "@/lib/format_display_tag";
 import { read_entry_templates } from "@/lib/read_entry_templates";
 import {
@@ -29,6 +30,22 @@ const navigation_items: CommandPaletteItem[] = [
     title: "Open Today",
     keywords: ["today", "focus", "daily"],
     href: "/today",
+  },
+  {
+    id: "nav-review",
+    kind: "navigate",
+    group: "Pages",
+    title: "Open End-of-day Review",
+    keywords: ["review", "end of day", "daily", "cleanup", "gaps"],
+    href: "/review",
+  },
+  {
+    id: "nav-templates",
+    kind: "navigate",
+    group: "Pages",
+    title: "Open Template Library",
+    keywords: ["templates", "library", "check in", "shortcuts"],
+    href: "/templates",
   },
   {
     id: "nav-sheets",
@@ -132,15 +149,27 @@ export function build_command_palette_items({
 
   if (include_templates && typeof window !== "undefined") {
     for (const template of read_entry_templates()) {
+      const description = build_entry_template_description(template);
       items.push({
         id: `template-${template.id}`,
         kind: "template_check_in",
-        group: "Check in with template",
+        group: template.favorite === true ? "Favorite templates" : "Templates",
         title: `Check in: ${template.name}`,
-        subtitle: template.description,
-        keywords: ["check in", "template", template.name, template.description],
-        description: template.description,
-        sheetName: snapshot.activeSheetName ?? undefined,
+        subtitle:
+          template.defaultSheetName === undefined
+            ? description
+            : `${template.defaultSheetName} · ${description}`,
+        keywords: [
+          "check in",
+          "template",
+          template.name,
+          description,
+          template.shortcutKey ?? "",
+        ],
+        description,
+        sheetName:
+          template.defaultSheetName ?? snapshot.activeSheetName ?? undefined,
+        templateId: template.id,
       });
     }
   }

@@ -16,6 +16,8 @@ interface TopbarQuickActionItem {
 
 const topbar_quick_action_items: TopbarQuickActionItem[] = [
   { id: "today", href: "/today", label: "Today" },
+  { id: "review", href: "/review", label: "Review" },
+  { id: "templates", href: "/templates", label: "Templates" },
   { id: "search", href: "/search", label: "Search" },
   { id: "sheets", href: "/sheets", label: "Sheets" },
   { id: "reporting", href: "/reporting", label: "Reporting" },

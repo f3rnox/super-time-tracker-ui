@@ -3,6 +3,7 @@ import { navigate_to_tracker_sheet } from "@/lib/navigate_to_tracker_sheet";
 import { notify_in_app } from "@/lib/notify_in_app";
 import { notify_tracker_state_sync } from "@/lib/notify_tracker_state_sync";
 import { post_tracker_action } from "@/lib/post_tracker_action";
+import { record_entry_template_usage } from "@/lib/record_entry_template_usage";
 import { type CommandPaletteItem } from "@/lib/types/command_palette";
 
 export interface ExecuteCommandPaletteItemArgs {
@@ -50,6 +51,10 @@ export async function execute_command_palette_item({
         pathname,
         navigate,
       });
+
+      if (item.templateId !== undefined) {
+        record_entry_template_usage(item.templateId);
+      }
       return;
     }
     case "resume_last":
