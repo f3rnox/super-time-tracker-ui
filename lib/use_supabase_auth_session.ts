@@ -30,9 +30,14 @@ export function use_supabase_auth_session(): SupabaseAuthSession {
 
     const supabase = create_browser_supabase_client()
 
-    void supabase.auth.getUser().then(({ data: { user } }) => {
-      set_email(user?.email ?? null)
-    })
+    void supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        set_email(session?.user.email ?? null)
+      })
+      .catch(() => {
+        set_email(null)
+      })
 
     const {
       data: { subscription },
@@ -51,7 +56,9 @@ export function use_supabase_auth_session(): SupabaseAuthSession {
     try {
       await fetch('/api/auth/signout', { method: 'POST' })
       const supabase = create_browser_supabase_client()
-      await supabase.auth.signOut()
+      await supabase.auth.signOut().catch(() => {
+        return
+      })
       notify_settings_saved('Signed out')
       router.refresh()
     } finally {

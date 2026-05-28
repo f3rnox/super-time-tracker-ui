@@ -11,7 +11,9 @@ interface GeneralSettingsViewProps {
 /**
  * Settings page: general tracker behavior.
  */
-export function GeneralSettingsView({ sheet_names }: GeneralSettingsViewProps) {
+export function GeneralSettingsView({
+  sheet_names,
+}: GeneralSettingsViewProps) {
   return (
     <SettingsPageLayout
       breadcrumb={{ current: 'General', parent: { label: 'Settings' } }}

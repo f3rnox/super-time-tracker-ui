@@ -119,3 +119,51 @@ export type GreedyCloudSync = 'true' | 'false'
 export const GREEDY_CLOUD_SYNC_STORAGE_KEY =
   'super-time-tracker-greedy-cloud-sync'
 export const GREEDY_CLOUD_SYNC_DEFAULT: GreedyCloudSync = 'true'
+
+export type FocusNudgesEnabled = 'true' | 'false'
+export const FOCUS_NUDGES_ENABLED_STORAGE_KEY =
+  'super-time-tracker-focus-nudges-enabled'
+export const FOCUS_NUDGES_ENABLED_DEFAULT: FocusNudgesEnabled = 'true'
+
+export type DailyFocusTargetMinutes = string
+export const DAILY_FOCUS_TARGET_MINUTES_STORAGE_KEY =
+  'super-time-tracker-daily-focus-target-minutes'
+export const DAILY_FOCUS_TARGET_MINUTES_DEFAULT: DailyFocusTargetMinutes = '240'
+
+export type WeeklyFocusTargetMinutes = string
+export const WEEKLY_FOCUS_TARGET_MINUTES_STORAGE_KEY =
+  'super-time-tracker-weekly-focus-target-minutes'
+export const WEEKLY_FOCUS_TARGET_MINUTES_DEFAULT: WeeklyFocusTargetMinutes = '1200'
+
+export type OverworkAlertHours = string
+export const OVERWORK_ALERT_HOURS_STORAGE_KEY =
+  'super-time-tracker-overwork-alert-hours'
+export const OVERWORK_ALERT_HOURS_DEFAULT: OverworkAlertHours = '8'
+
+export type NoLogReminderMinutes = string
+export const NO_LOG_REMINDER_MINUTES_STORAGE_KEY =
+  'super-time-tracker-no-log-reminder-minutes'
+export const NO_LOG_REMINDER_MINUTES_DEFAULT: NoLogReminderMinutes = '45'
+
+export type FocusGoalScope = 'global' | 'sheet' | 'tag'
+export const FOCUS_GOAL_SCOPE_STORAGE_KEY = 'super-time-tracker-focus-goal-scope'
+export const FOCUS_GOAL_SCOPE_DEFAULT: FocusGoalScope = 'global'
+
+export type FocusGoalSheetName = string
+export const FOCUS_GOAL_SHEET_NAME_STORAGE_KEY =
+  'super-time-tracker-focus-goal-sheet-name'
+export const FOCUS_GOAL_SHEET_NAME_DEFAULT: FocusGoalSheetName = ''
+
+export type FocusGoalTagName = string
+export const FOCUS_GOAL_TAG_NAME_STORAGE_KEY = 'super-time-tracker-focus-goal-tag-name'
+export const FOCUS_GOAL_TAG_NAME_DEFAULT: FocusGoalTagName = ''
+
+export type FocusGoalsPerSheetJson = string
+export const FOCUS_GOALS_PER_SHEET_STORAGE_KEY =
+  'super-time-tracker-focus-goals-per-sheet'
+export const FOCUS_GOALS_PER_SHEET_DEFAULT: FocusGoalsPerSheetJson = '{}'
+
+export type FocusGoalsPerTagJson = string
+export const FOCUS_GOALS_PER_TAG_STORAGE_KEY =
+  'super-time-tracker-focus-goals-per-tag'
+export const FOCUS_GOALS_PER_TAG_DEFAULT: FocusGoalsPerTagJson = '{}'

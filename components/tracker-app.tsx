@@ -7,6 +7,7 @@ import {
   CheckInFormCollapsible,
   type CheckInFormCollapsibleHandle,
 } from '@/components/check-in-form-collapsible'
+import { FocusGoalsNudgesBanner } from '@/components/focus-goals-nudges-banner'
 import { TrackerKeyboardShortcuts } from '@/components/tracker-keyboard-shortcuts'
 import { EntryTagFilter } from '@/components/entry-tag-filter'
 import { EntryList } from '@/components/entry-list'
@@ -211,6 +212,12 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
             {error}
           </p>
         ) : null}
+        <FocusGoalsNudgesBanner
+          has_running_timer={state.runningEntry !== null}
+          on_check_in_shortcut={() => {
+            check_in_form_ref.current?.expand_and_focus()
+          }}
+        />
 
         <div className="grid grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] items-stretch border border-panel-border bg-panel shadow-sm max-[860px]:grid-cols-1">
           <div className="flex min-h-0 min-w-0 flex-col border-r border-panel-border p-4 max-[860px]:border-r-0 max-[860px]:border-b">
