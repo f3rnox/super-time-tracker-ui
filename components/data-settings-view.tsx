@@ -1,16 +1,19 @@
 import Link from 'next/link'
 
 import { BackupRestoreSetting } from '@/components/backup-restore-setting'
+import { DbExportSetting } from '@/components/db-export-setting'
 import { SettingsPageLayout } from '@/components/settings-page-layout'
+import { type JSONTimeTrackerDB } from '@/lib/types'
 
 interface DataSettingsViewProps {
   db_path: string
+  db: JSONTimeTrackerDB
 }
 
 /**
  * Settings page: backup, restore, and tag management entry point.
  */
-export function DataSettingsView({ db_path }: DataSettingsViewProps) {
+export function DataSettingsView({ db_path, db }: DataSettingsViewProps) {
   return (
     <SettingsPageLayout
       breadcrumb={{
@@ -26,6 +29,9 @@ export function DataSettingsView({ db_path }: DataSettingsViewProps) {
       >
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <BackupRestoreSetting db_path={db_path} />
+        </li>
+        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+          <DbExportSetting db={db} />
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <div className="flex flex-col gap-0.5">

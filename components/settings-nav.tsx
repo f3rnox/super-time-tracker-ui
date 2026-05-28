@@ -46,11 +46,6 @@ const items: SettingsNavItem[] = [
     match: (pathname) => pathname.startsWith('/settings/data'),
   },
   {
-    href: '/settings/export',
-    label: 'Export',
-    match: (pathname) => pathname.startsWith('/settings/export'),
-  },
-  {
     href: '/settings/tags',
     label: 'Tag management',
     match: (pathname) => pathname.startsWith('/settings/tags'),

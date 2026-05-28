@@ -2,20 +2,19 @@
 
 import { useMemo, useState } from 'react'
 
-import { SettingsPageLayout } from '@/components/settings-page-layout'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { type JSONTimeTrackerDB } from '@/lib/types'
 
-interface ExportSettingsViewProps {
+interface DbExportSettingProps {
   db: JSONTimeTrackerDB
 }
 
 type ExportFormat = 'json' | 'csv' | 'markdown'
 
 /**
- * Settings page for exporting tracker data as JSON, CSV, or Markdown.
+ * Exports tracker data as JSON, CSV, or Markdown files.
  */
-export function ExportSettingsView({ db }: ExportSettingsViewProps) {
+export function DbExportSetting({ db }: DbExportSettingProps) {
   const [status_message, set_status_message] = useState<string | null>(null)
   const [error, set_error] = useState<string | null>(null)
 
@@ -49,57 +48,43 @@ export function ExportSettingsView({ db }: ExportSettingsViewProps) {
   }
 
   return (
-    <SettingsPageLayout
-      breadcrumb={{
-        current: 'Export',
-        parent: { label: 'Settings', href: '/settings' },
-      }}
-      title="Export"
-      description="Export your tracker database to JSON, CSV, or Markdown."
-    >
-      <ul
-        className="m-0 flex w-full list-none flex-col gap-2 p-0"
-        aria-label="Export settings"
-      >
-        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <div className="flex flex-col gap-0.5">
-            <h2 className="m-0 text-[0.95rem] font-semibold">Database export</h2>
-            <p className="m-0 text-[0.8rem] leading-snug text-muted">
-              {db.sheets.length} sheets and {entry_count} entries ready to export.
-            </p>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              className={get_button_class_name('ghost', 'small')}
-              onClick={() => handle_export('json')}
-            >
-              Export JSON
-            </button>
-            <button
-              type="button"
-              className={get_button_class_name('ghost', 'small')}
-              onClick={() => handle_export('csv')}
-            >
-              Export CSV
-            </button>
-            <button
-              type="button"
-              className={get_button_class_name('ghost', 'small')}
-              onClick={() => handle_export('markdown')}
-            >
-              Export Markdown
-            </button>
-          </div>
-          {status_message !== null ? (
-            <p className="m-0 mt-2 text-[0.82rem] text-accent">{status_message}</p>
-          ) : null}
-          {error !== null ? (
-            <p className="m-0 mt-2 text-[0.82rem] text-danger">{error}</p>
-          ) : null}
-        </li>
-      </ul>
-    </SettingsPageLayout>
+    <div className="flex w-full flex-col gap-3">
+      <div className="flex flex-col gap-0.5">
+        <h2 className="m-0 text-[0.95rem] font-semibold">Database export</h2>
+        <p className="m-0 text-[0.8rem] leading-snug text-muted">
+          {db.sheets.length} sheets and {entry_count} entries ready to export.
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          className={get_button_class_name('ghost', 'small')}
+          onClick={() => handle_export('json')}
+        >
+          Export JSON
+        </button>
+        <button
+          type="button"
+          className={get_button_class_name('ghost', 'small')}
+          onClick={() => handle_export('csv')}
+        >
+          Export CSV
+        </button>
+        <button
+          type="button"
+          className={get_button_class_name('ghost', 'small')}
+          onClick={() => handle_export('markdown')}
+        >
+          Export Markdown
+        </button>
+      </div>
+      {status_message !== null ? (
+        <p className="m-0 text-[0.82rem] text-accent">{status_message}</p>
+      ) : null}
+      {error !== null ? (
+        <p className="m-0 text-[0.82rem] text-danger">{error}</p>
+      ) : null}
+    </div>
   )
 }
 
@@ -149,7 +134,10 @@ function build_csv_export(db: JSONTimeTrackerDB): string {
 function build_markdown_export(db: JSONTimeTrackerDB): string {
   const lines: string[] = []
   const exported_at = new Date().toISOString()
-  const total_entries = db.sheets.reduce((total, sheet) => total + sheet.entries.length, 0)
+  const total_entries = db.sheets.reduce(
+    (total, sheet) => total + sheet.entries.length,
+    0,
+  )
 
   lines.push('# super-time-tracker export')
   lines.push('')
@@ -182,8 +170,12 @@ function build_markdown_export(db: JSONTimeTrackerDB): string {
         entry.end === null
           ? 'running'
           : `${Math.max(0, entry.end - entry.start) / 60000} min`
-      const tags = entry.tags.length === 0 ? '-' : entry.tags.map((tag) => `@${tag}`).join(' ')
-      const notes = entry.notes.length === 0 ? '-' : entry.notes.map((note) => note.text).join(' / ')
+      const tags =
+        entry.tags.length === 0 ? '-' : entry.tags.map((tag) => `@${tag}`).join(' ')
+      const notes =
+        entry.notes.length === 0
+          ? '-'
+          : entry.notes.map((note) => note.text).join(' / ')
 
       lines.push(
         `| ${entry.id} | ${escape_markdown_cell(entry.description)} | ${escape_markdown_cell(tags)} | ${start} | ${end} | ${duration} | ${escape_markdown_cell(notes)} |`,
