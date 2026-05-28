@@ -1,15 +1,16 @@
-import { apply_ui_preferences_dom_from_window } from '@/lib/apply_ui_preferences_dom_from_window'
-import { apply_ui_preferences_from_record } from '@/lib/apply_ui_preferences_from_record'
-import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
-import { is_cloud_sync_enabled } from '@/lib/is_cloud_sync_enabled'
-import { mark_tracker_db_merged_this_browser_session } from '@/lib/has_tracker_db_merged_this_browser_session'
-import { notify_cloud_db_sync } from '@/lib/notify_cloud_db_sync'
-import { with_ui_preferences_merge_guard } from '@/lib/ui_preferences_merge_guard'
+import { apply_ui_preferences_dom_from_window } from "@/lib/apply_ui_preferences_dom_from_window";
+import { apply_ui_preferences_from_record } from "@/lib/apply_ui_preferences_from_record";
+import { collect_ui_preferences_from_window } from "@/lib/collect_ui_preferences_from_window";
+import { is_cloud_sync_enabled } from "@/lib/is_cloud_sync_enabled";
+import { mark_tracker_db_merged_this_browser_session } from "@/lib/has_tracker_db_merged_this_browser_session";
+import { notify_cloud_db_sync } from "@/lib/notify_cloud_db_sync";
+import { notify_tracker_state_sync } from "@/lib/notify_tracker_state_sync";
+import { with_ui_preferences_merge_guard } from "@/lib/ui_preferences_merge_guard";
 
 export interface RunTrackerDbCloudSyncOptions {
-  merge_on_load?: boolean
-  action?: 'push' | 'pull'
-  on_complete?: () => void
+  merge_on_load?: boolean;
+  action?: "push" | "pull";
+  on_complete?: () => void;
 }
 
 /**
@@ -19,74 +20,78 @@ export async function run_tracker_db_cloud_sync(
   options: RunTrackerDbCloudSyncOptions = {},
 ): Promise<void> {
   if (!is_cloud_sync_enabled()) {
-    return
+    return;
   }
 
-  const action = options.action ?? 'push'
+  const action = options.action ?? "push";
   const syncing_message =
-    action === 'pull' ? 'Pulling from cloud…' : 'Syncing to cloud…'
+    action === "pull" ? "Pulling from cloud…" : "Syncing to cloud…";
   const success_message =
-    action === 'pull' ? 'Cloud pull complete' : 'Cloud sync complete'
+    action === "pull" ? "Cloud pull complete" : "Cloud sync complete";
 
-  notify_cloud_db_sync({ phase: 'syncing', message: syncing_message })
+  notify_cloud_db_sync({ phase: "syncing", message: syncing_message });
 
   try {
     if (options.merge_on_load === true) {
       await with_ui_preferences_merge_guard(async () => {
-        const local_preferences = collect_ui_preferences_from_window()
-        const merge_response = await fetch('/api/sync/merge-on-load', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const local_preferences = collect_ui_preferences_from_window();
+        const merge_response = await fetch("/api/sync/merge-on-load", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ preferences: local_preferences }),
-        })
+        });
 
         if (!merge_response.ok) {
-          const body = (await merge_response.json()) as { error?: string }
-          throw new Error(body.error ?? 'Merge on load failed')
+          const body = (await merge_response.json()) as { error?: string };
+          throw new Error(body.error ?? "Merge on load failed");
         }
 
         const merge_payload = (await merge_response.json()) as {
-          preferences?: Record<string, string>
-        }
+          preferences?: Record<string, string>;
+        };
 
-        apply_ui_preferences_from_record(merge_payload.preferences ?? {})
-      })
+        apply_ui_preferences_from_record(merge_payload.preferences ?? {});
+      });
     }
 
     const push_url =
-      options.merge_on_load === true && action === 'push'
-        ? '/api/sync/push?verbatim=true'
-        : `/api/sync/${action}`
+      options.merge_on_load === true && action === "push"
+        ? "/api/sync/push?verbatim=true"
+        : `/api/sync/${action}`;
 
-    const sync_response = await fetch(push_url, { method: 'POST' })
+    const sync_response = await fetch(push_url, { method: "POST" });
 
     if (!sync_response.ok) {
-      const body = (await sync_response.json()) as { error?: string }
-      throw new Error(body.error ?? `${action} failed`)
+      const body = (await sync_response.json()) as { error?: string };
+      throw new Error(body.error ?? `${action} failed`);
     }
 
     if (options.merge_on_load === true) {
-      mark_tracker_db_merged_this_browser_session()
+      mark_tracker_db_merged_this_browser_session();
     }
 
-    notify_cloud_db_sync({ phase: 'success', message: success_message })
+    notify_cloud_db_sync({ phase: "success", message: success_message });
+
+    if (action === "pull" || options.merge_on_load === true) {
+      notify_tracker_state_sync();
+    }
 
     if (options.merge_on_load === true) {
-      options.on_complete?.()
+      options.on_complete?.();
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          apply_ui_preferences_dom_from_window()
-        })
-      })
+          apply_ui_preferences_dom_from_window();
+        });
+      });
     } else {
-      options.on_complete?.()
+      options.on_complete?.();
     }
   } catch (sync_error: unknown) {
     const message =
-      sync_error instanceof Error ? sync_error.message : String(sync_error)
+      sync_error instanceof Error ? sync_error.message : String(sync_error);
 
-    notify_cloud_db_sync({ phase: 'error', message })
-    throw sync_error
+    notify_cloud_db_sync({ phase: "error", message });
+    throw sync_error;
   }
 }

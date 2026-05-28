@@ -28,6 +28,7 @@ import {
 } from '@/lib/get_sheet_tag_filter_snapshot'
 import { get_serialized_entries_total_ms } from '@/lib/get_serialized_entries_total_ms'
 import { notify_desktop } from '@/lib/notify_desktop'
+import { subscribe_tracker_state_sync } from '@/lib/notify_tracker_state_sync'
 import { delete_tracker_action } from '@/lib/delete_tracker_action'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
@@ -183,6 +184,47 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
     () => get_serialized_entries_total_ms(filtered_entries),
     [filtered_entries],
   )
+
+  useEffect(() => {
+    const refresh_state_after_sync = (): void => {
+      if (is_pending || is_switching_sheet) {
+        return
+      }
+
+      void fetch('/api/state')
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error('Failed to refresh tracker state')
+          }
+
+          return (await response.json()) as TrackerState
+        })
+        .then((next_state) => {
+          sync_active_sheet_preference(next_state)
+          set_state((current_state) => {
+            const current_active_key =
+              current_state.activeEntry === null
+                ? null
+                : `${current_state.activeEntry.sheetName}:${current_state.activeEntry.id}`
+            const next_active_key =
+              next_state.activeEntry === null
+                ? null
+                : `${next_state.activeEntry.sheetName}:${next_state.activeEntry.id}`
+
+            if (current_active_key === next_active_key) {
+              return current_state
+            }
+
+            return next_state
+          })
+        })
+        .catch(() => {
+          // Sync toasts already communicate failures.
+        })
+    }
+
+    return subscribe_tracker_state_sync(refresh_state_after_sync)
+  }, [is_pending, is_switching_sheet])
 
   const entries_empty_message = is_switching_sheet
     ? `Loading entries for "${active_sheet}"…`
