@@ -126,6 +126,12 @@ export function EntryListItem({
             on_edit(entry, values);
             on_clear_ai_revise_draft(row_key);
           }}
+          on_revise_ai={
+            can_revise_description_ai
+              ? () => on_revise_description_ai(entry)
+              : undefined
+          }
+          is_ai_revise_pending={ai_revise_pending_key === row_key}
         />
       </li>
     );

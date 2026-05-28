@@ -4,6 +4,7 @@ import { type ComponentProps, useEffect, useMemo, useState } from "react";
 
 import { format_datetime_hint } from "@/components/format_datetime_hint";
 import { TagAutocompleteInput } from "@/components/tag-autocomplete-input";
+import { AiSparklesIcon } from "@/components/ai-sparkles-icon";
 import { build_resume_description } from "@/lib/build_resume_description";
 import { get_button_class_name } from "@/lib/get_button_class_name";
 import { get_input_class_name } from "@/lib/get_input_class_name";
@@ -26,6 +27,8 @@ interface EntryEditFormProps {
   start_only?: boolean;
   on_save: (values: EntryEditFormValues) => void;
   on_cancel: () => void;
+  on_revise_ai?: () => void;
+  is_ai_revise_pending?: boolean;
 }
 
 /**
@@ -41,6 +44,8 @@ export function EntryEditForm({
   start_only = false,
   on_save,
   on_cancel,
+  on_revise_ai,
+  is_ai_revise_pending = false,
 }: Readonly<EntryEditFormProps>) {
   const initial_description = useMemo(
     () =>
@@ -125,7 +130,21 @@ export function EntryEditForm({
           className="flex flex-col gap-1"
           htmlFor={`entry-description-${entry.id}`}
         >
-          <span className="text-[0.8rem] font-semibold">Description</span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[0.8rem] font-semibold">Description</span>
+            {on_revise_ai !== undefined ? (
+              <button
+                type="button"
+                className="inline-flex cursor-pointer appearance-none items-center gap-1 rounded border-0 bg-transparent px-1.5 py-0.5 text-[0.72rem] text-muted shadow-none transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
+                title="Generate a new AI revision"
+                disabled={is_pending || is_ai_revise_pending}
+                onClick={on_revise_ai}
+              >
+                <AiSparklesIcon />
+                {is_ai_revise_pending ? "Generating…" : "Regenerate"}
+              </button>
+            ) : null}
+          </div>
           <TagAutocompleteInput
             id={`entry-description-${entry.id}`}
             value={description}

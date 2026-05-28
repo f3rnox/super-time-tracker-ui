@@ -26,18 +26,18 @@ const build_user_prompt = (context: string, notes: string): string => {
   const trimmed_notes = notes.trim();
 
   if (trimmed_context.length === 0 && trimmed_notes.length === 0) {
-    return "Generate one concise time-tracking entry description with optional @tags.";
+    return "Generate one time-tracking entry description with optional @tags.";
   }
 
   if (trimmed_context.length > 0 && trimmed_notes.length === 0) {
-    return `Current description: "${trimmed_context}". Revise it into one concise time-tracking entry description. Preserve and incorporate all meaningful details from the current description in the revised text. Keep inline @tags if relevant.`;
+    return `Current description: "${trimmed_context}". Revise it into one time-tracking entry description. Preserve and incorporate all meaningful details from the current description in the revised text. Keep inline @tags if relevant.`;
   }
 
   if (trimmed_context.length === 0 && trimmed_notes.length > 0) {
-    return `Notes: "${trimmed_notes}". Generate one concise time-tracking entry description that includes all meaningful details from the notes, with optional inline @tags.`;
+    return `Notes: "${trimmed_notes}". Generate one time-tracking entry description that includes all meaningful details from the notes, with optional inline @tags.`;
   }
 
-  return `Current description: "${trimmed_context}". Notes: "${trimmed_notes}". Revise into one concise time-tracking entry description that preserves and incorporates all meaningful details from both the current description and all notes. Keep inline @tags if relevant.`;
+  return `Current description: "${trimmed_context}". Notes: "${trimmed_notes}". Revise into one time-tracking entry description that preserves and incorporates all meaningful details from both the current description and all notes. Keep inline @tags if relevant.`;
 };
 
 const suggest_with_openai = async (
@@ -54,12 +54,12 @@ const suggest_with_openai = async (
     body: JSON.stringify({
       model: "gpt-4o-mini",
       temperature: 0.5,
-      max_tokens: 80,
+      max_tokens: 400,
       messages: [
         {
           role: "system",
           content:
-            "You generate one short time-tracking entry description. Output plain text only, no markdown, no quotes, one line.",
+            "You generate one time-tracking entry description. Output plain text only, no markdown, no quotes, one line.",
         },
         {
           role: "user",
@@ -103,9 +103,9 @@ const suggest_with_claude = async (
     body: JSON.stringify({
       model: "claude-3-5-haiku-latest",
       temperature: 0.5,
-      max_tokens: 80,
+      max_tokens: 400,
       system:
-        "You generate one short time-tracking entry description. Output plain text only, no markdown, no quotes, one line.",
+        "You generate one time-tracking entry description. Output plain text only, no markdown, no quotes, one line.",
       messages: [
         {
           role: "user",
@@ -150,12 +150,12 @@ const suggest_with_google_ai = async (
       body: JSON.stringify({
         generationConfig: {
           temperature: 0.5,
-          maxOutputTokens: 160,
+          maxOutputTokens: 400,
         },
         systemInstruction: {
           parts: [
             {
-              text: "You generate one short time-tracking entry description. Output plain text only, no markdown, no quotes, one line.",
+              text: "You generate one time-tracking entry description. Output plain text only, no markdown, no quotes, one line.",
             },
           ],
         },
@@ -241,7 +241,7 @@ const log_debug_suggestion_request = (
 ): void => {
   const user_message = build_user_prompt(context, notes);
   const system_message =
-    "You generate one short time-tracking entry description. Output plain text only, no markdown, no quotes, one line.";
+    "You generate one time-tracking entry description. Output plain text only, no markdown, no quotes, one line.";
 
   console.info("[ai-suggestion] server request received", {
     provider,
@@ -262,7 +262,7 @@ const log_debug_suggestion_request = (
 };
 
 /**
- * Suggests a concise entry description via the selected LLM provider.
+ * Suggests an entry description via the selected LLM provider.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   const started_at = Date.now();
