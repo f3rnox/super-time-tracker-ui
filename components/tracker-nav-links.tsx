@@ -42,14 +42,14 @@ export function TrackerNavLinks() {
   const pathname = usePathname() ?? '/'
 
   return (
-    <>
+    <div className="scrollbar-none flex min-w-0 flex-1 items-center gap-1 overflow-x-auto whitespace-nowrap py-0.5 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden min-[980px]:overflow-visible">
       {nav_items.map((item) => {
         const is_active = item.match(pathname)
 
         return (
           <Link
             key={item.href}
-            className={`${link_base_class} ${
+            className={`${link_base_class} shrink-0 ${
               is_active
                 ? 'bg-accent-soft text-foreground'
                 : 'text-muted hover:bg-surface-hover hover:text-foreground'
@@ -61,6 +61,6 @@ export function TrackerNavLinks() {
           </Link>
         )
       })}
-    </>
+    </div>
   )
 }

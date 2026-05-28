@@ -16,7 +16,7 @@ interface TrackerBreadcrumbProps {
 export function TrackerBreadcrumb({ current, parent }: TrackerBreadcrumbProps) {
   return (
     <nav aria-label="Breadcrumb" className="min-w-0 text-left">
-      <ol className="m-0 flex list-none flex-wrap items-center gap-1.5 p-0 text-[0.85rem]">
+      <ol className="m-0 flex min-w-0 list-none flex-wrap items-center gap-1.5 p-0 text-[0.85rem]">
         <li>
           <Link
             className="text-muted no-underline hover:text-foreground"
@@ -33,13 +33,13 @@ export function TrackerBreadcrumb({ current, parent }: TrackerBreadcrumbProps) {
             <li>
               {parent.href !== undefined ? (
                 <Link
-                  className="text-muted no-underline hover:text-foreground"
+                  className="max-w-44 truncate text-muted no-underline hover:text-foreground sm:max-w-none"
                   href={parent.href}
                 >
                   {parent.label}
                 </Link>
               ) : (
-                <span className="text-muted">{parent.label}</span>
+                <span className="max-w-44 truncate text-muted sm:max-w-none">{parent.label}</span>
               )}
             </li>
           </>
@@ -47,7 +47,7 @@ export function TrackerBreadcrumb({ current, parent }: TrackerBreadcrumbProps) {
         <li className="text-muted" aria-hidden="true">
           /
         </li>
-        <li className="font-medium text-foreground" aria-current="page">
+        <li className="max-w-44 truncate font-medium text-foreground sm:max-w-none" aria-current="page">
           {current}
         </li>
       </ol>

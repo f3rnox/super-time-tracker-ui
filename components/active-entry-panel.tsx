@@ -129,6 +129,26 @@ export const ActiveEntryPanel = forwardRef<
     }
   }
 
+  const actions_menu = (
+    <EntryActionsMenu
+      current_sheet_name={entry.sheetName}
+      sheets={sheets}
+      is_pending={is_pending}
+      on_edit={() => set_is_editing_times(true)}
+      on_show_add_note_form={() => set_is_adding_note(true)}
+      on_move={on_move}
+      on_delete={async () => {
+        const confirmed = confirm_destructive_actions
+          ? await confirm(get_delete_entry_confirm_dialog(entry))
+          : true
+
+        if (confirmed) {
+          on_delete()
+        }
+      }}
+    />
+  )
+
   if (is_editing_times) {
     return (
       <section className={panel_class}>
@@ -150,7 +170,7 @@ export const ActiveEntryPanel = forwardRef<
 
   return (
     <section className={panel_class}>
-      <div className="flex shrink-0 items-start justify-between gap-3">
+      <div className="flex min-w-0 shrink-0 items-start justify-between gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           {!in_bar ? (
             <span className="self-start rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on">
@@ -169,8 +189,8 @@ export const ActiveEntryPanel = forwardRef<
               }}
             />
           ) : (
-            <div className="inline-flex max-w-full flex-wrap items-center gap-1">
-              <h2 className="m-0 text-xl font-[650] leading-tight tracking-tight">
+            <div className="flex min-w-0 items-center gap-1">
+              <h2 className="m-0 min-w-0 truncate text-[1.12rem] font-[650] leading-tight tracking-tight min-[560px]:text-xl">
                 {entry.description || 'Untitled entry'}
               </h2>
               <button
@@ -186,27 +206,15 @@ export const ActiveEntryPanel = forwardRef<
             </div>
           )}
         </div>
-        <EntryActionsMenu
-          current_sheet_name={entry.sheetName}
-          sheets={sheets}
-          is_pending={is_pending}
-          on_edit={() => set_is_editing_times(true)}
-          on_show_add_note_form={() => set_is_adding_note(true)}
-          on_move={on_move}
-          on_delete={async () => {
-            const confirmed = confirm_destructive_actions
-              ? await confirm(get_delete_entry_confirm_dialog(entry))
-              : true
-
-            if (confirmed) {
-              on_delete()
-            }
-          }}
-        />
+        {!in_bar ? <div className="max-[560px]:self-end">{actions_menu}</div> : null}
       </div>
-      <div className="flex shrink-0 items-end justify-between gap-4 max-[860px]:flex-col max-[860px]:items-stretch">
+      <div
+        className={`flex shrink-0 items-end justify-between gap-4 max-[860px]:flex-col max-[860px]:items-stretch ${
+          in_bar ? 'px-1' : ''
+        }`}
+      >
         <div className="flex min-w-0 flex-col gap-2">
-          <p className="m-0 font-mono text-[2rem] font-medium leading-none tracking-tight text-accent">
+          <p className="m-0 whitespace-nowrap font-mono text-[1.65rem] font-medium leading-none tracking-tight text-accent min-[440px]:text-[1.85rem] min-[560px]:text-[2rem]">
             {format_duration(duration_ms, duration_format, show_seconds)}
           </p>
           {!is_editing_description && entry.tags.length > 0 ? (
@@ -220,12 +228,12 @@ export const ActiveEntryPanel = forwardRef<
           ) : null}
         </div>
         <div
-          className={`inline-flex shrink-0 items-center gap-2 ${in_bar ? 'min-w-0 max-[860px]:w-full max-[860px]:justify-end' : 'min-w-30 max-[860px]:w-full max-[860px]:justify-stretch'}`}
+          className={`flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-2 max-[560px]:flex-col max-[560px]:items-stretch ${in_bar ? 'w-full' : 'min-w-30 max-[860px]:w-full max-[860px]:justify-stretch'}`}
         >
           {!is_adding_note ? (
             <button
               type="button"
-              className={`${get_button_class_name('ghost')} max-[860px]:flex-1`}
+              className={`${get_button_class_name('ghost')} min-w-0 min-[561px]:px-2.5 min-[561px]:py-2 min-[561px]:text-[0.9rem] max-[560px]:flex-1`}
               disabled={is_pending || is_editing_description}
               onClick={() => set_is_adding_note(true)}
             >

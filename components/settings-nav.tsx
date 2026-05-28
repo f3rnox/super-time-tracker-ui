@@ -50,16 +50,16 @@ export function SettingsNav() {
 
   return (
     <nav aria-label="Settings sections" className="w-full">
-      <ul className="m-0 flex w-full list-none flex-col gap-0.5 p-0">
+      <ul className="scrollbar-none m-0 flex w-full list-none gap-1 overflow-x-auto p-0 pb-1 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden max-[860px]:flex-row min-[861px]:flex-col min-[861px]:gap-0.5 min-[861px]:overflow-visible min-[861px]:pb-0">
         {items.map((item) => {
           const is_active = item.match(pathname)
 
           return (
-            <li key={item.href}>
+            <li key={item.href} className="shrink-0 min-[861px]:shrink">
               <Link
                 href={item.href}
                 aria-current={is_active ? 'page' : undefined}
-                className={`block rounded-md px-3 py-2 text-[0.9rem] no-underline transition-colors duration-150 ${
+                className={`block whitespace-nowrap rounded-md px-3 py-2 text-[0.9rem] no-underline transition-colors duration-150 min-[861px]:whitespace-normal ${
                   is_active
                     ? 'bg-accent-soft text-foreground'
                     : 'text-muted hover:bg-surface-hover hover:text-foreground'

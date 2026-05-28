@@ -206,7 +206,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
       <div className="relative z-1">
         <TrackerTopbar />
       </div>
-      <div className="mx-auto max-w-[1120px] px-5 pb-10 pt-5">
+      <div className="mx-auto max-w-[1120px] px-4 pb-10 pt-4 sm:px-5 sm:pt-5">
         {error !== null ? (
           <p className="mb-4 border border-danger-border bg-danger-soft px-3 py-2.5 text-danger-text">
             {error}
@@ -219,7 +219,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
           }}
         />
 
-        <div className="grid grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] items-stretch border border-panel-border bg-panel shadow-sm max-[860px]:grid-cols-1">
+        <div className="grid grid-cols-[minmax(14rem,18rem)_minmax(0,1fr)] items-stretch border border-panel-border bg-panel shadow-sm max-[960px]:grid-cols-1">
           <div className="flex min-h-0 min-w-0 flex-col border-r border-panel-border p-4 max-[860px]:border-r-0 max-[860px]:border-b">
             <SheetSidebar
               sheets={state.sheets}

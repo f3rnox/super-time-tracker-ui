@@ -176,8 +176,8 @@ export function EntryList({
         ) : (
           <>
             {header_extra}
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex min-w-0 items-center gap-2">
                 {entries.length > 0 ? (
                   <Checkbox
                     className="shrink-0"
@@ -199,7 +199,7 @@ export function EntryList({
                       : `${entries.length} entries`}
                 </span>
               </div>
-              <p className="m-0 font-mono text-[0.85rem] text-muted">
+              <p className="m-0 font-mono text-[0.85rem] text-muted max-[640px]:w-full">
                 {format_duration(total_ms, duration_format)} total
               </p>
             </div>
@@ -246,7 +246,7 @@ export function EntryList({
                       : ''
                   }`}
                 >
-                  <div className="flex w-full min-w-0 items-center gap-2.5 compact:gap-1.5">
+                  <div className="flex w-full min-w-0 flex-col items-start gap-2.5 min-[700px]:flex-row min-[700px]:items-center compact:gap-1.5">
                     <label
                       className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 has-disabled:cursor-not-allowed"
                       aria-label={`Select entry ${entry.description || 'Untitled entry'}`}
@@ -293,7 +293,7 @@ export function EntryList({
                         </div>
                       </div>
                     </label>
-                    <div className="flex shrink-0 flex-row items-center gap-2 max-[860px]:flex-wrap max-[860px]:justify-end compact:gap-1.5">
+                    <div className="flex w-full shrink-0 flex-row items-center justify-between gap-2 min-[700px]:w-auto min-[700px]:justify-end max-[860px]:flex-wrap compact:gap-1.5">
                       <p
                         className={`m-0 whitespace-nowrap text-right font-mono text-[0.9rem] text-muted compact:text-[0.8rem] ${
                           entry.isActive ? 'text-accent' : ''

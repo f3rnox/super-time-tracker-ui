@@ -10,7 +10,7 @@ interface CheckoutButtonGroupProps {
   on_check_out: (at?: string) => void
 }
 
-const group_button_class = `${get_button_class_name('danger-solid')} rounded-none first:rounded-l-[0.65rem] last:rounded-r-[0.65rem] not-first:-ml-px not-first:min-w-12 not-first:border-l not-first:border-l-[color-mix(in_srgb,#ffffff_30%,var(--danger-solid))] max-[860px]:flex-1 max-[860px]:basis-1/2`
+const group_button_class = `${get_button_class_name('danger-solid')} rounded-none first:rounded-l-[0.65rem] last:rounded-r-[0.65rem] not-first:-ml-px not-first:min-w-12 not-first:border-l not-first:border-l-[color-mix(in_srgb,#ffffff_30%,var(--danger-solid))] min-[561px]:px-2.5 min-[561px]:py-2 min-[561px]:text-[0.9rem] max-[560px]:flex-1 max-[560px]:basis-1/2`
 
 /**
  * Check out now or at a natural-language time in a joined button group.
@@ -34,7 +34,7 @@ export function CheckoutButtonGroup({
 
   return (
     <div
-      className={`inline-flex shrink-0 ${in_bar ? 'min-w-0 max-[860px]:w-full' : 'min-w-30 max-[860px]:w-full'}`}
+      className={`inline-flex min-w-0 max-w-full ${in_bar ? 'max-[560px]:w-full' : 'min-w-30 max-[560px]:w-full'}`}
     >
       <button
         type="button"

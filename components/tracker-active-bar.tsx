@@ -1,12 +1,16 @@
 'use client'
 
-import { forwardRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 
 import {
   ActiveEntryPanel,
   type ActiveEntryPanelHandle,
 } from '@/components/active-entry-panel'
+import { EntryActionsMenu } from '@/components/entry-actions-menu'
+import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
+import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
+import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import {
   type SerializedEntry,
   type SerializedSheet,
@@ -54,6 +58,19 @@ export const TrackerActiveBar = forwardRef<
   },
   ref,
 ) {
+  const { confirm } = use_confirm_dialog()
+  const confirm_destructive_actions = use_confirm_destructive_actions()
+  const panel_ref = useRef<ActiveEntryPanelHandle>(null)
+
+  useImperativeHandle(ref, () => ({
+    start_edit: () => {
+      panel_ref.current?.start_edit()
+    },
+    start_add_note: () => {
+      panel_ref.current?.start_add_note()
+    },
+  }))
+
   if (active_entry === null) {
     return null
   }
@@ -65,9 +82,28 @@ export const TrackerActiveBar = forwardRef<
           Sheet {active_entry.sheetName}
         </span>
         <span className={tracking_pill_class}>Tracking</span>
+        <div className="ml-auto">
+          <EntryActionsMenu
+            current_sheet_name={active_entry.sheetName}
+            sheets={sheets}
+            is_pending={is_pending}
+            on_edit={() => panel_ref.current?.start_edit()}
+            on_show_add_note_form={() => panel_ref.current?.start_add_note()}
+            on_move={on_move}
+            on_delete={async () => {
+              const confirmed = confirm_destructive_actions
+                ? await confirm(get_delete_entry_confirm_dialog(active_entry))
+                : true
+
+              if (confirmed) {
+                on_delete()
+              }
+            }}
+          />
+        </div>
       </div>
       <ActiveEntryPanel
-        ref={ref}
+        ref={panel_ref}
         key={`${active_entry.sheetName}-${active_entry.id}`}
         entry={active_entry}
         sheets={sheets}
