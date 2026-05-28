@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { type RefObject, useMemo, useState } from 'react'
 
 import { KeyboardShortcutsDialog } from '@/components/keyboard-shortcuts-dialog'
@@ -39,6 +40,7 @@ export function TrackerKeyboardShortcuts({
   on_select_sheet,
   on_check_out,
 }: TrackerKeyboardShortcutsProps) {
+  const router = useRouter()
   const [is_help_open, set_is_help_open] = useState(false)
   const check_out = use_check_out_action(on_check_out)
 
@@ -97,6 +99,16 @@ export function TrackerKeyboardShortcuts({
         },
       },
       {
+        id: 'pomodoro',
+        label: 'P',
+        description: 'Open Pomodoro',
+        key: 'p',
+        is_available: () => !is_pending,
+        action: () => {
+          router.push('/pomodoro')
+        },
+      },
+      {
         id: 'previous-sheet',
         label: '[',
         description: 'Previous sheet',
@@ -141,6 +153,7 @@ export function TrackerKeyboardShortcuts({
     check_out,
     is_pending,
     on_select_sheet,
+    router,
     sheets,
   ])
 
