@@ -150,7 +150,7 @@ export function NotificationRulesRunner() {
           }
         }
 
-        if (running_entry !== null) {
+        if (running_entry !== null && running_entry !== undefined) {
           const running_since_ms = Date.parse(running_entry.start)
 
           if (Number.isFinite(running_since_ms)) {
