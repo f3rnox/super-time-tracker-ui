@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.21](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.20...v0.1.21) (2026-05-28)
+
+
+### Features
+
+* add ai entry text suggestion integration ([66eec42](https://github.com/f3rnox/super-time-tracker-ui/commit/66eec422780d5dd82d215611683e73f99bd31078))
+* add enable/disable cloud sync setting ([72a574a](https://github.com/f3rnox/super-time-tracker-ui/commit/72a574aad208bcd2a6fb69148fe6a63a6b489350))
+* added goals and goal settings ([647fe02](https://github.com/f3rnox/super-time-tracker-ui/commit/647fe0217ee32f62f21bb862d09841ac6f52d239))
+* make ui responsive ([b481da4](https://github.com/f3rnox/super-time-tracker-ui/commit/b481da4b108dd1a87290d91a9d6d03c882d981b9))
+* offline support ([e117406](https://github.com/f3rnox/super-time-tracker-ui/commit/e117406ba27e6f9fce2e1ea4b4050397704da4dd))
+* revise and finish pomodoro implementation ([d3d09d7](https://github.com/f3rnox/super-time-tracker-ui/commit/d3d09d7ff3e046c9afe3c0543eacbdbfe567ce49))
+* WIP pomodoro implementation ([f836ec8](https://github.com/f3rnox/super-time-tracker-ui/commit/f836ec8e089d4beaeb2790a34e303dd145c99133))
+
+
+### Bug Fixes
+
+* active entry button margin ([b8dd2bd](https://github.com/f3rnox/super-time-tracker-ui/commit/b8dd2bda56315ac677d2578af4d31757aab36fc0))
+* hide pomodoro hint box if an entry is active ([0e171ec](https://github.com/f3rnox/super-time-tracker-ui/commit/0e171ec4fa3f27eadd92efb65d004a7b64d5d639))
+* offline support ([308b21e](https://github.com/f3rnox/super-time-tracker-ui/commit/308b21e5135f46262e93eab3b23e163d7a264ee0))
+* start pomodoro shortcut button text color ([2dfb705](https://github.com/f3rnox/super-time-tracker-ui/commit/2dfb705e6deb81bd6e7f57a6ac119357936d1ab9))
+
 ### [0.1.20](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.19...v0.1.20) (2026-05-19)
 
 
