@@ -1,5 +1,6 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { type ReactNode, useEffect, useMemo, useState } from 'react'
 
 import { ReportingActivityHeatmap } from '@/components/reporting-activity-heatmap'
@@ -21,6 +22,8 @@ import { default_reporting_sort_preference } from '@/lib/preferences/default_rep
 import { format_duration } from '@/lib/format_duration'
 import { get_date_range_ms_from_inputs } from '@/lib/get_date_range_ms_from_inputs'
 import { get_initial_reporting_range_inputs } from '@/lib/get_initial_reporting_range_inputs'
+import { get_reporting_date_range_shortcut_inputs } from '@/lib/get_reporting_date_range_shortcut_inputs'
+import { parse_reporting_range_from_search_params } from '@/lib/parse_reporting_range_from_search_params'
 import { parse_reporting_source_sheets } from '@/lib/parse_reporting_source_sheets'
 import { round_chart_percent } from '@/lib/round_chart_percent'
 import { sort_sheet_report_stats } from '@/lib/sort_sheet_report_stats'
@@ -51,6 +54,7 @@ export function ReportingView({
   source_sheets,
   reference_now,
 }: ReportingViewProps) {
+  const search_params = useSearchParams()
   const duration_format = use_duration_format()
   const week_starts_on = use_week_starts_on()
   const [active_tab, set_active_tab] = useState<ReportingViewTab>('dashboard')
@@ -65,6 +69,24 @@ export function ReportingView({
     set_range_inputs(get_initial_reporting_range_inputs(undefined, week_starts_on))
     set_sort(default_reporting_sort_preference.read())
   }, [week_starts_on])
+
+  useEffect(() => {
+    const range_shortcut = parse_reporting_range_from_search_params(
+      search_params.get('range'),
+    )
+
+    if (range_shortcut === null) {
+      return
+    }
+
+    set_range_inputs(
+      get_reporting_date_range_shortcut_inputs(
+        range_shortcut,
+        new Date(),
+        week_starts_on_to_index(week_starts_on),
+      ),
+    )
+  }, [search_params, week_starts_on])
 
   useEffect(() => {
     set_calculation_now(reference_now)

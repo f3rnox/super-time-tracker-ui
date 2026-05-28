@@ -5,10 +5,16 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useEffect,
+  useMemo,
   useState,
 } from 'react'
 
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import {
+  get_registered_confirm_dialog,
+  register_confirm_dialog,
+} from '@/lib/confirm_dialog_registry'
 import { type ConfirmDialogOptions } from '@/lib/types/confirm_dialog'
 
 interface ConfirmDialogRequest {
@@ -28,11 +34,17 @@ const ConfirmDialogContext = createContext<ConfirmDialogContextValue | null>(nul
 export function use_confirm_dialog(): ConfirmDialogContextValue {
   const context = useContext(ConfirmDialogContext)
 
-  if (context === null) {
-    throw new Error('use_confirm_dialog must be used within ConfirmDialogProvider')
+  if (context !== null) {
+    return context
   }
 
-  return context
+  const registered = get_registered_confirm_dialog()
+
+  if (registered !== null) {
+    return { confirm: registered }
+  }
+
+  throw new Error('use_confirm_dialog must be used within ConfirmDialogProvider')
 }
 
 interface ConfirmDialogProviderProps {
@@ -51,13 +63,28 @@ export function ConfirmDialogProvider({ children }: ConfirmDialogProviderProps) 
     })
   }, [])
 
+  register_confirm_dialog(confirm)
+
+  useEffect(() => {
+    register_confirm_dialog(confirm)
+
+    return () => {
+      register_confirm_dialog(null)
+    }
+  }, [confirm])
+
+  const context_value = useMemo(
+    (): ConfirmDialogContextValue => ({ confirm }),
+    [confirm],
+  )
+
   const close = (confirmed: boolean): void => {
     request?.resolve(confirmed)
     set_request(null)
   }
 
   return (
-    <ConfirmDialogContext.Provider value={{ confirm }}>
+    <ConfirmDialogContext.Provider value={context_value}>
       {children}
       {request !== null ? (
         <ConfirmDialog

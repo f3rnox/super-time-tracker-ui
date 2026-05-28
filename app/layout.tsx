@@ -1,13 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 
-import { AppKeyboardShortcuts } from '@/components/app-keyboard-shortcuts'
-import { CloudSyncProvider } from '@/components/cloud-sync-provider'
-import { ToastNotifications } from '@/components/toast-notifications'
-import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
+import { AppProviders } from '@/components/app-providers'
 import { DocumentPreferencesInit } from '@/components/document-preferences-init'
-import { NotificationRulesRunner } from '@/components/notification-rules-runner'
-import { PwaInstallNotice } from '@/components/pwa-install-notice'
 import { PwaRegister } from '@/components/pwa-register'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
 import { UiPreferencesDocumentSync } from '@/components/ui-preferences-document-sync'
@@ -71,15 +66,7 @@ export default async function RootLayout({
         <PwaRegister />
         <ThemeModeSystemListener />
         <UiPreferencesDocumentSync />
-        <ConfirmDialogProvider>
-          <CloudSyncProvider>
-            <AppKeyboardShortcuts />
-            <NotificationRulesRunner />
-            {children}
-            <ToastNotifications />
-            <PwaInstallNotice />
-          </CloudSyncProvider>
-        </ConfirmDialogProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )

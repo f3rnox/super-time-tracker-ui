@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 
 import { Checkbox } from '@/components/checkbox'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
@@ -10,8 +10,15 @@ import { EntryEditForm, type EntryEditFormValues } from '@/components/entry-edit
 import { EntryListBulkBar } from '@/components/entry-list-bulk-bar'
 import { EntryListSortControls } from '@/components/entry-list-sort-controls'
 import { format_time } from '@/components/format_time'
+import { entry_can_split } from '@/lib/entry_can_split'
 import { get_delete_entries_confirm_dialog } from '@/lib/get_delete_entries_confirm_dialog'
 import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
+import { get_merge_entries_confirm_dialog } from '@/lib/get_merge_entries_confirm_dialog'
+import {
+  get_mergeable_entry_neighbors,
+  type MergeEntryDirection,
+} from '@/lib/get_mergeable_entry_neighbors'
+import { get_split_entry_confirm_dialog } from '@/lib/get_split_entry_confirm_dialog'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { get_entry_row_key } from '@/lib/get_entry_row_key'
@@ -32,6 +39,8 @@ import {
 interface EntryListProps {
   title: string
   entries: SerializedEntry[]
+  /** Full sheet entries used to detect merge neighbors (defaults to entries). */
+  merge_context_entries?: SerializedEntry[]
   sheets: SerializedSheet[]
   known_tags: string[]
   total_ms: number
@@ -54,6 +63,8 @@ interface EntryListProps {
   ) => void
   on_add_note: (entry: SerializedEntry, text: string) => void
   on_resume: (entry: SerializedEntry) => void
+  on_split?: (entry: SerializedEntry, at: string) => void
+  on_merge?: (entry: SerializedEntry, direction: MergeEntryDirection) => void
 }
 
 const tag_item_class =
@@ -65,6 +76,7 @@ const tag_item_class =
 export function EntryList({
   title,
   entries,
+  merge_context_entries,
   sheets,
   known_tags,
   total_ms,
@@ -80,6 +92,8 @@ export function EntryList({
   on_edit_note,
   on_add_note,
   on_resume,
+  on_split,
+  on_merge,
 }: EntryListProps) {
   const { confirm } = use_confirm_dialog()
   const confirm_destructive_actions = use_confirm_destructive_actions()
@@ -122,6 +136,18 @@ export function EntryList({
         : suggestion_provider === 'google_ai'
           ? google_ai_api_key
         : ''
+
+  const merge_neighbors_by_key = useMemo(() => {
+    const merge_source = merge_context_entries ?? entries
+    const map = new Map<string, ReturnType<typeof get_mergeable_entry_neighbors>>()
+
+    for (const entry of entries) {
+      const key = get_entry_row_key(entry)
+      map.set(key, get_mergeable_entry_neighbors(entry, merge_source))
+    }
+
+    return map
+  }, [entries, merge_context_entries])
   const can_revise_description_ai =
     suggestion_provider !== 'none' && selected_api_key.trim().length > 0
 
@@ -400,6 +426,46 @@ export function EntryList({
                         current_sheet_name={entry.sheetName}
                         sheets={sheets}
                         is_pending={is_pending || ai_revise_pending_key === row_key}
+                        can_split={on_split !== undefined && entry_can_split(entry)}
+                        on_split={
+                          on_split === undefined
+                            ? undefined
+                            : async (at) => {
+                                const confirmed = confirm_destructive_actions
+                                  ? await confirm(
+                                      get_split_entry_confirm_dialog(entry, at),
+                                    )
+                                  : true
+
+                                if (confirmed) {
+                                  on_split(entry, at)
+                                }
+                              }
+                        }
+                        can_merge_previous={
+                          merge_neighbors_by_key.get(row_key)?.previous === true
+                        }
+                        can_merge_next={
+                          merge_neighbors_by_key.get(row_key)?.next === true
+                        }
+                        on_merge={
+                          on_merge === undefined
+                            ? undefined
+                            : async (direction) => {
+                                const confirmed = confirm_destructive_actions
+                                  ? await confirm(
+                                      get_merge_entries_confirm_dialog(
+                                        entry,
+                                        direction,
+                                      ),
+                                    )
+                                  : true
+
+                                if (confirmed) {
+                                  on_merge(entry, direction)
+                                }
+                              }
+                        }
                         on_edit={() => {
                           set_editing_key(row_key)
                           set_ai_revise_draft_by_key((previous) => {

@@ -11,6 +11,10 @@ export function get_app_keyboard_shortcut_sections(
       title: 'General',
       entries: [
         {
+          label: 'Ctrl+P',
+          description: 'Open command palette',
+        },
+        {
           label: help_key_label,
           description: 'Show keyboard shortcuts',
         },

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { HamburgerIcon } from '@/components/hamburger-icon'
 import { prompt_entry_note } from '@/lib/prompt_entry_note'
+import { prompt_split_entry_at } from '@/lib/prompt_split_entry_at'
+import { type MergeEntryDirection } from '@/lib/get_mergeable_entry_neighbors'
 import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { type SerializedSheet } from '@/lib/types/tracker_state'
 
@@ -18,6 +20,11 @@ interface EntryActionsMenuProps {
   can_revise_description_ai?: boolean
   on_resume?: () => void
   entry_is_active?: boolean
+  can_split?: boolean
+  on_split?: (at: string) => void
+  can_merge_previous?: boolean
+  can_merge_next?: boolean
+  on_merge?: (direction: MergeEntryDirection) => void
   on_delete: () => void
   on_move: (target_sheet_name: string) => void
 }
@@ -39,6 +46,11 @@ export function EntryActionsMenu({
   can_revise_description_ai = false,
   on_resume,
   entry_is_active = false,
+  can_split = false,
+  on_split,
+  can_merge_previous = false,
+  can_merge_next = false,
+  on_merge,
   on_delete,
   on_move,
 }: EntryActionsMenuProps) {
@@ -177,6 +189,84 @@ export function EntryActionsMenu({
                 Resume
               </button>
             </li>
+          ) : null}
+          {on_split !== undefined ? (
+            <li role="none">
+              <button
+                type="button"
+                className={menu_item_class}
+                role="menuitem"
+                disabled={is_pending || !can_split}
+                title={
+                  can_split
+                    ? 'Split into two entries at a time'
+                    : 'Only completed entries can be split'
+                }
+                onClick={() => {
+                  close_menu()
+
+                  if (!can_split) {
+                    return
+                  }
+
+                  const at = prompt_split_entry_at()
+
+                  if (at !== null) {
+                    on_split(at)
+                  }
+                }}
+              >
+                Split entry
+              </button>
+            </li>
+          ) : null}
+          {on_merge !== undefined ? (
+            <>
+              <li role="none">
+                <button
+                  type="button"
+                  className={menu_item_class}
+                  role="menuitem"
+                  disabled={is_pending || !can_merge_previous}
+                  title={
+                    can_merge_previous
+                      ? 'Merge with the previous entry'
+                      : 'No touching previous entry'
+                  }
+                  onClick={() => {
+                    close_menu()
+
+                    if (can_merge_previous) {
+                      on_merge('previous')
+                    }
+                  }}
+                >
+                  Merge with previous
+                </button>
+              </li>
+              <li role="none">
+                <button
+                  type="button"
+                  className={menu_item_class}
+                  role="menuitem"
+                  disabled={is_pending || !can_merge_next}
+                  title={
+                    can_merge_next
+                      ? 'Merge with the next entry'
+                      : 'No touching next entry'
+                  }
+                  onClick={() => {
+                    close_menu()
+
+                    if (can_merge_next) {
+                      on_merge('next')
+                    }
+                  }}
+                >
+                  Merge with next
+                </button>
+              </li>
+            </>
           ) : null}
           <li className="my-1 border-t border-panel-border" role="separator" aria-hidden="true" />
           <li role="none">

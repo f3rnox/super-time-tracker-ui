@@ -204,7 +204,7 @@ export type TopbarQuickActionsJson = string
 export const TOPBAR_QUICK_ACTIONS_STORAGE_KEY =
   'super-time-tracker-topbar-quick-actions'
 export const TOPBAR_QUICK_ACTIONS_DEFAULT: TopbarQuickActionsJson =
-  '["today","reporting","pomodoro"]'
+  '["today","search","reporting","pomodoro"]'
 
 export type OpenAiApiKey = string
 export const OPENAI_API_KEY_STORAGE_KEY = 'super-time-tracker-openai-api-key'

@@ -28,6 +28,7 @@ const topbar_shortcut_menu_items: Record<
   { href: string; label: string }
 > = {
   today: { href: '/today', label: 'Today' },
+  search: { href: '/search', label: 'Search' },
   sheets: { href: '/sheets', label: 'Sheets' },
   reporting: { href: '/reporting', label: 'Reporting' },
   pomodoro: { href: '/pomodoro', label: 'Pomodoro' },

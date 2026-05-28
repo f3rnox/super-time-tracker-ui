@@ -16,6 +16,7 @@ const APP_ROUTES = [
   '/today',
   '/sheets',
   '/reporting',
+  '/search',
   '/pomodoro',
   '/settings',
   '/settings/display',

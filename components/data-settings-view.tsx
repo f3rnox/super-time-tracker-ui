@@ -8,12 +8,19 @@ import { type JSONTimeTrackerDB } from '@/lib/types'
 interface DataSettingsViewProps {
   db_path: string
   db: JSONTimeTrackerDB
+  sheet_names: string[]
+  tag_names: string[]
 }
 
 /**
  * Settings page: backup, restore, and tag management entry point.
  */
-export function DataSettingsView({ db_path, db }: DataSettingsViewProps) {
+export function DataSettingsView({
+  db_path,
+  db,
+  sheet_names,
+  tag_names,
+}: DataSettingsViewProps) {
   return (
     <SettingsPageLayout
       breadcrumb={{
@@ -31,7 +38,11 @@ export function DataSettingsView({ db_path, db }: DataSettingsViewProps) {
           <BackupRestoreSetting db_path={db_path} />
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
-          <DbExportSetting db={db} />
+          <DbExportSetting
+            db={db}
+            sheet_names={sheet_names}
+            tag_names={tag_names}
+          />
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <div className="flex flex-col gap-0.5">

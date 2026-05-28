@@ -8,9 +8,11 @@ import {
   CheckInFormCollapsible,
   type CheckInFormCollapsibleHandle,
 } from '@/components/check-in-form-collapsible'
+import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
 import { FocusGoalsNudgesBanner } from '@/components/focus-goals-nudges-banner'
 import { TrackerKeyboardShortcuts } from '@/components/tracker-keyboard-shortcuts'
 import { EntryTagFilter } from '@/components/entry-tag-filter'
+import { TrackerEntrySearchBar } from '@/components/tracker-entry-search-bar'
 import { EntryList } from '@/components/entry-list'
 import { SheetSidebar } from '@/components/sheet-sidebar'
 import { TrackerActiveBar } from '@/components/tracker-active-bar'
@@ -20,6 +22,7 @@ import { build_check_out_request_payload } from '@/lib/build_check_out_request_p
 import { build_resume_description } from '@/lib/build_resume_description'
 import { collect_tags_from_entries } from '@/lib/collect_tags_from_entries'
 import { filter_entries_by_tags } from '@/lib/filter_entries_by_tags'
+import { filter_serialized_entries_by_search_query } from '@/lib/filter_serialized_entries_by_search_query'
 import { finish_running_pomodoro_timer } from '@/lib/finish_running_pomodoro_timer'
 import { get_running_entry_key } from '@/lib/get_running_entry_key'
 import {
@@ -57,6 +60,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
   const [error, set_error] = useState<string | null>(null)
   const [is_pending, set_is_pending] = useState(false)
   const [is_switching_sheet, set_is_switching_sheet] = useState(false)
+  const [entry_search_query, set_entry_search_query] = useState('')
   const state_before_sheet_switch_ref = useRef<TrackerState>(initial_state)
 
   useEffect(() => {
@@ -155,6 +159,10 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
     previous_active_sheet_ref.current = active_sheet
   }, [active_sheet, clear_tag_filters_on_sheet_change])
 
+  useEffect(() => {
+    set_entry_search_query('')
+  }, [active_sheet])
+
   const filter_tags = useSyncExternalStore(
     subscribe_sheet_tag_filters,
     () => get_sheet_tag_filter_snapshot(active_sheet),
@@ -177,8 +185,20 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
       tag_filter_mode,
     )
 
-    return sort_serialized_entries(matching, entry_list_sort)
-  }, [state.activeSheetEntries, filter_tags, tag_filter_mode, entry_list_sort, is_switching_sheet])
+    const searched = filter_serialized_entries_by_search_query(
+      matching,
+      entry_search_query,
+    )
+
+    return sort_serialized_entries(searched, entry_list_sort)
+  }, [
+    state.activeSheetEntries,
+    filter_tags,
+    tag_filter_mode,
+    entry_list_sort,
+    entry_search_query,
+    is_switching_sheet,
+  ])
 
   const filtered_total_ms = useMemo(
     () => get_serialized_entries_total_ms(filtered_entries),
@@ -228,11 +248,15 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
   const entries_empty_message = is_switching_sheet
     ? `Loading entries for "${active_sheet}"…`
-    : filter_tags.length > 0
-      ? tag_filter_mode === 'any'
-        ? `No entries on sheet "${active_sheet}" match any selected tag.`
-        : `No entries on sheet "${active_sheet}" match all selected tags.`
-      : `No entries on sheet "${active_sheet}".`
+    : entry_search_query.trim().length > 0
+      ? filter_tags.length > 0
+        ? `No entries on sheet "${active_sheet}" match your search and selected tags.`
+        : `No entries on sheet "${active_sheet}" match your search.`
+      : filter_tags.length > 0
+        ? tag_filter_mode === 'any'
+          ? `No entries on sheet "${active_sheet}" match any selected tag.`
+          : `No entries on sheet "${active_sheet}" match all selected tags.`
+        : `No entries on sheet "${active_sheet}".`
 
   const select_sheet = (name: string): void => {
     if (name === active_sheet && !is_switching_sheet) {
@@ -278,7 +302,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
     })
 
   return (
-    <>
+    <ConfirmDialogProvider>
       <TrackerDocumentTitle active_entry={state.activeEntry} />
       <TrackerKeyboardShortcuts
         sheets={state.sheets}
@@ -454,6 +478,7 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
               <EntryList
               title="Entries"
               entries={filtered_entries}
+              merge_context_entries={state.activeSheetEntries}
               sheets={state.sheets}
               known_tags={state.knownTags}
               total_ms={filtered_total_ms}
@@ -461,10 +486,18 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
               is_pending={is_pending}
               show_sheet_name={false}
               header_extra={
-                <EntryTagFilter
-                  sheet_name={active_sheet}
-                  sheet_tags={sheet_tags}
-                />
+                <div className="flex w-full flex-col gap-3">
+                  <TrackerEntrySearchBar
+                    query={entry_search_query}
+                    active_sheet={active_sheet}
+                    is_pending={is_pending}
+                    on_query_change={set_entry_search_query}
+                  />
+                  <EntryTagFilter
+                    sheet_name={active_sheet}
+                    sheet_tags={sheet_tags}
+                  />
+                </div>
               }
               on_delete={(entry) =>
                 run_action(() =>
@@ -537,11 +570,29 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                   }),
                 )
               }
+              on_split={(entry, at) =>
+                run_action(() =>
+                  post_tracker_action('/api/entry/split', {
+                    sheetName: entry.sheetName,
+                    entryId: entry.id,
+                    at,
+                  }),
+                )
+              }
+              on_merge={(entry, direction) =>
+                run_action(() =>
+                  post_tracker_action('/api/entry/merge', {
+                    sheetName: entry.sheetName,
+                    entryId: entry.id,
+                    direction,
+                  }),
+                )
+              }
             />
             </section>
           </div>
         </div>
       </div>
-    </>
+    </ConfirmDialogProvider>
   )
 }

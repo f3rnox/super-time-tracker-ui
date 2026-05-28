@@ -26,6 +26,7 @@ export const tracker_shortcut_defaults: TrackerShortcutMap = {
 
 export const topbar_quick_action_ids = [
   'today',
+  'search',
   'sheets',
   'reporting',
   'pomodoro',
