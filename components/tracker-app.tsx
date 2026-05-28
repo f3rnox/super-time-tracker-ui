@@ -262,8 +262,8 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                   )} inline-flex min-w-40 flex-col items-center justify-center whitespace-nowrap text-center`}
                   aria-label="Open Pomodoro timer"
                 >
-                  <span className="text-[0.9rem] leading-none">Start Pomodoro</span>
-                  <span className="mt-1 text-[0.72rem] font-medium leading-none opacity-85">
+                  <span className="text-white text-[0.9rem] leading-none">Start Pomodoro</span>
+                  <span className="text-white mt-1 text-[0.72rem] font-medium leading-none opacity-85">
                     Focus timer
                   </span>
                 </Link>
