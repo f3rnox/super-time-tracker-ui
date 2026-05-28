@@ -15,12 +15,7 @@ interface SuggestDescriptionBody {
 const normalize_suggestion = (value: string): string => {
   const single_line = value.replace(/\s+/g, ' ').trim()
   const without_wrapping_quotes = single_line.replace(/^["'`]|["'`]$/g, '').trim()
-
-  if (without_wrapping_quotes.length <= 140) {
-    return without_wrapping_quotes
-  }
-
-  return without_wrapping_quotes.slice(0, 140).trim()
+  return without_wrapping_quotes
 }
 
 const build_user_prompt = (context: string, notes: string): string => {

@@ -34,6 +34,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   const [now_ms, set_now_ms] = useState<number>(() => Date.now())
   const [is_hydrated, set_is_hydrated] = useState(false)
   const [sync_error, set_sync_error] = useState<string | null>(null)
+  const [has_running_tracker_entry, set_has_running_tracker_entry] = useState(false)
   const original_title_ref = useRef<string | null>(null)
 
   useEffect(() => {
@@ -195,10 +196,42 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   const build_pomodoro_entry_description = (): string =>
     settings.work_entry_description.trim()
 
+  const has_any_running_tracker_entry = async (): Promise<boolean> => {
+    const response = await fetch('/api/state', {
+      method: 'GET',
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as { error?: string }
+      throw new Error(body.error ?? 'Failed to read tracker state')
+    }
+
+    const payload = (await response.json().catch(() => null)) as
+      | { runningEntry?: { id: number } | null }
+      | null
+    return payload?.runningEntry !== null && payload?.runningEntry !== undefined
+  }
+
+  const refresh_running_tracker_entry_status = async (): Promise<void> => {
+    try {
+      set_has_running_tracker_entry(await has_any_running_tracker_entry())
+    } catch {
+      // Ignore transient polling failures on the Pomodoro page.
+    }
+  }
+
   const start_tracker_entry_for_pomodoro = async (): Promise<void> => {
     const description = build_pomodoro_entry_description()
 
     if (description.length === 0) {
+      return
+    }
+
+    const has_running_entry = await has_any_running_tracker_entry()
+
+    if (has_running_entry) {
+      set_has_running_tracker_entry(true)
       return
     }
 
@@ -223,6 +256,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
           sheetName: active_entry.sheetName,
         })
       }
+      set_has_running_tracker_entry(true)
       return
     }
 
@@ -239,6 +273,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
 
     if (response.ok) {
       clear_pomodoro_task_entry_marker()
+      set_has_running_tracker_entry(false)
       return
     }
 
@@ -346,6 +381,20 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     settings.auto_start_next_phase,
     settings.rounds_before_long_break,
   ])
+
+  useEffect(() => {
+    void refresh_running_tracker_entry_status()
+  }, [])
+
+  useEffect(() => {
+    const interval_id = window.setInterval(() => {
+      void refresh_running_tracker_entry_status()
+    }, 5000)
+
+    return () => {
+      window.clearInterval(interval_id)
+    }
+  }, [])
 
   useEffect(() => {
     if (
@@ -538,7 +587,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
             {sync_error !== null ? (
               <p className="m-0 text-[0.82rem] text-danger">{sync_error}</p>
             ) : null}
-            {settings.check_in_on_work_start ? (
+            {settings.check_in_on_work_start && !has_running_tracker_entry ? (
               <div className="grid gap-2 rounded-md border border-panel-border bg-background p-3 md:grid-cols-2">
                 <label className="flex flex-col gap-1.5 md:col-span-2">
                   <span className="text-[0.8rem] font-semibold text-muted">
