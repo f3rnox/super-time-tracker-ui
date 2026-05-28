@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { SettingsIcon } from '@/components/settings-icon'
 import { TagAutocompleteInput } from '@/components/tag-autocomplete-input'
 import { TrackerTopbar } from '@/components/tracker-topbar'
 import { get_button_class_name } from '@/lib/get_button_class_name'
@@ -319,6 +320,50 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     })
   }
 
+  const start_timer_from_task_start_time = async (): Promise<void> => {
+    set_sync_error(null)
+
+    try {
+      const response = await fetch('/api/state', {
+        method: 'GET',
+        cache: 'no-store',
+      })
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string }
+        throw new Error(body.error ?? 'Failed to read tracker state')
+      }
+
+      const payload = (await response.json().catch(() => null)) as
+        | { runningEntry?: { start?: string } | null }
+        | null
+      const running_entry = payload?.runningEntry
+
+      if (running_entry?.start === undefined) {
+        throw new Error('No active task found to start from')
+      }
+
+      const started_at_ms = Date.parse(running_entry.start)
+
+      if (!Number.isFinite(started_at_ms)) {
+        throw new Error('Active task start time is invalid')
+      }
+
+      const elapsed_ms = Math.max(0, Date.now() - started_at_ms)
+      const duration_ms = get_phase_duration_ms(timer_state.phase)
+      const remaining_ms = Math.max(0, duration_ms - elapsed_ms)
+
+      set_timer_state((current) => ({
+        ...current,
+        status: 'running',
+        deadline_at_ms: Date.now() + remaining_ms,
+        paused_remaining_ms: null,
+      }))
+    } catch (error: unknown) {
+      set_sync_error(error instanceof Error ? error.message : String(error))
+    }
+  }
+
   const pause_timer = (): void => {
     set_sync_error(null)
     set_timer_state((current) => {
@@ -489,11 +534,21 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     <>
       <TrackerTopbar breadcrumb={{ current: 'Pomodoro' }} />
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-5 pb-12 pt-6">
-        <header className="flex flex-col gap-2 text-center">
-          <h1 className="m-0 text-[1.5rem] font-[650] tracking-tight">Pomodoro</h1>
-          <p className="m-0 text-[0.9rem] leading-relaxed text-muted">
-            Keep a simple focus cycle running alongside your time tracker.
-          </p>
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="m-0 text-[1.5rem] font-[650] tracking-tight">Pomodoro</h1>
+            <p className="m-0 mt-2 text-[0.9rem] leading-relaxed text-muted">
+              Keep a simple focus cycle running alongside your time tracker.
+            </p>
+          </div>
+          <Link
+            href="/settings/pomodoro"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-panel-border bg-ghost-bg text-muted no-underline hover:bg-surface-hover hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            aria-label="Pomodoro settings"
+            title="Pomodoro settings"
+          >
+            <SettingsIcon />
+          </Link>
         </header>
 
         <section className="rounded-md border border-panel-border bg-panel p-5 shadow-sm">
@@ -577,12 +632,16 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
               >
                 Reset
               </button>
-              <Link
-                href="/settings/pomodoro"
-                className={`${get_button_class_name('ghost')} inline-flex items-center no-underline`}
+              <button
+                type="button"
+                className={get_button_class_name('ghost')}
+                disabled={timer_state.status === 'running'}
+                onClick={() => {
+                  void start_timer_from_task_start_time()
+                }}
               >
-                Pomodoro settings
-              </Link>
+                Start from active task start time
+              </button>
             </div>
             {sync_error !== null ? (
               <p className="m-0 text-[0.82rem] text-danger">{sync_error}</p>
