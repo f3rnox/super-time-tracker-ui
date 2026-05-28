@@ -12,6 +12,7 @@ import { type EntryEditFormValues } from '@/components/entry-edit-form'
 import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
 import { is_pomodoro_task_entry } from '@/lib/pomodoro_task_marker'
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
+import { type CheckOutOptions } from '@/lib/types/check_out_options'
 import {
   type SerializedEntry,
   type SerializedSheet,
@@ -22,7 +23,7 @@ interface TrackerActiveBarProps {
   sheets: SerializedSheet[]
   known_tags: string[]
   is_pending: boolean
-  on_check_out: (at?: string) => void
+  on_check_out: (options?: CheckOutOptions) => void
   on_delete: () => void
   on_edit: (values: EntryEditFormValues) => void
   on_move: (target_sheet_name: string) => void

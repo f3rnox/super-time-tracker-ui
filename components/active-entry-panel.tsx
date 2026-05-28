@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 
+import { ActiveEntryCheckoutForm } from '@/components/active-entry-checkout-form'
 import { ActiveEntryDescriptionInline } from '@/components/active-entry-description-inline'
 import { CheckoutButtonGroup } from '@/components/checkout-button-group'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
@@ -12,13 +13,16 @@ import { NoteForm } from '@/components/note-form'
 import { PencilIcon } from '@/components/pencil-icon'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
+import { use_confirm_before_checkout } from '@/lib/use_confirm_before_checkout'
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import { use_duration_format } from '@/lib/use_duration_format'
 import { use_timer_show_seconds } from '@/lib/use_timer_show_seconds'
 import { get_button_class_name } from '@/lib/get_button_class_name'
+import { get_check_out_confirm_dialog } from '@/lib/get_check_out_confirm_dialog'
 import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
 import { get_delete_note_confirm_dialog } from '@/lib/get_delete_note_confirm_dialog'
 import { get_active_panel_class_name } from '@/lib/get_active_panel_class_name'
+import { type CheckOutOptions } from '@/lib/types/check_out_options'
 import {
   type SerializedEntry,
   type SerializedSheet,
@@ -34,7 +38,7 @@ interface ActiveEntryPanelProps {
   sheets: SerializedSheet[]
   known_tags: string[]
   in_bar?: boolean
-  on_check_out: (at?: string) => void
+  on_check_out: (options?: CheckOutOptions) => void
   on_delete: () => void
   on_edit: (values: EntryEditFormValues) => void
   on_move: (target_sheet_name: string) => void
@@ -75,34 +79,46 @@ export const ActiveEntryPanel = forwardRef<
 ) {
   const { confirm } = use_confirm_dialog()
   const confirm_destructive_actions = use_confirm_destructive_actions()
+  const confirm_before_checkout = use_confirm_before_checkout()
   const duration_format = use_duration_format()
   const show_seconds = use_timer_show_seconds()
   const [duration_ms, set_duration_ms] = useState(entry.durationMs)
   const [is_editing_description, set_is_editing_description] = useState(false)
   const [is_editing_times, set_is_editing_times] = useState(false)
   const [is_adding_note, set_is_adding_note] = useState(false)
+  const [is_checking_out, set_is_checking_out] = useState(false)
+  const [checkout_initial_at, set_checkout_initial_at] = useState<string | undefined>(
+    undefined,
+  )
 
   useImperativeHandle(
     ref,
     () => ({
       start_edit: () => {
-        if (!is_editing_description && !is_editing_times) {
+        if (!is_editing_description && !is_editing_times && !is_checking_out) {
           set_is_editing_description(true)
         }
       },
       start_add_note: () => {
-        if (!is_editing_description && !is_editing_times && !is_adding_note) {
+        if (
+          !is_editing_description &&
+          !is_editing_times &&
+          !is_adding_note &&
+          !is_checking_out
+        ) {
           set_is_adding_note(true)
         }
       },
     }),
-    [is_adding_note, is_editing_description, is_editing_times],
+    [is_adding_note, is_editing_description, is_editing_times, is_checking_out],
   )
 
   useEffect(() => {
     set_is_adding_note(false)
     set_is_editing_description(false)
     set_is_editing_times(false)
+    set_is_checking_out(false)
+    set_checkout_initial_at(undefined)
   }, [entry.id, entry.sheetName])
 
   useEffect(() => {
@@ -115,7 +131,38 @@ export const ActiveEntryPanel = forwardRef<
     return () => window.clearInterval(interval)
   }, [entry.durationMs, entry.start])
 
-  const is_panel_editing = is_editing_description || is_editing_times
+  const cancel_checkout = (): void => {
+    set_is_checking_out(false)
+    set_checkout_initial_at(undefined)
+  }
+
+  const start_checkout = (at?: string): void => {
+    if (is_pending) {
+      return
+    }
+
+    set_is_editing_description(false)
+    set_is_editing_times(false)
+    set_is_adding_note(false)
+    set_checkout_initial_at(at)
+    set_is_checking_out(true)
+  }
+
+  const submit_checkout = async (options?: CheckOutOptions): Promise<void> => {
+    if (confirm_before_checkout) {
+      const confirmed = await confirm(get_check_out_confirm_dialog(options))
+
+      if (!confirmed) {
+        return
+      }
+    }
+
+    on_check_out(options)
+    cancel_checkout()
+  }
+
+  const is_panel_editing =
+    is_editing_description || is_editing_times || is_checking_out
   const panel_class = get_active_panel_class_name(in_bar, is_panel_editing)
 
   const handle_delete_note = async (timestamp: string): Promise<void> => {
@@ -148,6 +195,23 @@ export const ActiveEntryPanel = forwardRef<
       }}
     />
   )
+
+  if (is_checking_out) {
+    return (
+      <section className={panel_class} aria-label="Check out active entry">
+        <ActiveEntryCheckoutForm
+          entry={entry}
+          in_bar={in_bar}
+          is_pending={is_pending}
+          initial_at={checkout_initial_at}
+          on_cancel={cancel_checkout}
+          on_submit={(options) => {
+            void submit_checkout(options)
+          }}
+        />
+      </section>
+    )
+  }
 
   if (is_editing_times) {
     return (
@@ -243,7 +307,7 @@ export const ActiveEntryPanel = forwardRef<
           <CheckoutButtonGroup
             in_bar={in_bar}
             is_pending={is_pending}
-            on_check_out={on_check_out}
+            on_start_checkout={start_checkout}
           />
         </div>
       </div>

@@ -42,8 +42,10 @@ export async function check_out_entry(
   sheet.activeEntryID = null;
   validate_entry_times(entry.start, entry.end);
 
-  if (note !== undefined && note.length > 0) {
-    entry.notes.push({ timestamp: new Date(), text: note });
+  const trimmed_note = note?.trim() ?? "";
+
+  if (trimmed_note.length > 0) {
+    entry.notes.push({ timestamp: new Date(), text: trimmed_note });
   }
 
   await write_db(db);

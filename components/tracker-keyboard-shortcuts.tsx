@@ -7,6 +7,7 @@ import { KeyboardShortcutsDialog } from '@/components/keyboard-shortcuts-dialog'
 import { type ActiveEntryPanelHandle } from '@/components/active-entry-panel'
 import { type CheckInFormCollapsibleHandle } from '@/components/check-in-form-collapsible'
 import { get_adjacent_sheet_name } from '@/lib/get_adjacent_sheet_name'
+import { type CheckOutOptions } from '@/lib/types/check_out_options'
 import { get_tracker_keyboard_shortcut_sections } from '@/lib/get_tracker_keyboard_shortcut_sections'
 import { use_check_out_action } from '@/lib/use_check_out_action'
 import { use_document_keyboard_shortcuts } from '@/lib/use_document_keyboard_shortcuts'
@@ -24,7 +25,7 @@ interface TrackerKeyboardShortcutsProps {
   check_in_form_ref: RefObject<CheckInFormCollapsibleHandle | null>
   active_entry_panel_ref: RefObject<ActiveEntryPanelHandle | null>
   on_select_sheet: (name: string) => void
-  on_check_out: (at?: string) => void
+  on_check_out: (options?: CheckOutOptions) => void
 }
 
 /**

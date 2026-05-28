@@ -9,6 +9,7 @@ import { type EntryEditFormValues } from '@/components/entry-edit-form'
 import { format_time } from '@/components/format_time'
 import { TodayScopeControls } from '@/components/today-scope-controls'
 import { TrackerTopbar } from '@/components/tracker-topbar'
+import { build_check_out_request_payload } from '@/lib/build_check_out_request_payload'
 import { delete_tracker_action } from '@/lib/delete_tracker_action'
 import { filter_today_focus_by_sheet_names } from '@/lib/filter_today_focus_by_sheet_names'
 import { format_display_tag } from '@/lib/format_display_tag'
@@ -184,12 +185,12 @@ export function TodayFocusView({ initial_data }: TodayFocusViewProps) {
                   known_tags={data.knownTags}
                   in_bar
                   is_pending={is_pending}
-                  on_check_out={(at) =>
+                  on_check_out={(options) =>
                     void run_action(async () => {
-                      await post_tracker_action('/api/out', {
-                        sheetName: entry.sheetName,
-                        ...(at !== undefined ? { at } : {}),
-                      })
+                      await post_tracker_action(
+                        '/api/out',
+                        build_check_out_request_payload(entry.sheetName, options),
+                      )
                       finish_running_pomodoro_timer()
                     })
                   }
