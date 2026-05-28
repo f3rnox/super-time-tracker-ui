@@ -10,12 +10,16 @@ export interface ITimeSheetEntry<T> {
   description: string;
   tags: string[];
   notes: ITimeSheetEntryNote<T>[];
+  /** When true, hidden from tracker nav and entry lists. */
+  archived?: boolean;
 }
 
 export interface ITimeSheet<T> {
   name: string;
   entries: ITimeSheetEntry<T>[];
   activeEntryID: number | null;
+  /** When true, hidden from hub and sheet sidebar. */
+  archived?: boolean;
 }
 
 export interface ITimeTrackerDB<T> {

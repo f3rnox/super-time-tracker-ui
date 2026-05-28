@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import {
   useEffect,
   useMemo,
@@ -22,8 +21,12 @@ import { TrackerEntrySearchBar } from "@/components/tracker-entry-search-bar";
 import { SheetSidebar } from "@/components/sheet-sidebar";
 import { TrackerActiveBar } from "@/components/tracker-active-bar";
 import { TrackerDocumentTitle } from "@/components/tracker-document-title";
+import { PomodoroQuickActionLink } from "@/components/pomodoro-quick-action-link";
 import { TrackerTopbar } from "@/components/tracker-topbar";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { build_check_out_request_payload } from "@/lib/build_check_out_request_payload";
+import { get_archive_entry_confirm_dialog } from "@/lib/get_archive_entry_confirm_dialog";
+import { use_confirm_destructive_actions } from "@/lib/use_confirm_destructive_actions";
 import { build_resume_description } from "@/lib/build_resume_description";
 import { collect_tags_from_entries } from "@/lib/collect_tags_from_entries";
 import { filter_entries_by_tags } from "@/lib/filter_entries_by_tags";
@@ -45,7 +48,6 @@ import { set_sheet_tag_filter } from "@/lib/set_sheet_tag_filter";
 import { sort_serialized_entries } from "@/lib/sort_serialized_entries";
 import { subscribe_sheet_tag_filters } from "@/lib/subscribe_sheet_tag_filters";
 import { apply_optimistic_sheet_switch } from "@/lib/apply_optimistic_sheet_switch";
-import { get_button_class_name } from "@/lib/get_button_class_name";
 import { sync_active_sheet_preference } from "@/lib/sync_active_sheet_preference";
 import { use_clear_tag_filters_on_sheet_change } from "@/lib/use_clear_tag_filters_on_sheet_change";
 import { useDesktopNotifications } from "@/lib/use_desktop_notifications";
@@ -88,6 +90,9 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
     initial_state.activeSheetEntriesLoaded === false,
   );
   const [entry_search_query, setEntry_search_query] = useState("");
+  const [show_archived_entries, setShow_archived_entries] = useState(false);
+  const { confirm } = use_confirm_dialog();
+  const confirm_destructive_actions = use_confirm_destructive_actions();
   const state_before_sheet_switch_ref = useRef<TrackerState>(initial_state);
 
   useEffect(() => {
@@ -211,6 +216,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
 
   useEffect(() => {
     setEntry_search_query("");
+    setShow_archived_entries(false);
   }, [active_sheet]);
 
   const filter_tags = useSyncExternalStore(
@@ -229,8 +235,12 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
       return [];
     }
 
+    const visibility_filtered = state.activeSheetEntries.filter((entry) =>
+      show_archived_entries ? entry.archived === true : entry.archived !== true,
+    );
+
     const matching = filter_entries_by_tags(
-      state.activeSheetEntries,
+      visibility_filtered,
       filter_tags,
       tag_filter_mode,
     );
@@ -247,9 +257,22 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
     tag_filter_mode,
     entry_list_sort,
     entry_search_query,
+    show_archived_entries,
     is_switching_sheet,
     is_loading_entries,
   ]);
+
+  const archived_entry_count = useMemo(
+    () =>
+      state.activeSheetEntries.filter((entry) => entry.archived === true)
+        .length,
+    [state.activeSheetEntries],
+  );
+
+  const visible_sheets = useMemo(
+    () => state.sheets.filter((sheet) => sheet.archived !== true),
+    [state.sheets],
+  );
 
   const filtered_total_ms = useMemo(
     () => get_serialized_entries_total_ms(filtered_entries),
@@ -278,15 +301,17 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
   const entries_empty_message =
     is_switching_sheet || is_loading_entries
       ? `Loading entries for "${active_sheet}"…`
-      : entry_search_query.trim().length > 0
-        ? filter_tags.length > 0
-          ? `No entries on sheet "${active_sheet}" match your search and selected tags.`
-          : `No entries on sheet "${active_sheet}" match your search.`
-        : filter_tags.length > 0
-          ? tag_filter_mode === "any"
-            ? `No entries on sheet "${active_sheet}" match any selected tag.`
-            : `No entries on sheet "${active_sheet}" match all selected tags.`
-          : `No entries on sheet "${active_sheet}".`;
+      : show_archived_entries
+        ? `No archived entries on sheet "${active_sheet}".`
+        : entry_search_query.trim().length > 0
+          ? filter_tags.length > 0
+            ? `No entries on sheet "${active_sheet}" match your search and selected tags.`
+            : `No entries on sheet "${active_sheet}" match your search.`
+          : filter_tags.length > 0
+            ? tag_filter_mode === "any"
+              ? `No entries on sheet "${active_sheet}" match any selected tag.`
+              : `No entries on sheet "${active_sheet}" match all selected tags.`
+            : `No entries on sheet "${active_sheet}".`;
 
   const select_sheet = (name: string): void => {
     if (name === active_sheet && !is_switching_sheet) {
@@ -386,6 +411,14 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                   }),
                 )
               }
+              on_archive={(name) =>
+                run_action(() =>
+                  patch_tracker_action("/api/sheet", {
+                    name,
+                    archived: true,
+                  }),
+                )
+              }
               on_delete={(name) =>
                 run_action(() =>
                   post_tracker_action("/api/sheet", { name, delete: true }),
@@ -406,20 +439,7 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                       Jump into Pomodoro without leaving the tracker.
                     </p>
                   </div>
-                  <Link
-                    href="/pomodoro"
-                    className={`${get_button_class_name(
-                      "primary",
-                    )} inline-flex min-w-40 flex-col items-center justify-center whitespace-nowrap text-center`}
-                    aria-label="Open Pomodoro timer"
-                  >
-                    <span className="text-white text-[0.9rem] leading-none">
-                      Start Pomodoro
-                    </span>
-                    <span className="text-white mt-1 text-[0.72rem] font-medium leading-none opacity-85">
-                      Focus timer
-                    </span>
-                  </Link>
+                  <PomodoroQuickActionLink />
                 </div>
               ) : null}
               <TrackerActiveBar
@@ -521,12 +541,17 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                 title="Entries"
                 entries={filtered_entries}
                 merge_context_entries={state.activeSheetEntries}
-                sheets={state.sheets}
+                sheets={visible_sheets}
                 known_tags={state.knownTags}
                 total_ms={filtered_total_ms}
                 empty_message={entries_empty_message}
                 is_pending={is_pending}
                 show_sheet_name={false}
+                archived_entry_count={archived_entry_count}
+                show_archived_entries={show_archived_entries}
+                on_toggle_show_archived={() =>
+                  setShow_archived_entries((show) => !show)
+                }
                 header_extra={
                   <div className="flex w-full flex-col gap-3">
                     <TrackerEntrySearchBar
@@ -630,6 +655,32 @@ export function TrackerApp({ initial_state }: Readonly<TrackerAppProps>) {
                       sheetName: entry.sheetName,
                       entryId: entry.id,
                       direction,
+                    }),
+                  )
+                }
+                on_archive={async (entry) => {
+                  const confirmed = confirm_destructive_actions
+                    ? await confirm(get_archive_entry_confirm_dialog(entry))
+                    : true;
+
+                  if (!confirmed) {
+                    return;
+                  }
+
+                  void run_action(() =>
+                    patch_tracker_action("/api/entry", {
+                      sheetName: entry.sheetName,
+                      entryId: entry.id,
+                      archived: true,
+                    }),
+                  );
+                }}
+                on_unarchive={(entry) =>
+                  run_action(() =>
+                    patch_tracker_action("/api/entry", {
+                      sheetName: entry.sheetName,
+                      entryId: entry.id,
+                      archived: false,
                     }),
                   )
                 }

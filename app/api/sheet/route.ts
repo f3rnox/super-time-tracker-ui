@@ -5,6 +5,7 @@ import { delete_sheet } from "@/lib/delete_sheet";
 import { get_tracker_state } from "@/lib/get_tracker_state";
 import { rename_sheet } from "@/lib/rename_sheet";
 import { set_active_sheet } from "@/lib/set_active_sheet";
+import { set_sheet_archived } from "@/lib/set_sheet_archived";
 
 interface SheetBody {
   name?: string;
@@ -14,6 +15,7 @@ interface SheetBody {
 interface RenameSheetBody {
   name?: string;
   newName?: string;
+  archived?: boolean;
 }
 
 /**
@@ -34,7 +36,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       await set_active_sheet(name);
     }
 
-    const state = await get_tracker_state(body.delete === true ? undefined : name);
+    const state = await get_tracker_state(
+      body.delete === true ? undefined : name,
+    );
     return NextResponse.json(state);
   } catch (error: unknown) {
     return api_error_response(error);
@@ -54,11 +58,15 @@ export async function PATCH(request: Request): Promise<NextResponse> {
       return api_error_response(new Error("Sheet name is required"));
     }
 
-    if (new_name.length === 0) {
-      return api_error_response(new Error("New sheet name is required"));
+    if (body.archived !== undefined) {
+      await set_sheet_archived({ sheet_name: name, archived: body.archived });
     }
 
-    await rename_sheet({ sheet_name: name, new_name });
+    if (new_name.length > 0) {
+      await rename_sheet({ sheet_name: name, new_name });
+    } else if (body.archived === undefined) {
+      return api_error_response(new Error("New sheet name is required"));
+    }
 
     const state = await get_tracker_state();
     return NextResponse.json(state);

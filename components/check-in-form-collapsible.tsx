@@ -3,6 +3,7 @@
 import {
   type ReactNode,
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useState,
 } from "react";
@@ -36,7 +37,13 @@ export const CheckInFormCollapsible = forwardRef<
   ref,
 ) {
   const should_collapse_by_default = use_check_in_form_collapsed();
-  const [is_expanded, setIs_expanded] = useState(!should_collapse_by_default);
+  const [is_expanded, setIs_expanded] = useState(true);
+
+  useEffect(() => {
+    if (should_collapse_by_default) {
+      setIs_expanded(false);
+    }
+  }, [should_collapse_by_default]);
 
   useImperativeHandle(
     ref,

@@ -15,6 +15,7 @@ import {
   type MergeEntryDirection,
 } from "@/lib/get_mergeable_entry_neighbors";
 import { format_entry_count_label } from "@/lib/format_entry_count_label";
+import { get_button_class_name } from "@/lib/get_button_class_name";
 import { omit_record_key } from "@/lib/omit_record_key";
 import { get_api_key_for_suggestion_provider } from "@/lib/get_api_key_for_suggestion_provider";
 import { get_entry_row_key } from "@/lib/get_entry_row_key";
@@ -45,6 +46,11 @@ interface EntryListProps {
   show_sheet_name?: boolean;
   header_extra?: React.ReactNode;
   on_delete: (entry: SerializedEntry) => void;
+  on_archive?: (entry: SerializedEntry) => void;
+  on_unarchive?: (entry: SerializedEntry) => void;
+  archived_entry_count?: number;
+  show_archived_entries?: boolean;
+  on_toggle_show_archived?: () => void;
   on_edit: (entry: SerializedEntry, values: EntryEditFormValues) => void;
   on_move: (entry: SerializedEntry, target_sheet_name: string) => void;
   on_move_many: (entries: SerializedEntry[], target_sheet_name: string) => void;
@@ -76,6 +82,11 @@ export function EntryList({
   show_sheet_name = true,
   header_extra,
   on_delete,
+  on_archive,
+  on_unarchive,
+  archived_entry_count = 0,
+  show_archived_entries = false,
+  on_toggle_show_archived,
   on_edit,
   on_move,
   on_move_many,
@@ -295,7 +306,22 @@ export function EntryList({
                 {format_duration(total_ms, duration_format)} total
               </p>
             </div>
-            <EntryListSortControls is_pending={is_pending} />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <EntryListSortControls is_pending={is_pending} />
+              {archived_entry_count > 0 &&
+              on_toggle_show_archived !== undefined ? (
+                <button
+                  type="button"
+                  className={get_button_class_name("ghost", "small")}
+                  disabled={is_pending}
+                  onClick={on_toggle_show_archived}
+                >
+                  {show_archived_entries
+                    ? "Hide archived"
+                    : `Show archived (${archived_entry_count})`}
+                </button>
+              ) : null}
+            </div>
             {ai_revise_error === null ? null : (
               <p className="m-0 text-[0.8rem] text-danger">{ai_revise_error}</p>
             )}
@@ -347,6 +373,8 @@ export function EntryList({
                 on_resume={on_resume}
                 on_move={on_move}
                 on_delete={on_delete}
+                on_archive={on_archive}
+                on_unarchive={on_unarchive}
                 on_edit_note={on_edit_note}
                 on_split={on_split}
                 on_merge={on_merge}

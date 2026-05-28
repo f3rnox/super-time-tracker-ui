@@ -1,4 +1,6 @@
 import { collect_known_tags } from "@/lib/collect_known_tags";
+import { filter_visible_entries } from "@/lib/filter_visible_entries";
+import { is_sheet_archived } from "@/lib/is_sheet_archived";
 import { resolve_db_path_label } from "@/lib/resolve_db_path_label";
 import { get_focus_nudges_status } from "@/lib/get_focus_nudges_status";
 import { get_sheet } from "@/lib/get_sheet";
@@ -6,6 +8,7 @@ import { get_serialized_entries_total_ms } from "@/lib/get_serialized_entries_to
 import { read_db } from "@/lib/read_db";
 import { resolve_active_sheet_name } from "@/lib/resolve_active_sheet_name";
 import { find_all_serialized_active_entries } from "@/lib/find_all_serialized_active_entries";
+import { find_running_entry_on_sheet } from "@/lib/find_running_entry_on_sheet";
 import { find_serialized_active_entry_for_sheet } from "@/lib/find_serialized_active_entry_for_sheet";
 import { serialize_sheet_entries } from "@/lib/serialize_sheet_entries";
 import { set_active_sheet } from "@/lib/set_active_sheet";
@@ -69,9 +72,10 @@ export async function get_tracker_state(
     sheets: sheets.map((sheet) => ({
       name: sheet.name,
       activeEntryID: sheet.activeEntryID,
-      entryCount: sheet.entries.length,
+      entryCount: filter_visible_entries(sheet.entries).length,
       isActive: sheet.name === resolved_sheet_name,
-      hasActiveEntry: sheet.activeEntryID !== null,
+      hasActiveEntry: find_running_entry_on_sheet(sheet) !== null,
+      ...(is_sheet_archived(sheet) ? { archived: true } : {}),
     })),
     activeEntry: active_sheet_entry,
     runningEntry: running_entry,

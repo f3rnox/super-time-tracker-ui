@@ -1,4 +1,5 @@
 import { gen_sheet } from "@/lib/gen_db";
+import { get_next_entry_id } from "@/lib/get_next_entry_id";
 import { get_sheet } from "@/lib/get_sheet";
 import { read_db } from "@/lib/read_db";
 import { write_db } from "@/lib/write_db";
@@ -135,7 +136,7 @@ export async function move_entries_to_sheet(
   }
 
   for (const move of pending_moves) {
-    const new_id = target_sheet.entries.length;
+    const new_id = get_next_entry_id(target_sheet);
 
     target_sheet.entries.push({
       ...move.entry,

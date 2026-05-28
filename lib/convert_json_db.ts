@@ -15,9 +15,11 @@ export function convert_json_db(json_db: JSONTimeTrackerDB): TimeTrackerDB {
       name: json_name,
       entries: json_entries,
       activeEntryID: json_active_entry_id,
+      archived: json_archived,
     }) => ({
       name: json_name,
       activeEntryID: json_active_entry_id,
+      ...(json_archived === true ? { archived: true } : {}),
       entries: json_entries.map(
         ({
           id: json_id,
@@ -26,6 +28,7 @@ export function convert_json_db(json_db: JSONTimeTrackerDB): TimeTrackerDB {
           description: json_description,
           tags: json_tags,
           notes: json_notes,
+          archived: json_entry_archived,
         }) => ({
           id: json_id,
           description: json_description,
@@ -36,6 +39,7 @@ export function convert_json_db(json_db: JSONTimeTrackerDB): TimeTrackerDB {
           })),
           start: new Date(json_start),
           end: json_end === null ? null : new Date(json_end),
+          ...(json_entry_archived === true ? { archived: true } : {}),
         }),
       ),
     }),

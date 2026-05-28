@@ -23,5 +23,6 @@ export function serialize_entry(
     sheetName: sheet_name,
     durationMs: get_entry_duration_ms(entry),
     isActive: is_active,
+    ...(entry.archived === true ? { archived: true } : {}),
   };
 }

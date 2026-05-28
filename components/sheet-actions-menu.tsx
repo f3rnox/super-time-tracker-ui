@@ -8,7 +8,10 @@ interface SheetActionsMenuProps {
   sheet_name: string;
   is_pending: boolean;
   can_delete: boolean;
+  is_archived?: boolean;
   on_rename: () => void;
+  on_archive?: () => void;
+  on_unarchive?: () => void;
   on_delete: () => void;
 }
 
@@ -22,7 +25,10 @@ export function SheetActionsMenu({
   sheet_name,
   is_pending,
   can_delete,
+  is_archived = false,
   on_rename,
+  on_archive,
+  on_unarchive,
   on_delete,
 }: Readonly<SheetActionsMenuProps>) {
   const [is_open, setIs_open] = useState(false);
@@ -85,6 +91,37 @@ export function SheetActionsMenu({
               Rename
             </button>
           </li>
+          {is_archived ? (
+            <li role="none">
+              <button
+                type="button"
+                className={menu_item_class}
+                role="menuitem"
+                disabled={is_pending || on_unarchive === undefined}
+                onClick={() => {
+                  close_menu();
+                  on_unarchive?.();
+                }}
+              >
+                Restore sheet
+              </button>
+            </li>
+          ) : (
+            <li role="none">
+              <button
+                type="button"
+                className={menu_item_class}
+                role="menuitem"
+                disabled={is_pending || on_archive === undefined}
+                onClick={() => {
+                  close_menu();
+                  on_archive?.();
+                }}
+              >
+                Archive sheet
+              </button>
+            </li>
+          )}
           <li
             className="my-1 border-t border-panel-border"
             role="separator"

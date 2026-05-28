@@ -5,7 +5,7 @@ create extension if not exists "pgcrypto";
 create table public.tracker_accounts (
   user_id uuid primary key references auth.users (id) on delete cascade,
   active_sheet_name text,
-  db_version integer not null default 3,
+  db_version integer not null default 4,
   ui_preferences jsonb not null default '{}'::jsonb,
   local_imported_at timestamptz,
   created_at timestamptz not null default now(),
@@ -17,6 +17,7 @@ create table public.sheets (
   user_id uuid not null references public.tracker_accounts (user_id) on delete cascade,
   name text not null,
   active_entry_id integer,
+  archived boolean not null default false,
   created_at timestamptz not null default now(),
   unique (user_id, name)
 );
@@ -30,6 +31,7 @@ create table public.entries (
   end_at timestamptz,
   description text not null default '',
   tags text[] not null default '{}',
+  archived boolean not null default false,
   primary key (sheet_id, id)
 );
 

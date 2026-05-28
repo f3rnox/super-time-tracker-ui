@@ -1,4 +1,6 @@
 import { gen_sheet } from "@/lib/gen_db";
+import { find_running_entry_on_sheet } from "@/lib/find_running_entry_on_sheet";
+import { get_next_entry_id } from "@/lib/get_next_entry_id";
 import { get_sheet } from "@/lib/get_sheet";
 import { parse_entry_from_input } from "@/lib/parse_entry_from_input";
 import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
@@ -36,15 +38,15 @@ export async function check_in_entry(
     ? get_sheet(db, sheet_name)
     : add_sheet_to_db(db, sheet_name);
 
+  const running_entry = find_running_entry_on_sheet(sheet);
+
+  if (running_entry !== null) {
+    throw new Error(
+      `An entry is already active (${running_entry.id}): ${running_entry.description}`,
+    );
+  }
+
   if (sheet.activeEntryID !== null) {
-    const entry = sheet.entries.find(({ id }) => id === sheet.activeEntryID);
-
-    if (entry !== undefined) {
-      throw new Error(
-        `An entry is already active (${entry.id}): ${entry.description}`,
-      );
-    }
-
     sheet.activeEntryID = null;
   }
 
@@ -53,7 +55,7 @@ export async function check_in_entry(
       ? new Date()
       : parse_natural_language_date(at);
 
-  const id = sheet.entries.length;
+  const id = get_next_entry_id(sheet);
   const parsed = parse_entry_from_input(id, description, start_date);
   const entry: TimeSheetEntry = {
     ...parsed,

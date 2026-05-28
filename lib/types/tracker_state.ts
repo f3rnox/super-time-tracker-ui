@@ -15,6 +15,7 @@ export interface SerializedEntry {
   sheetName: string;
   durationMs: number;
   isActive: boolean;
+  archived?: boolean;
 }
 
 export interface SerializedSheet {
@@ -23,6 +24,7 @@ export interface SerializedSheet {
   entryCount: number;
   isActive: boolean;
   hasActiveEntry: boolean;
+  archived?: boolean;
 }
 
 export interface TrackerState {

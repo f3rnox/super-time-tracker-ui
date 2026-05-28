@@ -4,6 +4,7 @@ import { type ComponentProps, useState } from "react";
 
 import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { SheetActionsMenu } from "@/components/sheet-actions-menu";
+import { get_archive_sheet_confirm_dialog } from "@/lib/get_archive_sheet_confirm_dialog";
 import { get_delete_sheet_confirm_dialog } from "@/lib/get_delete_sheet_confirm_dialog";
 import { use_confirm_destructive_actions } from "@/lib/use_confirm_destructive_actions";
 import { get_button_class_name } from "@/lib/get_button_class_name";
@@ -17,6 +18,7 @@ interface SheetSidebarProps {
   on_select: (name: string) => void;
   on_create: (name: string) => void;
   on_rename: (name: string, new_name: string) => void;
+  on_archive: (name: string) => void;
   on_delete: (name: string) => void;
   is_pending: boolean;
 }
@@ -30,12 +32,14 @@ export function SheetSidebar({
   on_select,
   on_create,
   on_rename,
+  on_archive,
   on_delete,
   is_pending,
 }: Readonly<SheetSidebarProps>) {
   const { confirm } = use_confirm_dialog();
   const confirm_destructive_actions = use_confirm_destructive_actions();
-  const can_delete_sheet = sheets.length > 1;
+  const visible_sheets = sheets.filter((sheet) => sheet.archived !== true);
+  const can_delete_sheet = visible_sheets.length > 1;
   const [is_adding_sheet, setIs_adding_sheet] = useState(false);
   const [new_sheet_name, setNew_sheet_name] = useState("");
   const [editing_sheet_name, setEditing_sheet_name] = useState<string | null>(
@@ -101,7 +105,7 @@ export function SheetSidebar({
         Sheets
       </h2>
       <ul className="m-0 flex min-h-0 flex-1 list-none flex-col gap-1.5 p-0">
-        {sheets.map((sheet) => (
+        {visible_sheets.map((sheet) => (
           <li key={sheet.name} className="min-w-0">
             {editing_sheet_name === sheet.name ? (
               <form
@@ -167,6 +171,17 @@ export function SheetSidebar({
                   is_pending={is_pending}
                   can_delete={can_delete_sheet}
                   on_rename={() => start_rename(sheet.name)}
+                  on_archive={async () => {
+                    const confirmed = confirm_destructive_actions
+                      ? await confirm(
+                          get_archive_sheet_confirm_dialog(sheet.name),
+                        )
+                      : true;
+
+                    if (confirmed) {
+                      on_archive(sheet.name);
+                    }
+                  }}
                   on_delete={async () => {
                     const confirmed = confirm_destructive_actions
                       ? await confirm(

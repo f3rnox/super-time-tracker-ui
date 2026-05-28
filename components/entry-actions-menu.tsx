@@ -26,6 +26,9 @@ interface EntryActionsMenuProps {
   can_merge_next?: boolean;
   on_merge?: (direction: MergeEntryDirection) => void;
   on_delete: () => void;
+  on_archive?: () => void;
+  on_unarchive?: () => void;
+  entry_is_archived?: boolean;
   on_move: (target_sheet_name: string) => void;
 }
 
@@ -53,6 +56,9 @@ export function EntryActionsMenu(props: Readonly<EntryActionsMenuProps>) {
     can_merge_next = false,
     on_merge,
     on_delete,
+    on_archive,
+    on_unarchive,
+    entry_is_archived = false,
     on_move,
   } = props;
   const current_sheet = sheets.find(
@@ -65,7 +71,7 @@ export function EntryActionsMenu(props: Readonly<EntryActionsMenuProps>) {
     ? "This entry is already active"
     : "Another entry is active on this sheet";
   const other_sheets = sheets.filter(
-    (sheet) => sheet.name !== current_sheet_name,
+    (sheet) => sheet.name !== current_sheet_name && sheet.archived !== true,
   );
   const [is_open, setIs_open] = useState(false);
   const menu_ref = useRef<HTMLDivElement>(null);
@@ -164,6 +170,14 @@ export function EntryActionsMenu(props: Readonly<EntryActionsMenuProps>) {
             is_pending,
             close_menu,
             on_move,
+          })}
+          {render_archive_item({
+            is_pending,
+            entry_is_archived,
+            entry_is_active,
+            close_menu,
+            on_archive,
+            on_unarchive,
           })}
           <div role="none">
             <hr
@@ -479,6 +493,69 @@ function render_move_to_sheet_items({
       </button>
     </div>
   ));
+}
+
+function render_archive_item({
+  is_pending,
+  entry_is_archived,
+  entry_is_active,
+  close_menu,
+  on_archive,
+  on_unarchive,
+}: Readonly<{
+  is_pending: boolean;
+  entry_is_archived: boolean;
+  entry_is_active: boolean;
+  close_menu: () => void;
+  on_archive?: () => void;
+  on_unarchive?: () => void;
+}>) {
+  if (entry_is_archived) {
+    if (on_unarchive === undefined) {
+      return null;
+    }
+
+    return (
+      <div role="none">
+        <button
+          type="button"
+          className={menu_item_class}
+          role="menuitem"
+          disabled={is_pending}
+          onClick={() => {
+            close_menu();
+            on_unarchive();
+          }}
+        >
+          Restore entry
+        </button>
+      </div>
+    );
+  }
+
+  if (on_archive === undefined) {
+    return null;
+  }
+
+  return (
+    <div role="none">
+      <button
+        type="button"
+        className={menu_item_class}
+        role="menuitem"
+        disabled={is_pending || entry_is_active}
+        title={
+          entry_is_active ? "Check out before archiving this entry" : undefined
+        }
+        onClick={() => {
+          close_menu();
+          on_archive();
+        }}
+      >
+        Archive entry
+      </button>
+    </div>
+  );
 }
 
 function render_delete_item(

@@ -39,9 +39,7 @@ export async function edit_entry(args: EditEntryArgs): Promise<TimeSheetEntry> {
     );
 
     entry.description =
-      parsed.description.length > 0
-        ? parsed.description
-        : description.trim();
+      parsed.description.length > 0 ? parsed.description : description.trim();
     entry.tags = parsed.tags;
     did_update = true;
   }
@@ -54,6 +52,10 @@ export async function edit_entry(args: EditEntryArgs): Promise<TimeSheetEntry> {
   if (has_string_value(end)) {
     entry.end = parse_natural_language_date(end);
     did_update = true;
+
+    if (sheet.activeEntryID === entry_id) {
+      sheet.activeEntryID = null;
+    }
   }
 
   if (!did_update) {

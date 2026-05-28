@@ -55,6 +55,8 @@ type EntryListItemProps = Readonly<{
   on_resume: (entry: SerializedEntry) => void;
   on_move: (entry: SerializedEntry, target_sheet_name: string) => void;
   on_delete: (entry: SerializedEntry) => void;
+  on_archive?: (entry: SerializedEntry) => void;
+  on_unarchive?: (entry: SerializedEntry) => void;
   on_edit_note: (
     entry: SerializedEntry,
     timestamp: string,
@@ -95,6 +97,8 @@ export function EntryListItem({
   on_resume,
   on_move,
   on_delete,
+  on_archive,
+  on_unarchive,
   on_edit_note,
   on_split,
   on_merge,
@@ -131,7 +135,7 @@ export function EntryListItem({
     <li
       className={`group relative flex flex-col gap-0 border-b border-panel-border px-2 py-2.5 transition-colors duration-150 last:border-b-0 hover:bg-surface-hover compact:py-1.5 ${
         is_selected ? "bg-accent-soft hover:bg-accent-soft" : ""
-      }`}
+      } ${entry.archived === true ? "opacity-70" : ""}`}
     >
       <div className="flex w-full min-w-0 flex-col items-start gap-2.5 min-[700px]:flex-row min-[700px]:items-center compact:gap-1.5">
         <label
@@ -209,6 +213,13 @@ export function EntryListItem({
             entry_is_active={entry.isActive}
             on_move={(target_sheet_name) => on_move(entry, target_sheet_name)}
             on_delete={menu_handlers.on_delete}
+            entry_is_archived={entry.archived === true}
+            on_archive={
+              on_archive === undefined ? undefined : () => on_archive(entry)
+            }
+            on_unarchive={
+              on_unarchive === undefined ? undefined : () => on_unarchive(entry)
+            }
           />
         </div>
       </div>

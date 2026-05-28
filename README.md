@@ -1,8 +1,9 @@
 # super-time-tracker-ui
 
-Web UI for [super-time-tracker](https://github.com/f3rnox/super-time-tracker) time
-sheets. The npm package ships a standalone Next.js build and the `stt-ui` CLI to
-run it locally.
+Web UI for
+[super-time-tracker](https://github.com/f3rnox/super-time-tracker) time sheets.
+The npm package ships a standalone Next.js build and the `stt-ui` CLI to run it
+locally.
 
 Requires Node.js 20 or newer.
 
@@ -62,9 +63,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Production build
 
-`pnpm build` produces a standalone app under `dist/standalone`. Build output uses
-`next-output/` as the Next.js dist directory. Post-build scripts copy static
-assets into the standalone tree and prune the publish bundle.
+`pnpm build` produces a standalone app under `dist/standalone`. Build output
+uses `next-output/` as the Next.js dist directory. Post-build scripts copy
+static assets into the standalone tree and prune the publish bundle.
 
 Run the production server from the repo:
 
@@ -79,8 +80,8 @@ output instead.
 
 ## Publishing
 
-`prepublishOnly` runs `pnpm build`. The published tarball includes `bin/stt-ui.js`
-and `dist/standalone` only.
+`prepublishOnly` runs `pnpm build`. The published tarball includes
+`bin/stt-ui.js` and `dist/standalone` only.
 
 ## License
 

@@ -3,7 +3,7 @@ import {
   type JSONTimeSheet,
   type JSONTimeSheetEntry,
   type TimeTrackerDB,
-} from '@/lib/types'
+} from "@/lib/types";
 
 /**
  * Converts an in-memory database into JSON-serializable timestamps.
@@ -12,6 +12,7 @@ export function convert_db_to_json(db: TimeTrackerDB): JSONTimeTrackerDB {
   const sheets: JSONTimeSheet[] = db.sheets.map((sheet) => ({
     name: sheet.name,
     activeEntryID: sheet.activeEntryID,
+    ...(sheet.archived === true ? { archived: true } : {}),
     entries: sheet.entries.map(
       (entry): JSONTimeSheetEntry => ({
         id: entry.id,
@@ -23,13 +24,14 @@ export function convert_db_to_json(db: TimeTrackerDB): JSONTimeTrackerDB {
           text: note.text,
           timestamp: note.timestamp.getTime(),
         })),
+        ...(entry.archived === true ? { archived: true } : {}),
       }),
     ),
-  }))
+  }));
 
   return {
     version: db.version,
     activeSheetName: db.activeSheetName,
     sheets,
-  }
+  };
 }

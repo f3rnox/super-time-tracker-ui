@@ -2,6 +2,7 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 
+import { SheetHubArchivedSection } from "@/components/sheet-hub-archived-section";
 import { SheetHubRowCard } from "@/components/sheet-hub-row";
 import { TrackerTopbar } from "@/components/tracker-topbar";
 import {
@@ -16,12 +17,16 @@ import { type SheetHubRow } from "@/lib/types/sheet_hub";
 
 interface SheetHubViewProps {
   rows: SheetHubRow[];
+  archived_rows: SheetHubRow[];
 }
 
 /**
  * Projects overview with per-sheet week/month totals and pin controls.
  */
-export function SheetHubView({ rows }: Readonly<SheetHubViewProps>) {
+export function SheetHubView({
+  rows,
+  archived_rows,
+}: Readonly<SheetHubViewProps>) {
   const duration_format = use_duration_format();
   const pinned_names = useSyncExternalStore(
     subscribe_pinned_sheet_names,
@@ -65,6 +70,10 @@ export function SheetHubView({ rows }: Readonly<SheetHubViewProps>) {
             ))}
           </ul>
         )}
+        <SheetHubArchivedSection
+          rows={archived_rows}
+          duration_format={duration_format}
+        />
       </main>
     </>
   );

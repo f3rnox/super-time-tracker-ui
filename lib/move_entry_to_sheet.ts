@@ -1,4 +1,5 @@
 import { gen_sheet } from "@/lib/gen_db";
+import { get_next_entry_id } from "@/lib/get_next_entry_id";
 import { get_sheet } from "@/lib/get_sheet";
 import { read_db } from "@/lib/read_db";
 import { write_db } from "@/lib/write_db";
@@ -29,7 +30,9 @@ export async function move_entry_to_sheet(
 
   const db = await read_db();
   const source_sheet = get_sheet(db, sheet_name);
-  const entry_index = source_sheet.entries.findIndex(({ id }) => id === entry_id);
+  const entry_index = source_sheet.entries.findIndex(
+    ({ id }) => id === entry_id,
+  );
 
   if (entry_index === -1) {
     throw new Error(`Entry ${entry_id} not found in sheet ${sheet_name}`);
@@ -65,7 +68,7 @@ export async function move_entry_to_sheet(
     source_sheet.activeEntryID = null;
   }
 
-  const new_id = target_sheet.entries.length;
+  const new_id = get_next_entry_id(target_sheet);
   const moved_entry: TimeSheetEntry = {
     ...entry,
     id: new_id,

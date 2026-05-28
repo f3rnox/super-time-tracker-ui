@@ -2,23 +2,24 @@
 
 import {
   type ComponentProps,
-  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
 } from "react";
 
+import { SaveIcon } from "@/components/save-icon";
 import { TagAutocompleteInput } from "@/components/tag-autocomplete-input";
+import { TrashIcon } from "@/components/trash-icon";
 import { get_api_key_for_suggestion_provider } from "@/lib/get_api_key_for_suggestion_provider";
 import { get_button_class_name } from "@/lib/get_button_class_name";
 import { get_input_class_name } from "@/lib/get_input_class_name";
+import { get_select_class_name } from "@/lib/get_select_class_name";
 import { claude_api_key_preference } from "@/lib/preferences/claude_api_key_preference";
 import { entry_suggestion_provider_preference } from "@/lib/preferences/entry_suggestion_provider_preference";
 import { google_ai_api_key_preference } from "@/lib/preferences/google_ai_api_key_preference";
 import { openai_api_key_preference } from "@/lib/preferences/openai_api_key_preference";
-import { read_entry_templates } from "@/lib/read_entry_templates";
 import { request_ai_entry_description_suggestion } from "@/lib/request_ai_entry_description_suggestion";
-import { type EntryTemplate } from "@/lib/types/entry_template";
+import { use_entry_templates } from "@/lib/use_entry_templates";
 import { write_entry_templates } from "@/lib/write_entry_templates";
 
 export interface CheckInFormValues {
@@ -32,6 +33,9 @@ interface CheckInFormProps {
   is_pending: boolean;
 }
 
+const template_icon_button_class =
+  "inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-[0.65rem] border border-panel-border bg-transparent text-muted transition-[background-color,color] duration-150 hover:bg-surface-hover hover:text-foreground focus-visible:outline-2 focus-visible:outline-input-focus-border focus-visible:outline-offset-1 disabled:cursor-not-allowed disabled:opacity-55 sm:aspect-square sm:h-full sm:w-auto sm:min-w-10 sm:max-w-11";
+
 /**
  * Form for starting a new time sheet entry.
  */
@@ -40,7 +44,7 @@ export function CheckInForm({
   on_submit,
   is_pending,
 }: Readonly<CheckInFormProps>) {
-  const [templates, setTemplates] = useState<EntryTemplate[]>([]);
+  const templates = use_entry_templates();
   const [selected_template_id, setSelected_template_id] = useState("");
   const [description, setDescription] = useState("");
   const [at, setAt] = useState("");
@@ -76,10 +80,6 @@ export function CheckInForm({
   );
   const can_suggest =
     suggestion_provider !== "none" && selected_api_key.trim().length > 0;
-
-  useEffect(() => {
-    setTemplates(read_entry_templates());
-  }, []);
 
   const selected_template = useMemo(
     () =>
@@ -145,7 +145,6 @@ export function CheckInForm({
       },
     ];
 
-    setTemplates(next_templates);
     setSelected_template_id(template_id);
     write_entry_templates(next_templates);
   };
@@ -158,7 +157,6 @@ export function CheckInForm({
     const next_templates = templates.filter(
       (template) => template.id !== selected_template.id,
     );
-    setTemplates(next_templates);
     setSelected_template_id("");
     write_entry_templates(next_templates);
   };
@@ -200,9 +198,9 @@ export function CheckInForm({
       >
         What are you working on?
       </label>
-      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+      <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-stretch">
         <select
-          className={get_input_class_name()}
+          className={get_select_class_name()}
           value={selected_template_id}
           disabled={is_pending || templates.length === 0}
           onChange={(event) => {
@@ -226,39 +224,60 @@ export function CheckInForm({
             </option>
           ))}
         </select>
-        <button
-          type="button"
-          className={get_button_class_name("ghost")}
-          disabled={is_pending || description.trim().length === 0}
-          onClick={save_template}
-        >
-          Save template
-        </button>
-        <button
-          type="button"
-          className={get_button_class_name("ghost")}
-          disabled={is_pending || selected_template === null}
-          onClick={delete_selected_template}
-        >
-          Delete template
-        </button>
+        <div className="flex w-fit gap-2 justify-self-start sm:h-full">
+          <button
+            type="button"
+            className={template_icon_button_class}
+            disabled={is_pending || description.trim().length === 0}
+            aria-label="Save template"
+            title="Save template"
+            onClick={save_template}
+          >
+            <SaveIcon />
+          </button>
+          <button
+            type="button"
+            className={template_icon_button_class}
+            disabled={is_pending || selected_template === null}
+            aria-label="Delete template"
+            title="Delete template"
+            onClick={delete_selected_template}
+          >
+            <TrashIcon />
+          </button>
+        </div>
+      </div>
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start">
+        <div className="min-w-0 sm:flex-1">
+          <TagAutocompleteInput
+            id="check-in-description"
+            value={description}
+            known_tags={known_tags}
+            placeholder="e.g. crafting something @design"
+            disabled={is_pending}
+            autoFocus
+            on_change={setDescription}
+          />
+        </div>
+        <div className="sm:w-44 sm:shrink-0">
+          <input
+            id="check-in-at"
+            className={get_input_class_name()}
+            value={at}
+            onChange={(event) => setAt(event.target.value)}
+            placeholder="Start (optional)"
+            aria-label="Start time (optional, natural language)"
+            disabled={is_pending}
+          />
+        </div>
       </div>
       <div
         className={`grid gap-2 max-[860px]:grid-cols-1 ${
           can_suggest
-            ? "grid-cols-[minmax(0,1fr)_auto_auto]"
-            : "grid-cols-[minmax(0,1fr)_auto]"
+            ? "grid-cols-[minmax(0,1fr)_auto]"
+            : "grid-cols-[minmax(0,1fr)]"
         }`}
       >
-        <TagAutocompleteInput
-          id="check-in-description"
-          value={description}
-          known_tags={known_tags}
-          placeholder="e.g. crafting something @design"
-          disabled={is_pending}
-          autoFocus
-          on_change={setDescription}
-        />
         {can_suggest ? (
           <button
             type="button"
@@ -272,7 +291,7 @@ export function CheckInForm({
         ) : null}
         <button
           type="submit"
-          className={get_button_class_name("primary")}
+          className={`${get_button_class_name("primary")} ${can_suggest ? "" : "col-span-full"}`}
           disabled={is_pending || description.trim().length === 0}
         >
           Check in
@@ -281,20 +300,6 @@ export function CheckInForm({
       {suggestion_error === null ? null : (
         <p className="m-0 text-[0.8rem] text-danger">{suggestion_error}</p>
       )}
-      <label className="text-[0.85rem] text-muted" htmlFor="check-in-at">
-        Start time{" "}
-        <span className="font-normal opacity-85">
-          (optional, natural language)
-        </span>
-      </label>
-      <input
-        id="check-in-at"
-        className={get_input_class_name()}
-        value={at}
-        onChange={(event) => setAt(event.target.value)}
-        placeholder="e.g. 30 minutes ago"
-        disabled={is_pending}
-      />
     </form>
   );
 }
