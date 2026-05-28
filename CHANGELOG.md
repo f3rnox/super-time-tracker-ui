@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.31](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.30...v0.1.31) (2026-05-28)
+
+
+### Features
+
+* add keyboard shortcuts and topbar shortcuts settings page ([ae63bd0](https://github.com/f3rnox/super-time-tracker-ui/commit/ae63bd0ba4f1a37f9b6b45aa86bbe289069af8ff))
+
 ### [0.1.30](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.29...v0.1.30) (2026-05-28)
 
 
