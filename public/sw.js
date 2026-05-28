@@ -1,12 +1,15 @@
-const CACHE_NAME = 'super-time-tracker-cache-v2'
+const CACHE_NAME = 'super-time-tracker-cache-v3'
 const OFFLINE_URL = '/offline'
 const PRECACHE_URLS = [
   '/',
   OFFLINE_URL,
   '/manifest.webmanifest',
-  '/favicon.ico',
-  '/icons/pwa-icon-192.svg',
-  '/icons/pwa-icon-512.svg',
+  '/icons/favicon.ico',
+  '/icons/favicon-16x16.png',
+  '/icons/favicon-32x32.png',
+  '/icons/apple-touch-icon.png',
+  '/icons/android-chrome-192x192.png',
+  '/icons/android-chrome-512x512.png',
 ]
 const APP_ROUTES = [
   '/',

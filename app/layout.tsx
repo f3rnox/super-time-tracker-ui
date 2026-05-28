@@ -6,6 +6,7 @@ import { CloudSyncProvider } from '@/components/cloud-sync-provider'
 import { ToastNotifications } from '@/components/toast-notifications'
 import { ConfirmDialogProvider } from '@/components/confirm-dialog-provider'
 import { DocumentPreferencesInit } from '@/components/document-preferences-init'
+import { NotificationRulesRunner } from '@/components/notification-rules-runner'
 import { PwaInstallNotice } from '@/components/pwa-install-notice'
 import { PwaRegister } from '@/components/pwa-register'
 import { ThemeModeSystemListener } from '@/components/theme-mode-system-listener'
@@ -31,10 +32,13 @@ export const metadata: Metadata = {
   themeColor: '#14b8a6',
   icons: {
     icon: [
-      { url: '/icons/pwa-icon-192.svg', type: 'image/svg+xml', sizes: '192x192' },
-      { url: '/icons/pwa-icon-512.svg', type: 'image/svg+xml', sizes: '512x512' },
+      { url: '/icons/favicon.ico', type: 'image/x-icon' },
+      { url: '/icons/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+      { url: '/icons/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/icons/android-chrome-192x192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icons/android-chrome-512x512.png', type: 'image/png', sizes: '512x512' },
     ],
-    apple: [{ url: '/icons/pwa-icon-192.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icons/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
   },
   appleWebApp: {
     capable: true,
@@ -67,6 +71,7 @@ export default async function RootLayout({
         <ConfirmDialogProvider>
           <CloudSyncProvider>
             <AppKeyboardShortcuts />
+            <NotificationRulesRunner />
             {children}
             <ToastNotifications />
             <PwaInstallNotice />

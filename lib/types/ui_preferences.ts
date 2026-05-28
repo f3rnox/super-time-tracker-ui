@@ -153,6 +153,14 @@ export const NO_LOG_REMINDER_MINUTES_STORAGE_KEY =
   'super-time-tracker-no-log-reminder-minutes'
 export const NO_LOG_REMINDER_MINUTES_DEFAULT: NoLogReminderMinutes = '45'
 
+export type WorkHoursStart = string
+export const WORK_HOURS_START_STORAGE_KEY = 'super-time-tracker-work-hours-start'
+export const WORK_HOURS_START_DEFAULT: WorkHoursStart = '09:00'
+
+export type WorkHoursEnd = string
+export const WORK_HOURS_END_STORAGE_KEY = 'super-time-tracker-work-hours-end'
+export const WORK_HOURS_END_DEFAULT: WorkHoursEnd = '17:00'
+
 export type FocusGoalScope = 'global' | 'sheet' | 'tag'
 export const FOCUS_GOAL_SCOPE_STORAGE_KEY = 'super-time-tracker-focus-goal-scope'
 export const FOCUS_GOAL_SCOPE_DEFAULT: FocusGoalScope = 'global'

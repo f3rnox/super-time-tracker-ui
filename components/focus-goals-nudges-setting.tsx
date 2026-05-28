@@ -13,6 +13,8 @@ import { focus_goals_per_tag_preference } from '@/lib/preferences/focus_goals_pe
 import { focus_nudges_enabled_preference } from '@/lib/preferences/focus_nudges_enabled_preference'
 import { no_log_reminder_minutes_preference } from '@/lib/preferences/no_log_reminder_minutes_preference'
 import { overwork_alert_hours_preference } from '@/lib/preferences/overwork_alert_hours_preference'
+import { work_hours_end_preference } from '@/lib/preferences/work_hours_end_preference'
+import { work_hours_start_preference } from '@/lib/preferences/work_hours_start_preference'
 import { weekly_focus_target_minutes_preference } from '@/lib/preferences/weekly_focus_target_minutes_preference'
 import { persist_ui_preference } from '@/lib/persist_ui_preference'
 import { type FocusGoalScope } from '@/lib/types/ui_preferences'
@@ -64,6 +66,16 @@ export function FocusGoalsNudgesSetting({
     overwork_alert_hours_preference.subscribe,
     overwork_alert_hours_preference.get_snapshot,
     overwork_alert_hours_preference.get_server_snapshot,
+  )
+  const work_hours_start = useSyncExternalStore(
+    work_hours_start_preference.subscribe,
+    work_hours_start_preference.get_snapshot,
+    work_hours_start_preference.get_server_snapshot,
+  )
+  const work_hours_end = useSyncExternalStore(
+    work_hours_end_preference.subscribe,
+    work_hours_end_preference.get_snapshot,
+    work_hours_end_preference.get_server_snapshot,
   )
   const goal_scope = useSyncExternalStore(
     focus_goal_scope_preference.subscribe,
@@ -208,6 +220,35 @@ export function FocusGoalsNudgesSetting({
         </span>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           <label className="flex flex-col gap-1">
+            <span className="text-[0.8rem] text-muted">Work hours start</span>
+            <input
+              type="time"
+              className="rounded-md border border-panel-border bg-panel px-2.5 py-2 text-[0.85rem]"
+              value={work_hours_start}
+              disabled={disabled}
+              onChange={(event) =>
+                persist_ui_preference(
+                  work_hours_start_preference,
+                  event.target.value,
+                )
+              }
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[0.8rem] text-muted">Work hours end</span>
+            <input
+              type="time"
+              className="rounded-md border border-panel-border bg-panel px-2.5 py-2 text-[0.85rem]"
+              value={work_hours_end}
+              disabled={disabled}
+              onChange={(event) =>
+                persist_ui_preference(work_hours_end_preference, event.target.value)
+              }
+            />
+          </label>
+        </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <label className="flex flex-col gap-1">
             <span className="text-[0.8rem] text-muted">No-log reminder</span>
             <select
               className="rounded-md border border-panel-border bg-panel px-2.5 py-2 text-[0.85rem]"
@@ -249,6 +290,10 @@ export function FocusGoalsNudgesSetting({
             </select>
           </label>
         </div>
+        <p className="m-0 text-[0.78rem] leading-snug text-muted">
+          Rule reminders: notify when no active timer during work hours, and alert
+          when an active timer runs longer than the overwork threshold.
+        </p>
       </div>
     </div>
   )

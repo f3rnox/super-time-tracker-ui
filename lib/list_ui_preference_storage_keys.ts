@@ -29,6 +29,8 @@ import {
   TIMER_SHOW_SECONDS_STORAGE_KEY,
   WEEKLY_FOCUS_TARGET_MINUTES_STORAGE_KEY,
   WEEK_STARTS_ON_STORAGE_KEY,
+  WORK_HOURS_END_STORAGE_KEY,
+  WORK_HOURS_START_STORAGE_KEY,
 } from '@/lib/types/ui_preferences'
 import { POMODORO_STORAGE_KEY } from '@/lib/types/pomodoro'
 import {
@@ -82,5 +84,7 @@ export function list_ui_preference_storage_keys(): string[] {
     TIMER_SHOW_SECONDS_STORAGE_KEY,
     WEEKLY_FOCUS_TARGET_MINUTES_STORAGE_KEY,
     WEEK_STARTS_ON_STORAGE_KEY,
+    WORK_HOURS_END_STORAGE_KEY,
+    WORK_HOURS_START_STORAGE_KEY,
   ]
 }
