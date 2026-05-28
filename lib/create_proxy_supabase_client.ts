@@ -4,17 +4,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { get_supabase_env } from "@/lib/get_supabase_env";
 
-export interface MiddlewareSupabaseClients {
+export interface ProxySupabaseClients {
   supabase: SupabaseClient;
   response: NextResponse;
 }
 
 /**
- * Creates a Supabase client for Next.js middleware session refresh.
+ * Creates a Supabase client for Next.js proxy session refresh.
  */
-export function create_middleware_supabase_client(
+export function create_proxy_supabase_client(
   request: NextRequest,
-): MiddlewareSupabaseClients {
+): ProxySupabaseClients {
   let response = NextResponse.next({ request });
   const { anon_key, url } = get_supabase_env();
 
