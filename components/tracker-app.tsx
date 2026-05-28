@@ -246,28 +246,30 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
           <div className="flex min-w-0 flex-col">
             <section className="flex min-w-0 flex-col gap-4 border-b border-panel-border border-l-4 border-l-accent p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-panel-border bg-background px-3 py-2">
-                <div className="min-w-0">
-                  <p className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
-                    Quick action
-                  </p>
-                  <p className="m-0 mt-1 text-[0.9rem] font-medium">
-                    Jump into Pomodoro without leaving the tracker.
-                  </p>
+              {state.activeEntry === null ? (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-panel-border bg-background px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
+                      Quick action
+                    </p>
+                    <p className="m-0 mt-1 text-[0.9rem] font-medium">
+                      Jump into Pomodoro without leaving the tracker.
+                    </p>
+                  </div>
+                  <Link
+                    href="/pomodoro"
+                    className={`${get_button_class_name(
+                      'primary',
+                    )} inline-flex min-w-40 flex-col items-center justify-center whitespace-nowrap text-center`}
+                    aria-label="Open Pomodoro timer"
+                  >
+                    <span className="text-white text-[0.9rem] leading-none">Start Pomodoro</span>
+                    <span className="text-white mt-1 text-[0.72rem] font-medium leading-none opacity-85">
+                      Focus timer
+                    </span>
+                  </Link>
                 </div>
-                <Link
-                  href="/pomodoro"
-                  className={`${get_button_class_name(
-                    'primary',
-                  )} inline-flex min-w-40 flex-col items-center justify-center whitespace-nowrap text-center`}
-                  aria-label="Open Pomodoro timer"
-                >
-                  <span className="text-white text-[0.9rem] leading-none">Start Pomodoro</span>
-                  <span className="text-white mt-1 text-[0.72rem] font-medium leading-none opacity-85">
-                    Focus timer
-                  </span>
-                </Link>
-              </div>
+              ) : null}
               <TrackerActiveBar
                 ref={active_entry_panel_ref}
                 active_entry={state.activeEntry}
