@@ -1,6 +1,7 @@
 import { apply_ui_preferences_dom_from_window } from '@/lib/apply_ui_preferences_dom_from_window'
 import { apply_ui_preferences_from_record } from '@/lib/apply_ui_preferences_from_record'
 import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
+import { is_cloud_sync_enabled } from '@/lib/is_cloud_sync_enabled'
 import { mark_tracker_db_merged_this_browser_session } from '@/lib/has_tracker_db_merged_this_browser_session'
 import { notify_cloud_db_sync } from '@/lib/notify_cloud_db_sync'
 import { with_ui_preferences_merge_guard } from '@/lib/ui_preferences_merge_guard'
@@ -17,6 +18,10 @@ export interface RunTrackerDbCloudSyncOptions {
 export async function run_tracker_db_cloud_sync(
   options: RunTrackerDbCloudSyncOptions = {},
 ): Promise<void> {
+  if (!is_cloud_sync_enabled()) {
+    return
+  }
+
   const action = options.action ?? 'push'
   const syncing_message =
     action === 'pull' ? 'Pulling from cloud…' : 'Syncing to cloud…'

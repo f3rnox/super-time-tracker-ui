@@ -120,6 +120,10 @@ export const GREEDY_CLOUD_SYNC_STORAGE_KEY =
   'super-time-tracker-greedy-cloud-sync'
 export const GREEDY_CLOUD_SYNC_DEFAULT: GreedyCloudSync = 'true'
 
+export type CloudSyncEnabled = 'true' | 'false'
+export const CLOUD_SYNC_ENABLED_STORAGE_KEY = 'super-time-tracker-cloud-sync-enabled'
+export const CLOUD_SYNC_ENABLED_DEFAULT: CloudSyncEnabled = 'true'
+
 export type FocusNudgesEnabled = 'true' | 'false'
 export const FOCUS_NUDGES_ENABLED_STORAGE_KEY =
   'super-time-tracker-focus-nudges-enabled'

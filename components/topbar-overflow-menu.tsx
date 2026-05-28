@@ -6,6 +6,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { HamburgerIcon } from '@/components/hamburger-icon'
 import { build_auth_page_href } from '@/lib/build_auth_page_href'
+import { notify_settings_saved } from '@/lib/notify_settings_saved'
+import { cloud_sync_enabled_preference } from '@/lib/preferences/cloud_sync_enabled_preference'
 import { get_theme_server_snapshot, get_theme_snapshot } from '@/lib/get_theme_snapshot'
 import { subscribe_theme } from '@/lib/subscribe_theme'
 import { toggle_theme } from '@/lib/toggle_theme'
@@ -25,6 +27,11 @@ export function TopbarOverflowMenu(): React.ReactElement {
     subscribe_theme,
     get_theme_snapshot,
     get_theme_server_snapshot,
+  )
+  const cloud_sync_enabled = useSyncExternalStore(
+    cloud_sync_enabled_preference.subscribe,
+    cloud_sync_enabled_preference.get_snapshot,
+    cloud_sync_enabled_preference.get_server_snapshot,
   )
   const { email, is_configured, is_pending, sign_out } = use_supabase_auth_session()
 
@@ -74,6 +81,16 @@ export function TopbarOverflowMenu(): React.ReactElement {
     router.push(build_auth_page_href('sign_in', pathname))
   }
 
+  const toggle_cloud_sync_enabled = (): void => {
+    const next_value = cloud_sync_enabled === 'true' ? 'false' : 'true'
+
+    cloud_sync_enabled_preference.write(next_value)
+    cloud_sync_enabled_preference.notify()
+    notify_settings_saved(
+      next_value === 'true' ? 'Cloud sync enabled' : 'Cloud sync disabled',
+    )
+  }
+
   return (
     <div className="relative shrink-0" ref={menu_ref}>
       <button
@@ -121,6 +138,28 @@ export function TopbarOverflowMenu(): React.ReactElement {
               Sync settings
             </Link>
           </li>
+          {is_configured ? (
+            <li role="none">
+              <button
+                type="button"
+                className={menu_item_class}
+                role="menuitemcheckbox"
+                aria-checked={cloud_sync_enabled === 'true'}
+                onClick={toggle_cloud_sync_enabled}
+              >
+                <span className="inline-flex w-full items-center justify-between gap-2">
+                  <span>
+                    {cloud_sync_enabled === 'true'
+                      ? 'Disable cloud sync'
+                      : 'Enable cloud sync'}
+                  </span>
+                  <span className="text-muted" aria-hidden="true">
+                    {cloud_sync_enabled === 'true' ? 'On' : 'Off'}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ) : null}
           <li
             className="my-1 border-t border-panel-border"
             role="separator"

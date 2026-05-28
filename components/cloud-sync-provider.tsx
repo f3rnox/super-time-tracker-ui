@@ -9,6 +9,7 @@ import {
   clear_tracker_db_merged_this_browser_session,
   has_tracker_db_merged_this_browser_session,
 } from '@/lib/has_tracker_db_merged_this_browser_session'
+import { is_cloud_sync_enabled } from '@/lib/is_cloud_sync_enabled'
 import { is_supabase_configured } from '@/lib/is_supabase_configured'
 import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
 import { should_merge_tracker_db_on_navigation } from '@/lib/should_merge_tracker_db_on_navigation'
@@ -27,7 +28,7 @@ export function CloudSyncProvider({
   const skip_next_greedy_pathname_sync_ref = useRef(true)
 
   useEffect(() => {
-    if (!is_supabase_configured()) {
+    if (!is_supabase_configured() || !is_cloud_sync_enabled()) {
       return
     }
 
@@ -91,7 +92,11 @@ export function CloudSyncProvider({
   }, [router])
 
   useEffect(() => {
-    if (!is_supabase_configured() || !should_merge_tracker_db_on_navigation()) {
+    if (
+      !is_supabase_configured() ||
+      !is_cloud_sync_enabled() ||
+      !should_merge_tracker_db_on_navigation()
+    ) {
       return
     }
 

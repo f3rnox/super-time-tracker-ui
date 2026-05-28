@@ -1,11 +1,16 @@
 import { collect_ui_preferences_from_window } from '@/lib/collect_ui_preferences_from_window'
+import { is_cloud_sync_enabled } from '@/lib/is_cloud_sync_enabled'
 import { is_supabase_configured } from '@/lib/is_supabase_configured'
 
 /**
  * Pushes all local UI preferences to the cloud API immediately.
  */
 export function run_ui_preferences_cloud_sync(): void {
-  if (typeof window === 'undefined' || !is_supabase_configured()) {
+  if (
+    typeof window === 'undefined' ||
+    !is_supabase_configured() ||
+    !is_cloud_sync_enabled()
+  ) {
     return
   }
 
