@@ -1,45 +1,45 @@
-'use client'
+"use client";
 
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from "react";
 
 import {
   ActiveEntryPanel,
   type ActiveEntryPanelHandle,
-} from '@/components/active-entry-panel'
-import { EntryActionsMenu } from '@/components/entry-actions-menu'
-import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
-import { type EntryEditFormValues } from '@/components/entry-edit-form'
-import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
-import { is_pomodoro_task_entry } from '@/lib/pomodoro_task_marker'
-import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
-import { type CheckOutOptions } from '@/lib/types/check_out_options'
+} from "@/components/active-entry-panel";
+import { EntryActionsMenu } from "@/components/entry-actions-menu";
+import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { type EntryEditFormValues } from "@/components/entry-edit-form";
+import { get_delete_entry_confirm_dialog } from "@/lib/get_delete_entry_confirm_dialog";
+import { is_pomodoro_task_entry } from "@/lib/pomodoro_task_marker";
+import { use_confirm_destructive_actions } from "@/lib/use_confirm_destructive_actions";
+import { type CheckOutOptions } from "@/lib/types/check_out_options";
 import {
   type SerializedEntry,
   type SerializedSheet,
-} from '@/lib/types/tracker_state'
+} from "@/lib/types/tracker_state";
 
 interface TrackerActiveBarProps {
-  active_entry: SerializedEntry | null
-  sheets: SerializedSheet[]
-  known_tags: string[]
-  is_pending: boolean
-  on_check_out: (options?: CheckOutOptions) => void
-  on_delete: () => void
-  on_edit: (values: EntryEditFormValues) => void
-  on_move: (target_sheet_name: string) => void
-  on_add_note: (text: string, at?: string) => void
-  on_edit_note: (timestamp: string, text: string) => void
-  on_delete_note: (timestamp: string) => void
+  active_entry: SerializedEntry | null;
+  sheets: SerializedSheet[];
+  known_tags: string[];
+  is_pending: boolean;
+  on_check_out: (options?: CheckOutOptions) => void;
+  on_delete: () => void;
+  on_edit: (values: EntryEditFormValues) => void;
+  on_move: (target_sheet_name: string) => void;
+  on_add_note: (text: string, at?: string) => void;
+  on_edit_note: (timestamp: string, text: string) => void;
+  on_delete_note: (timestamp: string) => void;
 }
 
 const section_label_class =
-  'text-[0.72rem] font-semibold uppercase tracking-[0.04em] text-muted whitespace-nowrap'
+  "text-[0.72rem] font-semibold uppercase tracking-[0.04em] text-muted whitespace-nowrap";
 
 const tracking_pill_class =
-  'shrink-0 rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on'
+  "shrink-0 rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on";
 
 const pomodoro_pill_class =
-  'shrink-0 rounded-full border border-panel-border bg-surface-raised px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-foreground'
+  "shrink-0 rounded-full border border-panel-border bg-surface-raised px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-foreground";
 
 /**
  * Active entry display for the tracker content column.
@@ -63,21 +63,21 @@ export const TrackerActiveBar = forwardRef<
   },
   ref,
 ) {
-  const { confirm } = use_confirm_dialog()
-  const confirm_destructive_actions = use_confirm_destructive_actions()
-  const panel_ref = useRef<ActiveEntryPanelHandle>(null)
+  const { confirm } = useConfirmDialog();
+  const confirm_destructive_actions = use_confirm_destructive_actions();
+  const panel_ref = useRef<ActiveEntryPanelHandle>(null);
 
   useImperativeHandle(ref, () => ({
     start_edit: () => {
-      panel_ref.current?.start_edit()
+      panel_ref.current?.start_edit();
     },
     start_add_note: () => {
-      panel_ref.current?.start_add_note()
+      panel_ref.current?.start_add_note();
     },
-  }))
+  }));
 
   if (active_entry === null) {
-    return null
+    return null;
   }
 
   return (
@@ -101,10 +101,10 @@ export const TrackerActiveBar = forwardRef<
             on_delete={async () => {
               const confirmed = confirm_destructive_actions
                 ? await confirm(get_delete_entry_confirm_dialog(active_entry))
-                : true
+                : true;
 
               if (confirmed) {
-                on_delete()
+                on_delete();
               }
             }}
           />
@@ -127,5 +127,5 @@ export const TrackerActiveBar = forwardRef<
         on_delete_note={on_delete_note}
       />
     </div>
-  )
-})
+  );
+});

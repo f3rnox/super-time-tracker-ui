@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useId, useRef } from "react";
 
-import { KeyboardShortcutsContent } from '@/components/keyboard-shortcuts-content'
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { type KeyboardShortcutSection } from '@/lib/types/keyboard_shortcut'
+import { KeyboardShortcutsContent } from "@/components/keyboard-shortcuts-content";
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { type KeyboardShortcutSection } from "@/lib/types/keyboard_shortcut";
 
 interface KeyboardShortcutsDialogProps {
-  sections: KeyboardShortcutSection[]
-  on_close: () => void
+  sections: KeyboardShortcutSection[];
+  on_close: () => void;
 }
 
 /**
@@ -17,25 +17,25 @@ interface KeyboardShortcutsDialogProps {
 export function KeyboardShortcutsDialog({
   sections,
   on_close,
-}: KeyboardShortcutsDialogProps) {
-  const title_id = useId()
-  const close_ref = useRef<HTMLButtonElement>(null)
+}: Readonly<KeyboardShortcutsDialogProps>) {
+  const title_id = useId();
+  const close_ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    close_ref.current?.focus()
+    close_ref.current?.focus();
 
     const handle_key_down = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        on_close()
+      if (event.key === "Escape") {
+        on_close();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handle_key_down)
+    document.addEventListener("keydown", handle_key_down);
 
     return () => {
-      document.removeEventListener('keydown', handle_key_down)
-    }
-  }, [on_close])
+      document.removeEventListener("keydown", handle_key_down);
+    };
+  }, [on_close]);
 
   return (
     <div
@@ -54,7 +54,10 @@ export function KeyboardShortcutsDialog({
         aria-labelledby={title_id}
         className="relative z-1 w-full max-w-lg rounded-lg border border-panel-border bg-panel p-5 shadow-md"
       >
-        <h2 id={title_id} className="m-0 text-[1.1rem] font-[650] tracking-tight">
+        <h2
+          id={title_id}
+          className="m-0 text-[1.1rem] font-[650] tracking-tight"
+        >
           Keyboard shortcuts
         </h2>
         <div className="mt-4 max-h-[min(28rem,70vh)] overflow-y-auto pr-1">
@@ -64,7 +67,7 @@ export function KeyboardShortcutsDialog({
           <button
             ref={close_ref}
             type="button"
-            className={get_button_class_name('primary')}
+            className={get_button_class_name("primary")}
             onClick={on_close}
           >
             Close
@@ -72,5 +75,5 @@ export function KeyboardShortcutsDialog({
         </div>
       </div>
     </div>
-  )
+  );
 }

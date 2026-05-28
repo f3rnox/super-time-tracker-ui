@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
+import Link from "next/link";
 
-import { format_last_activity_label } from '@/lib/format_last_activity_label'
-import { format_duration } from '@/lib/format_duration'
-import { navigate_to_tracker_sheet } from '@/lib/navigate_to_tracker_sheet'
-import { type SheetHubRow } from '@/lib/types/sheet_hub'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
+import { format_last_activity_label } from "@/lib/format_last_activity_label";
+import { format_duration } from "@/lib/format_duration";
+import { navigate_to_tracker_sheet } from "@/lib/navigate_to_tracker_sheet";
+import { type SheetHubRow } from "@/lib/types/sheet_hub";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
 
 interface SheetHubRowCardProps {
-  row: SheetHubRow
-  duration_format: DurationFormat
-  is_pinned: boolean
-  on_toggle_pin: () => void
+  row: SheetHubRow;
+  duration_format: DurationFormat;
+  is_pinned: boolean;
+  on_toggle_pin: () => void;
 }
 
 /**
@@ -23,8 +23,8 @@ export function SheetHubRowCard({
   duration_format,
   is_pinned,
   on_toggle_pin,
-}: SheetHubRowCardProps) {
-  const last_activity = format_last_activity_label(row.lastActivityAt)
+}: Readonly<SheetHubRowCardProps>) {
+  const last_activity = format_last_activity_label(row.lastActivityAt);
 
   return (
     <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
@@ -43,7 +43,7 @@ export function SheetHubRowCard({
           <p className="m-0 mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[0.82rem] text-muted">
             <span>{last_activity}</span>
             <span>
-              {row.entryCount} {row.entryCount === 1 ? 'entry' : 'entries'}
+              {row.entryCount} {row.entryCount === 1 ? "entry" : "entries"}
             </span>
           </p>
         </div>
@@ -57,7 +57,7 @@ export function SheetHubRowCard({
             }
             onClick={on_toggle_pin}
           >
-            {is_pinned ? '★' : '☆'}
+            {is_pinned ? "★" : "☆"}
           </button>
           <Link
             href="/"
@@ -87,5 +87,5 @@ export function SheetHubRowCard({
         </div>
       </div>
     </li>
-  )
+  );
 }

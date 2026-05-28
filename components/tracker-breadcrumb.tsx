@@ -1,19 +1,22 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 export interface TrackerBreadcrumbSegment {
-  label: string
-  href?: string
+  label: string;
+  href?: string;
 }
 
 interface TrackerBreadcrumbProps {
-  current: string
-  parent?: TrackerBreadcrumbSegment
+  current: string;
+  parent?: TrackerBreadcrumbSegment;
 }
 
 /**
  * Breadcrumb trail from the tracker home to a sub-page.
  */
-export function TrackerBreadcrumb({ current, parent }: TrackerBreadcrumbProps) {
+export function TrackerBreadcrumb({
+  current,
+  parent,
+}: Readonly<TrackerBreadcrumbProps>) {
   return (
     <nav aria-label="Breadcrumb" className="min-w-0 text-left">
       <ol className="m-0 flex min-w-0 list-none flex-wrap items-center gap-1.5 p-0 text-[0.85rem]">
@@ -39,7 +42,9 @@ export function TrackerBreadcrumb({ current, parent }: TrackerBreadcrumbProps) {
                   {parent.label}
                 </Link>
               ) : (
-                <span className="max-w-44 truncate text-muted sm:max-w-none">{parent.label}</span>
+                <span className="max-w-44 truncate text-muted sm:max-w-none">
+                  {parent.label}
+                </span>
               )}
             </li>
           </>
@@ -47,10 +52,13 @@ export function TrackerBreadcrumb({ current, parent }: TrackerBreadcrumbProps) {
         <li className="text-muted" aria-hidden="true">
           /
         </li>
-        <li className="max-w-44 truncate font-medium text-foreground sm:max-w-none" aria-current="page">
+        <li
+          className="max-w-44 truncate font-medium text-foreground sm:max-w-none"
+          aria-current="page"
+        >
           {current}
         </li>
       </ol>
     </nav>
-  )
+  );
 }

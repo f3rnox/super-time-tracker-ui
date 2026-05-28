@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { EntryFacetFiltersPanel } from '@/components/entry-facet-filters'
-import { get_empty_entry_search_filters } from '@/lib/parse_entry_search_filters'
-import { type EntrySearchFilters } from '@/lib/types/entry_search'
+import { EntryFacetFiltersPanel } from "@/components/entry-facet-filters";
+import { get_empty_entry_search_filters } from "@/lib/parse_entry_search_filters";
+import { type EntrySearchFilters } from "@/lib/types/entry_search";
 
-interface EntrySearchFiltersPanelProps {
-  filters: EntrySearchFilters
-  sheet_names: string[]
-  tag_names: string[]
-  is_pending: boolean
-  on_change: (filters: EntrySearchFilters) => void
-}
+type EntrySearchFiltersPanelProps = Readonly<{
+  filters: EntrySearchFilters;
+  sheet_names: string[];
+  tag_names: string[];
+  is_pending: boolean;
+  on_change: (filters: EntrySearchFilters) => void;
+}>;
 
 /**
  * Filter controls for global entry search (sheet, tag, date range).
@@ -41,5 +41,5 @@ export function EntrySearchFiltersPanel({
         })
       }
     />
-  )
+  );
 }

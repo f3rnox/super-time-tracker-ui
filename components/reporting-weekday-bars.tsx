@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { useMemo } from 'react'
+import { useMemo } from "react";
 
-import { format_duration } from '@/lib/format_duration'
-import { round_chart_percent } from '@/lib/round_chart_percent'
-import { type WeekdayTimeStat } from '@/lib/types/reporting'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
+import { format_duration } from "@/lib/format_duration";
+import { round_chart_percent } from "@/lib/round_chart_percent";
+import { type WeekdayTimeStat } from "@/lib/types/reporting";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
 
 interface ReportingWeekdayBarsProps {
-  weekday_distribution: WeekdayTimeStat[]
-  duration_format: DurationFormat
+  weekday_distribution: WeekdayTimeStat[];
+  duration_format: DurationFormat;
 }
 
 /**
@@ -18,7 +18,7 @@ interface ReportingWeekdayBarsProps {
 export function ReportingWeekdayBars({
   weekday_distribution,
   duration_format,
-}: ReportingWeekdayBarsProps) {
+}: Readonly<ReportingWeekdayBarsProps>) {
   const max_ms = useMemo(
     () =>
       weekday_distribution.reduce(
@@ -26,15 +26,11 @@ export function ReportingWeekdayBars({
         0,
       ),
     [weekday_distribution],
-  )
+  );
   const total_ms = useMemo(
-    () =>
-      weekday_distribution.reduce(
-        (total, stat) => total + stat.totalMs,
-        0,
-      ),
+    () => weekday_distribution.reduce((total, stat) => total + stat.totalMs, 0),
     [weekday_distribution],
-  )
+  );
 
   return (
     <section className="flex w-full flex-col gap-3 rounded-md border border-panel-border bg-panel p-4 shadow-sm">
@@ -54,7 +50,7 @@ export function ReportingWeekdayBars({
             const width_percent =
               max_ms > 0
                 ? round_chart_percent((stat.totalMs / max_ms) * 100)
-                : 0
+                : 0;
 
             return (
               <li
@@ -70,17 +66,19 @@ export function ReportingWeekdayBars({
                 >
                   <span
                     className="block h-full rounded-full bg-accent"
-                    style={{ width: `${Math.max(width_percent, stat.totalMs > 0 ? 4 : 0)}%` }}
+                    style={{
+                      width: `${Math.max(width_percent, stat.totalMs > 0 ? 4 : 0)}%`,
+                    }}
                   />
                 </span>
                 <span className="font-mono text-foreground">
                   {format_duration(stat.totalMs, duration_format)}
                 </span>
               </li>
-            )
+            );
           })}
         </ul>
       )}
     </section>
-  )
+  );
 }

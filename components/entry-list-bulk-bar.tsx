@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
-import { Checkbox } from '@/components/checkbox'
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { get_input_class_name } from '@/lib/get_input_class_name'
+import { Checkbox } from "@/components/checkbox";
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { get_input_class_name } from "@/lib/get_input_class_name";
 import {
   type SerializedEntry,
   type SerializedSheet,
-} from '@/lib/types/tracker_state'
+} from "@/lib/types/tracker_state";
 
-interface EntryListBulkBarProps {
-  selected_count: number
-  total_count: number
-  all_selected: boolean
-  some_selected: boolean
-  selected_entries: SerializedEntry[]
-  sheets: SerializedSheet[]
-  is_pending: boolean
-  on_toggle_all: () => void
-  on_move: (target_sheet_name: string) => void
-  on_delete: () => void
-  on_clear: () => void
-}
+type EntryListBulkBarProps = Readonly<{
+  selected_count: number;
+  total_count: number;
+  all_selected: boolean;
+  some_selected: boolean;
+  selected_entries: SerializedEntry[];
+  sheets: SerializedSheet[];
+  is_pending: boolean;
+  on_toggle_all: () => void;
+  on_move: (target_sheet_name: string) => void;
+  on_delete: () => void;
+  on_clear: () => void;
+}>;
 
 /**
  * Header takeover for bulk actions when entries are selected.
@@ -40,26 +40,26 @@ export function EntryListBulkBar({
   on_delete,
   on_clear,
 }: EntryListBulkBarProps) {
-  const [target_sheet_name, set_target_sheet_name] = useState('')
-  const has_active_selection = selected_entries.some((entry) => entry.isActive)
+  const [targetSheetName, setTargetSheetName] = useState("");
+  const has_active_selection = selected_entries.some((entry) => entry.isActive);
   const movable_sheets = sheets.filter((sheet) => {
     if (has_active_selection && sheet.hasActiveEntry) {
-      return false
+      return false;
     }
 
-    return selected_entries.some((entry) => entry.sheetName !== sheet.name)
-  })
+    return selected_entries.some((entry) => entry.sheetName !== sheet.name);
+  });
 
   const handle_move = (): void => {
-    const trimmed = target_sheet_name.trim()
+    const trimmed = targetSheetName.trim();
 
     if (trimmed.length === 0) {
-      return
+      return;
     }
 
-    on_move(trimmed)
-    set_target_sheet_name('')
-  }
+    on_move(trimmed);
+    setTargetSheetName("");
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-accent-border bg-accent-soft px-3 py-2">
@@ -68,7 +68,9 @@ export function EntryListBulkBar({
         checked={all_selected}
         indeterminate={some_selected}
         disabled={is_pending}
-        aria_label={all_selected ? 'Deselect all entries' : 'Select all entries'}
+        aria_label={
+          all_selected ? "Deselect all entries" : "Select all entries"
+        }
         on_change={on_toggle_all}
       />
       <p className="m-0 shrink-0 text-[0.85rem] font-semibold">
@@ -78,11 +80,11 @@ export function EntryListBulkBar({
       <div className="ml-auto flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1.5">
           <select
-            className={`${get_input_class_name('compact')} min-w-32`}
-            value={target_sheet_name}
+            className={`${get_input_class_name("compact")} min-w-32`}
+            value={targetSheetName}
             disabled={is_pending || movable_sheets.length === 0}
             aria-label="Move to sheet"
-            onChange={(event) => set_target_sheet_name(event.target.value)}
+            onChange={(event) => setTargetSheetName(event.target.value)}
           >
             <option value="">Move to…</option>
             {movable_sheets.map((sheet) => (
@@ -93,10 +95,10 @@ export function EntryListBulkBar({
           </select>
           <button
             type="button"
-            className={get_button_class_name('ghost', 'small')}
+            className={get_button_class_name("ghost", "small")}
             disabled={
               is_pending ||
-              target_sheet_name.trim().length === 0 ||
+              targetSheetName.trim().length === 0 ||
               movable_sheets.length === 0
             }
             onClick={handle_move}
@@ -106,7 +108,7 @@ export function EntryListBulkBar({
         </div>
         <button
           type="button"
-          className={get_button_class_name('danger', 'small')}
+          className={get_button_class_name("danger", "small")}
           disabled={is_pending}
           onClick={on_delete}
         >
@@ -114,7 +116,7 @@ export function EntryListBulkBar({
         </button>
         <button
           type="button"
-          className={`${get_button_class_name('ghost', 'small')} shrink-0`}
+          className={`${get_button_class_name("ghost", "small")} shrink-0`}
           disabled={is_pending}
           aria-label="Clear selection"
           title="Clear selection"
@@ -124,5 +126,5 @@ export function EntryListBulkBar({
         </button>
       </div>
     </div>
-  )
+  );
 }

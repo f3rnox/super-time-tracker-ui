@@ -1,51 +1,51 @@
-'use client'
+"use client";
 
-import { useSearchParams } from 'next/navigation'
-import { type ReactNode, useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from "next/navigation";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 
-import { ReportingActivityHeatmap } from '@/components/reporting-activity-heatmap'
-import { ReportingDailyBarChart } from '@/components/reporting-daily-bar-chart'
-import { ReportingDateRangePicker } from '@/components/reporting-date-range-picker'
-import { ReportingMonthInReview } from '@/components/reporting-month-in-review'
-import { ReportingSortControls } from '@/components/reporting-sort-controls'
-import { ReportingTagPieChart } from '@/components/reporting-tag-pie-chart'
-import { ReportingTrendCard } from '@/components/reporting-trend-card'
+import { ReportingActivityHeatmap } from "@/components/reporting-activity-heatmap";
+import { ReportingDailyBarChart } from "@/components/reporting-daily-bar-chart";
+import { ReportingDateRangePicker } from "@/components/reporting-date-range-picker";
+import { ReportingMonthInReview } from "@/components/reporting-month-in-review";
+import { ReportingSortControls } from "@/components/reporting-sort-controls";
+import { ReportingTagPieChart } from "@/components/reporting-tag-pie-chart";
+import { ReportingTrendCard } from "@/components/reporting-trend-card";
 import {
   ReportingViewTabs,
   type ReportingViewTab,
-} from '@/components/reporting-view-tabs'
-import { ReportingWeekdayBars } from '@/components/reporting-weekday-bars'
-import { TrackerTopbar } from '@/components/tracker-topbar'
-import { build_reporting_analytics } from '@/lib/build_reporting_analytics'
-import { build_reporting_stats } from '@/lib/build_reporting_stats'
-import { default_reporting_sort_preference } from '@/lib/preferences/default_reporting_sort_preference'
-import { format_duration } from '@/lib/format_duration'
-import { get_date_range_ms_from_inputs } from '@/lib/get_date_range_ms_from_inputs'
-import { get_initial_reporting_range_inputs } from '@/lib/get_initial_reporting_range_inputs'
-import { get_reporting_date_range_shortcut_inputs } from '@/lib/get_reporting_date_range_shortcut_inputs'
-import { parse_reporting_range_from_search_params } from '@/lib/parse_reporting_range_from_search_params'
-import { parse_reporting_source_sheets } from '@/lib/parse_reporting_source_sheets'
-import { round_chart_percent } from '@/lib/round_chart_percent'
-import { sort_sheet_report_stats } from '@/lib/sort_sheet_report_stats'
-import { use_duration_format } from '@/lib/use_duration_format'
-import { use_week_starts_on } from '@/lib/use_week_starts_on'
-import { week_starts_on_to_index } from '@/lib/week_starts_on_to_index'
+} from "@/components/reporting-view-tabs";
+import { ReportingWeekdayBars } from "@/components/reporting-weekday-bars";
+import { TrackerTopbar } from "@/components/tracker-topbar";
+import { build_reporting_analytics } from "@/lib/build_reporting_analytics";
+import { build_reporting_stats } from "@/lib/build_reporting_stats";
+import { default_reporting_sort_preference } from "@/lib/preferences/default_reporting_sort_preference";
+import { format_duration } from "@/lib/format_duration";
+import { get_date_range_ms_from_inputs } from "@/lib/get_date_range_ms_from_inputs";
+import { get_initial_reporting_range_inputs } from "@/lib/get_initial_reporting_range_inputs";
+import { get_reporting_date_range_shortcut_inputs } from "@/lib/get_reporting_date_range_shortcut_inputs";
+import { parse_reporting_range_from_search_params } from "@/lib/parse_reporting_range_from_search_params";
+import { parse_reporting_source_sheets } from "@/lib/parse_reporting_source_sheets";
+import { round_chart_percent } from "@/lib/round_chart_percent";
+import { sort_sheet_report_stats } from "@/lib/sort_sheet_report_stats";
+import { use_duration_format } from "@/lib/use_duration_format";
+import { use_week_starts_on } from "@/lib/use_week_starts_on";
+import { week_starts_on_to_index } from "@/lib/week_starts_on_to_index";
 import {
   type ReportingDateRangeInputs,
   type ReportingSourceSheet,
   type SheetReportSort,
   type SheetReportStats,
-} from '@/lib/types/reporting'
+} from "@/lib/types/reporting";
 
 interface ReportingViewProps {
-  source_sheets: ReportingSourceSheet[]
-  reference_now: number
+  source_sheets: ReportingSourceSheet[];
+  reference_now: number;
 }
 
 const empty_range: ReportingDateRangeInputs = {
-  from_date: '',
-  to_date: '',
-}
+  from_date: "",
+  to_date: "",
+};
 
 /**
  * Reporting dashboard with tag/time charts, trends, and a month-in-review summary.
@@ -53,30 +53,32 @@ const empty_range: ReportingDateRangeInputs = {
 export function ReportingView({
   source_sheets,
   reference_now,
-}: ReportingViewProps) {
-  const search_params = useSearchParams()
-  const duration_format = use_duration_format()
-  const week_starts_on = use_week_starts_on()
-  const [active_tab, set_active_tab] = useState<ReportingViewTab>('dashboard')
-  const [sort, set_sort] = useState<SheetReportSort>(() =>
+}: Readonly<ReportingViewProps>) {
+  const search_params = useSearchParams();
+  const duration_format = use_duration_format();
+  const week_starts_on = use_week_starts_on();
+  const [active_tab, setActive_tab] = useState<ReportingViewTab>("dashboard");
+  const [sort, setSort] = useState<SheetReportSort>(() =>
     default_reporting_sort_preference.get_server_snapshot(),
-  )
+  );
   const [range_inputs, set_range_inputs] =
-    useState<ReportingDateRangeInputs>(empty_range)
-  const [calculation_now, set_calculation_now] = useState(reference_now)
+    useState<ReportingDateRangeInputs>(empty_range);
+  const [calculation_now, setCalculation_now] = useState(reference_now);
 
   useEffect(() => {
-    set_range_inputs(get_initial_reporting_range_inputs(undefined, week_starts_on))
-    set_sort(default_reporting_sort_preference.read())
-  }, [week_starts_on])
+    set_range_inputs(
+      get_initial_reporting_range_inputs(undefined, week_starts_on),
+    );
+    setSort(default_reporting_sort_preference.read());
+  }, [week_starts_on]);
 
   useEffect(() => {
     const range_shortcut = parse_reporting_range_from_search_params(
-      search_params.get('range'),
-    )
+      search_params.get("range"),
+    );
 
     if (range_shortcut === null) {
-      return
+      return;
     }
 
     set_range_inputs(
@@ -85,21 +87,21 @@ export function ReportingView({
         new Date(),
         week_starts_on_to_index(week_starts_on),
       ),
-    )
-  }, [search_params, week_starts_on])
+    );
+  }, [search_params, week_starts_on]);
 
   useEffect(() => {
-    set_calculation_now(reference_now)
-  }, [reference_now])
+    setCalculation_now(reference_now);
+  }, [reference_now]);
 
   useEffect(() => {
-    set_calculation_now(Date.now())
-  }, [range_inputs, source_sheets, week_starts_on])
+    setCalculation_now(Date.now());
+  }, [range_inputs, source_sheets, week_starts_on]);
 
   const sheets = useMemo(
     () => parse_reporting_source_sheets(source_sheets),
     [source_sheets],
-  )
+  );
   const date_range = useMemo(
     () =>
       get_date_range_ms_from_inputs(
@@ -107,17 +109,16 @@ export function ReportingView({
         range_inputs.to_date,
       ),
     [range_inputs],
-  )
+  );
   const range_is_partial =
-    (range_inputs.from_date.length > 0) !==
-    (range_inputs.to_date.length > 0)
+    range_inputs.from_date.length > 0 !== range_inputs.to_date.length > 0;
   const range_is_invalid =
     range_is_partial ||
     (range_inputs.from_date.length > 0 &&
       range_inputs.to_date.length > 0 &&
-      date_range === null)
+      date_range === null);
 
-  const week_starts_on_index = week_starts_on_to_index(week_starts_on)
+  const week_starts_on_index = week_starts_on_to_index(week_starts_on);
   const { stats, analytics } = useMemo(() => {
     return {
       stats: build_reporting_stats(
@@ -132,8 +133,8 @@ export function ReportingView({
         calculation_now,
         week_starts_on_index,
       ),
-    }
-  }, [sheets, date_range, week_starts_on_index, calculation_now])
+    };
+  }, [sheets, date_range, week_starts_on_index, calculation_now]);
 
   const {
     activeSheets,
@@ -142,27 +143,27 @@ export function ReportingView({
     idleSheets,
     periodTotals,
     totalEntryCount,
-  } = stats
-  const sheet_count = activeSheets.length + idleSheets.length
-  const show_period_totals = date_range === null
+  } = stats;
+  const sheet_count = activeSheets.length + idleSheets.length;
+  const show_period_totals = date_range === null;
 
   const sorted_active_sheets = useMemo(
     () => sort_sheet_report_stats(activeSheets, sort),
     [activeSheets, sort],
-  )
+  );
   const sorted_idle_sheets = useMemo(
     () => sort_sheet_report_stats(idleSheets, sort),
     [idleSheets, sort],
-  )
+  );
 
   const bar_chart_subtitle =
     date_range === null
-      ? 'Last 30 days of activity.'
-      : `${analytics.dailyBuckets.length} days in the selected range.`
+      ? "Last 30 days of activity."
+      : `${analytics.dailyBuckets.length} days in the selected range.`;
 
   return (
     <>
-      <TrackerTopbar breadcrumb={{ current: 'Reporting' }} />
+      <TrackerTopbar breadcrumb={{ current: "Reporting" }} />
       <main className="mx-auto flex w-full max-w-[1120px] flex-col items-center gap-6 px-5 pb-12 pt-6">
         <header className="flex w-full max-w-2xl flex-col gap-3">
           <h1 className="m-0 text-center text-[1.5rem] font-[650] tracking-tight">
@@ -170,15 +171,12 @@ export function ReportingView({
           </h1>
           <p className="m-0 max-w-md self-center text-center text-[0.9rem] leading-relaxed text-muted">
             {date_range === null
-              ? 'A snapshot of where your time has been going.'
-              : 'Metrics filtered to the selected date range.'}
+              ? "A snapshot of where your time has been going."
+              : "Metrics filtered to the selected date range."}
           </p>
         </header>
 
-        <ReportingViewTabs
-          active_tab={active_tab}
-          on_change={set_active_tab}
-        />
+        <ReportingViewTabs active_tab={active_tab} on_change={setActive_tab} />
 
         <ReportingDateRangePicker
           range={range_inputs}
@@ -192,7 +190,7 @@ export function ReportingView({
           aria-label="Summary"
         >
           <SummaryCard
-            label={date_range === null ? 'Total tracked' : 'In range'}
+            label={date_range === null ? "Total tracked" : "In range"}
             value={format_duration(grandTotalMs, duration_format)}
           />
           <SummaryCard
@@ -232,7 +230,7 @@ export function ReportingView({
             Choose both dates to filter metrics, or clear the range to see all
             time.
           </p>
-        ) : active_tab === 'dashboard' ? (
+        ) : active_tab === "dashboard" ? (
           <DashboardLayout>
             <ReportingMonthInReview
               stats={analytics.monthInReview}
@@ -279,12 +277,12 @@ export function ReportingView({
           </DashboardLayout>
         ) : (
           <SheetsLayout>
-            <ReportingSortControls sort={sort} on_sort_change={set_sort} />
+            <ReportingSortControls sort={sort} on_sort_change={setSort} />
             {activeSheets.length === 0 ? (
               <p className="m-0 w-full max-w-2xl text-center text-[0.9rem] text-muted">
                 {date_range === null
-                  ? 'No tracked time yet. Check in on a sheet to see stats here.'
-                  : 'No tracked time in this date range.'}
+                  ? "No tracked time yet. Check in on a sheet to see stats here."
+                  : "No tracked time in this date range."}
               </p>
             ) : (
               <SheetStatsSection
@@ -303,7 +301,7 @@ export function ReportingView({
             )}
             {idleSheets.length > 0 ? (
               <SheetStatsSection
-                title={date_range === null ? 'Empty sheets' : 'Sheets in range'}
+                title={date_range === null ? "Empty sheets" : "Sheets in range"}
                 aria_label="Sheets without time in range"
                 muted
               >
@@ -320,61 +318,61 @@ export function ReportingView({
         )}
       </main>
     </>
-  )
+  );
 }
 
 interface DashboardLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
  * Vertical stack wrapper for the dashboard tab content.
  */
-function DashboardLayout({ children }: DashboardLayoutProps) {
-  return (
-    <div className="flex w-full max-w-5xl flex-col gap-5">{children}</div>
-  )
+function DashboardLayout({ children }: Readonly<DashboardLayoutProps>) {
+  return <div className="flex w-full max-w-5xl flex-col gap-5">{children}</div>;
 }
 
 interface SheetsLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
  * Centered narrow column wrapper for the per-sheet breakdown tab.
  */
-function SheetsLayout({ children }: SheetsLayoutProps) {
+function SheetsLayout({ children }: Readonly<SheetsLayoutProps>) {
   return (
     <div className="flex w-full max-w-2xl flex-col items-center gap-4">
       {children}
     </div>
-  )
+  );
 }
 
 interface SummaryCardProps {
-  label: string
-  value: string
+  label: string;
+  value: string;
 }
 
 /**
  * Compact summary metric for the reporting header.
  */
-function SummaryCard({ label, value }: SummaryCardProps) {
+function SummaryCard({ label, value }: Readonly<SummaryCardProps>) {
   return (
     <div className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
       <p className="m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
         {label}
       </p>
-      <p className="m-0 mt-1 text-[1.1rem] font-[650] tracking-tight">{value}</p>
+      <p className="m-0 mt-1 text-[1.1rem] font-[650] tracking-tight">
+        {value}
+      </p>
     </div>
-  )
+  );
 }
 
 interface SheetStatsSectionProps {
-  title: string
-  aria_label: string
-  muted?: boolean
-  children: ReactNode
+  title: string;
+  aria_label: string;
+  muted?: boolean;
+  children: ReactNode;
 }
 
 /**
@@ -385,12 +383,12 @@ function SheetStatsSection({
   aria_label,
   muted = false,
   children,
-}: SheetStatsSectionProps) {
+}: Readonly<SheetStatsSectionProps>) {
   return (
     <section className="flex w-full max-w-2xl flex-col gap-2">
       <h2
         className={`m-0 text-[0.72rem] font-semibold uppercase tracking-[0.06em] ${
-          muted ? 'text-muted' : 'text-foreground'
+          muted ? "text-muted" : "text-foreground"
         }`}
       >
         {title}
@@ -402,13 +400,13 @@ function SheetStatsSection({
         {children}
       </ul>
     </section>
-  )
+  );
 }
 
 interface SheetStatsRowProps {
-  sheet: SheetReportStats
-  grand_total_ms: number
-  duration_format: import('@/lib/types/ui_preferences').DurationFormat
+  sheet: SheetReportStats;
+  grand_total_ms: number;
+  duration_format: import("@/lib/types/ui_preferences").DurationFormat;
 }
 
 /**
@@ -418,18 +416,20 @@ function SheetStatsRow({
   sheet,
   grand_total_ms,
   duration_format,
-}: SheetStatsRowProps) {
+}: Readonly<SheetStatsRowProps>) {
   const share_percent =
-    grand_total_ms > 0 ? Math.round((sheet.totalMs / grand_total_ms) * 100) : 0
+    grand_total_ms > 0 ? Math.round((sheet.totalMs / grand_total_ms) * 100) : 0;
   const bar_percent =
     grand_total_ms > 0
       ? round_chart_percent((sheet.totalMs / grand_total_ms) * 100)
-      : 0
+      : 0;
 
   return (
     <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="m-0 min-w-0 truncate text-[1rem] font-semibold">{sheet.sheetName}</h2>
+        <h2 className="m-0 min-w-0 truncate text-[1rem] font-semibold">
+          {sheet.sheetName}
+        </h2>
         <span className="shrink-0 font-mono text-[0.95rem] font-semibold text-accent">
           {format_duration(sheet.totalMs, duration_format)}
         </span>
@@ -446,33 +446,38 @@ function SheetStatsRow({
       <p className="m-0 mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[0.82rem] text-muted">
         <span>{share_percent}% of total</span>
         <span>
-          {sheet.entryCount} {sheet.entryCount === 1 ? 'entry' : 'entries'}
+          {sheet.entryCount} {sheet.entryCount === 1 ? "entry" : "entries"}
         </span>
         <span>
           {sheet.entryCount === 0
-            ? 'No average'
+            ? "No average"
             : `${format_duration(sheet.averageEntryMs, duration_format)} avg`}
         </span>
-        {sheet.hasActiveEntry ? <span className="text-accent">Timer running</span> : null}
+        {sheet.hasActiveEntry ? (
+          <span className="text-accent">Timer running</span>
+        ) : null}
       </p>
     </li>
-  )
+  );
 }
 
 interface IdleSheetStatsRowProps {
-  sheet: SheetReportStats
-  in_range: boolean
+  sheet: SheetReportStats;
+  in_range: boolean;
 }
 
 /**
  * Compact row for sheets with no entries or no tracked time.
  */
-function IdleSheetStatsRow({ sheet, in_range }: IdleSheetStatsRowProps) {
+function IdleSheetStatsRow({
+  sheet,
+  in_range,
+}: Readonly<IdleSheetStatsRowProps>) {
   const status_label = in_range
-    ? 'No time in range'
+    ? "No time in range"
     : sheet.entryCount === 0
-      ? 'No entries'
-      : 'No tracked time'
+      ? "No entries"
+      : "No tracked time";
 
   return (
     <li className="rounded-md border border-dashed border-panel-border bg-surface-raised/60 px-3.5 py-2.5">
@@ -480,11 +485,13 @@ function IdleSheetStatsRow({ sheet, in_range }: IdleSheetStatsRowProps) {
         <h3 className="m-0 min-w-0 truncate text-[0.95rem] font-medium text-muted">
           {sheet.sheetName}
         </h3>
-        <span className="shrink-0 text-[0.82rem] text-muted">{status_label}</span>
+        <span className="shrink-0 text-[0.82rem] text-muted">
+          {status_label}
+        </span>
       </div>
       {sheet.hasActiveEntry ? (
         <p className="m-0 mt-1.5 text-[0.82rem] text-accent">Timer running</p>
       ) : null}
     </li>
-  )
+  );
 }

@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from "react";
 
-import { HamburgerIcon } from '@/components/hamburger-icon'
+import { HamburgerIcon } from "@/components/hamburger-icon";
 
 interface SheetActionsMenuProps {
-  sheet_name: string
-  is_pending: boolean
-  can_delete: boolean
-  on_rename: () => void
-  on_delete: () => void
+  sheet_name: string;
+  is_pending: boolean;
+  can_delete: boolean;
+  on_rename: () => void;
+  on_delete: () => void;
 }
 
 const menu_item_class =
-  'block w-full cursor-pointer rounded-[0.45rem] border-0 bg-transparent px-2.5 py-1.5 text-left font-inherit text-[0.85rem] text-inherit hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-55'
+  "block w-full cursor-pointer rounded-[0.45rem] border-0 bg-transparent px-2.5 py-1.5 text-left font-inherit text-[0.85rem] text-inherit hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-55";
 
 /**
  * Hamburger menu for sheet actions such as rename.
@@ -24,13 +24,13 @@ export function SheetActionsMenu({
   can_delete,
   on_rename,
   on_delete,
-}: SheetActionsMenuProps) {
-  const [is_open, set_is_open] = useState(false)
-  const menu_ref = useRef<HTMLDivElement>(null)
+}: Readonly<SheetActionsMenuProps>) {
+  const [is_open, setIs_open] = useState(false);
+  const menu_ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!is_open) {
-      return
+      return;
     }
 
     const handle_pointer_down = (event: PointerEvent): void => {
@@ -38,20 +38,20 @@ export function SheetActionsMenu({
         menu_ref.current !== null &&
         !menu_ref.current.contains(event.target as Node)
       ) {
-        set_is_open(false)
+        setIs_open(false);
       }
-    }
+    };
 
-    document.addEventListener('pointerdown', handle_pointer_down)
+    document.addEventListener("pointerdown", handle_pointer_down);
 
     return () => {
-      document.removeEventListener('pointerdown', handle_pointer_down)
-    }
-  }, [is_open])
+      document.removeEventListener("pointerdown", handle_pointer_down);
+    };
+  }, [is_open]);
 
   const close_menu = (): void => {
-    set_is_open(false)
-  }
+    setIs_open(false);
+  };
 
   return (
     <div className="relative shrink-0 self-center" ref={menu_ref}>
@@ -62,7 +62,7 @@ export function SheetActionsMenu({
         aria-expanded={is_open}
         aria-haspopup="menu"
         disabled={is_pending}
-        onClick={() => set_is_open((open) => !open)}
+        onClick={() => setIs_open((open) => !open)}
       >
         <HamburgerIcon />
       </button>
@@ -78,24 +78,28 @@ export function SheetActionsMenu({
               role="menuitem"
               disabled={is_pending}
               onClick={() => {
-                close_menu()
-                on_rename()
+                close_menu();
+                on_rename();
               }}
             >
               Rename
             </button>
           </li>
-          <li className="my-1 border-t border-panel-border" role="separator" aria-hidden="true" />
+          <li
+            className="my-1 border-t border-panel-border"
+            role="separator"
+            aria-hidden="true"
+          />
           <li role="none">
             <button
               type="button"
               className={`${menu_item_class} text-danger`}
               role="menuitem"
               disabled={is_pending || !can_delete}
-              title={can_delete ? undefined : 'Cannot delete the last sheet'}
+              title={can_delete ? undefined : "Cannot delete the last sheet"}
               onClick={() => {
-                close_menu()
-                on_delete()
+                close_menu();
+                on_delete();
               }}
             >
               Delete sheet
@@ -104,5 +108,5 @@ export function SheetActionsMenu({
         </ul>
       ) : null}
     </div>
-  )
+  );
 }

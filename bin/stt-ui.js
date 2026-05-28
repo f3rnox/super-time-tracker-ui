@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict'
 
-const { execSync, spawn } = require('child_process')
-const { existsSync } = require('fs')
-const http = require('http')
-const { join } = require('path')
+const { execSync, spawn } = require('node:child_process')
+const { existsSync } = require('node:fs')
+const http = require('node:http')
+const { join } = require('node:path')
 
 const root = join(__dirname, '..')
 const { version } = require('../package.json')

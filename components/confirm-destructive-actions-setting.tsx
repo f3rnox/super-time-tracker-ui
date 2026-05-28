@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { confirm_destructive_actions_preference } from '@/lib/preferences/confirm_destructive_actions_preference'
-import { persist_ui_preference } from '@/lib/persist_ui_preference'
+import { confirm_destructive_actions_preference } from "@/lib/preferences/confirm_destructive_actions_preference";
+import { persist_ui_preference } from "@/lib/persist_ui_preference";
 
 const set_confirm_destructive_actions = (enabled: boolean): void => {
   persist_ui_preference(
     confirm_destructive_actions_preference,
-    enabled ? 'true' : 'false',
-  )
-}
+    enabled ? "true" : "false",
+  );
+};
 
 /**
  * Setting: ask for confirmation before deleting entries or sheets.
@@ -20,11 +20,14 @@ export function ConfirmDestructiveActionsSetting() {
     confirm_destructive_actions_preference.subscribe,
     confirm_destructive_actions_preference.get_snapshot,
     confirm_destructive_actions_preference.get_server_snapshot,
-  )
-  const is_enabled = value === 'true'
+  );
+  const is_enabled = value === "true";
 
   return (
-    <label className="flex w-full cursor-pointer items-center gap-2.5">
+    <label
+      aria-label="Confirm destructive actions"
+      className="flex w-full cursor-pointer items-center gap-2.5"
+    >
       <input
         type="checkbox"
         className="shrink-0"
@@ -42,5 +45,5 @@ export function ConfirmDestructiveActionsSetting() {
         </span>
       </span>
     </label>
-  )
+  );
 }

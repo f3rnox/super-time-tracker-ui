@@ -1,23 +1,21 @@
-import { ClearTagFiltersOnSheetChangeSetting } from '@/components/clear-tag-filters-on-sheet-change-setting'
-import { ConfirmBeforeCheckoutSetting } from '@/components/confirm-before-checkout-setting'
-import { ConfirmDestructiveActionsSetting } from '@/components/confirm-destructive-actions-setting'
-import { DebugLoggingSetting } from '@/components/debug-logging-setting'
-import { DefaultSheetSessionSetting } from '@/components/default-sheet-session-setting'
-import { SettingsPageLayout } from '@/components/settings-page-layout'
+import { ClearTagFiltersOnSheetChangeSetting } from "@/components/clear-tag-filters-on-sheet-change-setting";
+import { ConfirmBeforeCheckoutSetting } from "@/components/confirm-before-checkout-setting";
+import { ConfirmDestructiveActionsSetting } from "@/components/confirm-destructive-actions-setting";
+import { DebugLoggingSetting } from "@/components/debug-logging-setting";
+import { DefaultSheetSessionSetting } from "@/components/default-sheet-session-setting";
+import { SettingsPageLayout } from "@/components/settings-page-layout";
 
-interface GeneralSettingsViewProps {
-  sheet_names: string[]
-}
+type GeneralSettingsViewProps = Readonly<{
+  sheet_names: string[];
+}>;
 
 /**
  * Settings page: general tracker behavior.
  */
-export function GeneralSettingsView({
-  sheet_names,
-}: GeneralSettingsViewProps) {
+export function GeneralSettingsView({ sheet_names }: GeneralSettingsViewProps) {
   return (
     <SettingsPageLayout
-      breadcrumb={{ current: 'General', parent: { label: 'Settings' } }}
+      breadcrumb={{ current: "General", parent: { label: "Settings" } }}
       title="General"
       description="Tracker startup, confirmations, and session behavior."
     >
@@ -42,5 +40,5 @@ export function GeneralSettingsView({
         </li>
       </ul>
     </SettingsPageLayout>
-  )
+  );
 }

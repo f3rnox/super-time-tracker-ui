@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { greedy_cloud_sync_preference } from '@/lib/preferences/greedy_cloud_sync_preference'
-import { persist_ui_preference } from '@/lib/persist_ui_preference'
+import { greedy_cloud_sync_preference } from "@/lib/preferences/greedy_cloud_sync_preference";
+import { persist_ui_preference } from "@/lib/persist_ui_preference";
 
 const set_greedy_cloud_sync = (enabled: boolean): void => {
   persist_ui_preference(
     greedy_cloud_sync_preference,
-    enabled ? 'true' : 'false',
-  )
-}
+    enabled ? "true" : "false",
+  );
+};
 
 /**
  * Toggles merge-on-navigation and push-after-every-change cloud sync behavior.
@@ -20,11 +20,14 @@ export function GreedyCloudSyncSetting() {
     greedy_cloud_sync_preference.subscribe,
     greedy_cloud_sync_preference.get_snapshot,
     greedy_cloud_sync_preference.get_server_snapshot,
-  )
-  const is_enabled = value === 'true'
+  );
+  const is_enabled = value === "true";
 
   return (
-    <label className="flex w-full cursor-pointer items-center gap-2.5">
+    <label
+      aria-label="Greedy cloud sync"
+      className="flex w-full cursor-pointer items-center gap-2.5"
+    >
       <input
         type="checkbox"
         className="shrink-0"
@@ -40,5 +43,5 @@ export function GreedyCloudSyncSetting() {
         </span>
       </span>
     </label>
-  )
+  );
 }

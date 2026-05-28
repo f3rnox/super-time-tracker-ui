@@ -41,9 +41,10 @@
     "format:check": "pnpm format:prettier:check",
     "format:prettier": "prettier --write .",
     "format:prettier:check": "prettier --check .",
-    "lint": "pnpm lint:markdownlint && pnpm lint:eslint",
-    "lint:eslint": "eslint package.json src/**/*",
-    "lint:eslint:fix": "eslint package.json src/**/*",
+    "lint": "pnpm lint:markdownlint && pnpm lint:typescript && pnpm lint:eslint",
+    "lint:eslint": "eslint .",
+    "lint:eslint:fix": "eslint . --fix",
+    "lint:typescript": "tsc --noEmit -p tsconfig.lint.json",
     "lint:fix": "pnpm lint:markdownlint:fix && pnpm lint:eslint:fix",
     "lint:markdownlint": "markdownlint README.md",
     "lint:markdownlint:fix": "markdownlint --fix README.md",
@@ -100,5 +101,13 @@
     "typescript-eslint": "^8.58.0",
     "updates": "^17.13.5",
     "vitest": "^4.1.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,mts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.md": "markdownlint --fix",
+    "*.{json,yml,yaml,css,scss}": "prettier --write"
   }
 }

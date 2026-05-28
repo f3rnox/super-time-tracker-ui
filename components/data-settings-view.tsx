@@ -1,16 +1,16 @@
-import Link from 'next/link'
+import Link from "next/link";
 
-import { BackupRestoreSetting } from '@/components/backup-restore-setting'
-import { DbExportSetting } from '@/components/db-export-setting'
-import { SettingsPageLayout } from '@/components/settings-page-layout'
-import { type JSONTimeTrackerDB } from '@/lib/types'
+import { BackupRestoreSetting } from "@/components/backup-restore-setting";
+import { DbExportSetting } from "@/components/db-export-setting";
+import { SettingsPageLayout } from "@/components/settings-page-layout";
+import { type JSONTimeTrackerDB } from "@/lib/types";
 
-interface DataSettingsViewProps {
-  db_path: string
-  db: JSONTimeTrackerDB
-  sheet_names: string[]
-  tag_names: string[]
-}
+type DataSettingsViewProps = Readonly<{
+  db_path: string;
+  db: JSONTimeTrackerDB;
+  sheet_names: string[];
+  tag_names: string[];
+}>;
 
 /**
  * Settings page: backup, restore, and tag management entry point.
@@ -24,8 +24,8 @@ export function DataSettingsView({
   return (
     <SettingsPageLayout
       breadcrumb={{
-        current: 'Data & backup',
-        parent: { label: 'Settings', href: '/settings' },
+        current: "Data & backup",
+        parent: { label: "Settings", href: "/settings" },
       }}
       title="Data & backup"
       description="Database backups and bulk operations on stored entries."
@@ -60,5 +60,5 @@ export function DataSettingsView({
         </li>
       </ul>
     </SettingsPageLayout>
-  )
+  );
 }

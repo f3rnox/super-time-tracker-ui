@@ -1,16 +1,16 @@
-import { type ReactNode } from 'react'
+import { type ReactNode } from "react";
 
 import {
   TrackerTopbar,
   type TrackerTopbarBreadcrumb,
-} from '@/components/tracker-topbar'
+} from "@/components/tracker-topbar";
 
-interface AuthPageLayoutProps {
-  breadcrumb: TrackerTopbarBreadcrumb
-  title: string
-  description: string
-  children: ReactNode
-}
+type AuthPageLayoutProps = Readonly<{
+  breadcrumb: TrackerTopbarBreadcrumb;
+  title: string;
+  description: string;
+  children: ReactNode;
+}>;
 
 /**
  * Shared chrome for sign-in and register pages.
@@ -40,5 +40,5 @@ export function AuthPageLayout({
         </section>
       </main>
     </>
-  )
+  );
 }

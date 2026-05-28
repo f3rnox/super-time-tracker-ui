@@ -1,18 +1,19 @@
-'use client'
+"use client";
 
-import { type FormEvent, useState } from 'react'
+import { type ComponentProps, useState } from "react";
 
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { get_input_class_name } from '@/lib/get_input_class_name'
-import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { get_note_form_border_class } from "@/lib/get_note_form_border_class";
+import { get_input_class_name } from "@/lib/get_input_class_name";
+import { use_escape_to_cancel } from "@/lib/use_escape_to_cancel";
 
 interface NoteFormProps {
-  on_submit: (text: string, at?: string) => void
-  on_cancel?: () => void
-  is_pending: boolean
-  in_active_panel?: boolean
-  in_bar?: boolean
-  allow_at?: boolean
+  on_submit: (text: string, at?: string) => void;
+  on_cancel?: () => void;
+  is_pending: boolean;
+  in_active_panel?: boolean;
+  in_bar?: boolean;
+  allow_at?: boolean;
 }
 
 /**
@@ -25,33 +26,30 @@ export function NoteForm({
   in_active_panel = false,
   in_bar = false,
   allow_at = false,
-}: NoteFormProps) {
-  const [text, set_text] = useState('')
-  const [at, set_at] = useState('')
+}: Readonly<NoteFormProps>) {
+  const [text, setText] = useState("");
+  const [at, setAt] = useState("");
 
-  use_escape_to_cancel(() => on_cancel?.(), on_cancel !== undefined)
+  use_escape_to_cancel(() => on_cancel?.(), on_cancel !== undefined);
 
-  const handle_submit = (event: FormEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    const trimmed = text.trim()
+  const handle_submit: NonNullable<ComponentProps<"form">["onSubmit"]> = (
+    event,
+  ) => {
+    event.preventDefault();
+    const trimmed = text.trim();
 
     if (trimmed.length === 0) {
-      return
+      return;
     }
 
-    const trimmed_at = at.trim()
+    const trimmed_at = at.trim();
 
-    on_submit(trimmed, trimmed_at.length > 0 ? trimmed_at : undefined)
-    set_text('')
-    set_at('')
-  }
+    on_submit(trimmed, trimmed_at.length > 0 ? trimmed_at : undefined);
+    setText("");
+    setAt("");
+  };
 
-  const border_class =
-    in_active_panel && !in_bar
-      ? 'border-t border-accent-border pt-4'
-      : in_bar
-        ? 'border-t border-[color-mix(in_srgb,var(--accent-border)_65%,var(--panel-border))] pt-3.5'
-        : ''
+  const border_class = get_note_form_border_class(in_active_panel, in_bar);
 
   return (
     <form
@@ -66,7 +64,7 @@ export function NoteForm({
           id="note-text"
           className={get_input_class_name()}
           value={text}
-          onChange={(event) => set_text(event.target.value)}
+          onChange={(event) => setText(event.target.value)}
           placeholder="Pair with alice on the widget"
           disabled={is_pending}
           autoFocus
@@ -74,39 +72,41 @@ export function NoteForm({
         <div className="flex flex-wrap items-center gap-2 max-[860px]:w-full">
           <button
             type="submit"
-            className={get_button_class_name('ghost')}
+            className={get_button_class_name("ghost")}
             disabled={is_pending || text.trim().length === 0}
           >
             Save note
           </button>
-          {on_cancel !== undefined ? (
+          {on_cancel === undefined ? null : (
             <button
               type="button"
-              className={get_button_class_name('ghost')}
+              className={get_button_class_name("ghost")}
               disabled={is_pending}
               onClick={on_cancel}
             >
               Cancel
             </button>
-          ) : null}
+          )}
         </div>
       </div>
       {allow_at ? (
         <>
           <label className="text-[0.85rem] text-muted" htmlFor="note-at">
-            Note time{' '}
-            <span className="font-normal opacity-85">(optional, natural language)</span>
+            Note time{" "}
+            <span className="font-normal opacity-85">
+              (optional, natural language)
+            </span>
           </label>
           <input
             id="note-at"
             className={get_input_class_name()}
             value={at}
-            onChange={(event) => set_at(event.target.value)}
+            onChange={(event) => setAt(event.target.value)}
             placeholder="e.g. 30 minutes ago"
             disabled={is_pending}
           />
         </>
       ) : null}
     </form>
-  )
+  );
 }

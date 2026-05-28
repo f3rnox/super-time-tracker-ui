@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   createContext,
@@ -8,91 +8,98 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react'
+} from "react";
 
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
   get_registered_confirm_dialog,
   register_confirm_dialog,
-} from '@/lib/confirm_dialog_registry'
-import { type ConfirmDialogOptions } from '@/lib/types/confirm_dialog'
+} from "@/lib/confirm_dialog_registry";
+import { type ConfirmDialogOptions } from "@/lib/types/confirm_dialog";
 
 interface ConfirmDialogRequest {
-  options: ConfirmDialogOptions
-  resolve: (confirmed: boolean) => void
+  options: ConfirmDialogOptions;
+  resolve: (confirmed: boolean) => void;
 }
 
 interface ConfirmDialogContextValue {
-  confirm: (options: ConfirmDialogOptions) => Promise<boolean>
+  confirm: (options: ConfirmDialogOptions) => Promise<boolean>;
 }
 
-const ConfirmDialogContext = createContext<ConfirmDialogContextValue | null>(null)
+const ConfirmDialogContext = createContext<ConfirmDialogContextValue | null>(
+  null,
+);
 
 /**
  * Returns the promise-based confirm dialog API from context.
  */
-export function use_confirm_dialog(): ConfirmDialogContextValue {
-  const context = useContext(ConfirmDialogContext)
+export function useConfirmDialog(): ConfirmDialogContextValue {
+  const context = useContext(ConfirmDialogContext);
 
   if (context !== null) {
-    return context
+    return context;
   }
 
-  const registered = get_registered_confirm_dialog()
+  const registered = get_registered_confirm_dialog();
 
   if (registered !== null) {
-    return { confirm: registered }
+    return { confirm: registered };
   }
 
-  throw new Error('use_confirm_dialog must be used within ConfirmDialogProvider')
+  throw new Error("useConfirmDialog must be used within ConfirmDialogProvider");
 }
 
 interface ConfirmDialogProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
  * Provides a themed confirm dialog for the application tree.
  */
-export function ConfirmDialogProvider({ children }: ConfirmDialogProviderProps) {
-  const [request, set_request] = useState<ConfirmDialogRequest | null>(null)
+export function ConfirmDialogProvider({
+  children,
+}: Readonly<ConfirmDialogProviderProps>) {
+  const [request, setRequest] = useState<ConfirmDialogRequest | null>(null);
 
-  const confirm = useCallback((options: ConfirmDialogOptions): Promise<boolean> => {
-    return new Promise<boolean>((resolve) => {
-      set_request({ options, resolve })
-    })
-  }, [])
+  const confirm = useCallback(
+    (options: ConfirmDialogOptions): Promise<boolean> => {
+      return new Promise<boolean>((resolve) => {
+        setRequest({ options, resolve });
+      });
+    },
+    [],
+  );
 
-  register_confirm_dialog(confirm)
+  register_confirm_dialog(confirm);
 
   useEffect(() => {
-    register_confirm_dialog(confirm)
+    register_confirm_dialog(confirm);
 
     return () => {
-      register_confirm_dialog(null)
-    }
-  }, [confirm])
+      register_confirm_dialog(null);
+    };
+  }, [confirm]);
 
   const context_value = useMemo(
     (): ConfirmDialogContextValue => ({ confirm }),
     [confirm],
-  )
+  );
 
   const close = (confirmed: boolean): void => {
-    request?.resolve(confirmed)
-    set_request(null)
-  }
+    request?.resolve(confirmed);
+    setRequest(null);
+  };
 
   return (
     <ConfirmDialogContext.Provider value={context_value}>
       {children}
-      {request !== null ? (
+      {request === null ? null : (
         <ConfirmDialog
           options={request.options}
           on_confirm={() => close(true)}
           on_cancel={() => close(false)}
         />
-      ) : null}
+      )}
     </ConfirmDialogContext.Provider>
-  )
+  );
 }

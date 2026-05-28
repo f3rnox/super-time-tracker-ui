@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { format_duration } from '@/lib/format_duration'
-import { type PeriodTrendComparison } from '@/lib/types/reporting'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
+import { format_duration } from "@/lib/format_duration";
+import { type PeriodTrendComparison } from "@/lib/types/reporting";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
 
 interface ReportingTrendCardProps {
-  trend: PeriodTrendComparison
-  duration_format: DurationFormat
-  current_label: string
-  previous_label: string
+  trend: PeriodTrendComparison;
+  duration_format: DurationFormat;
+  current_label: string;
+  previous_label: string;
 }
 
 /**
@@ -19,9 +19,9 @@ export function ReportingTrendCard({
   duration_format,
   current_label,
   previous_label,
-}: ReportingTrendCardProps) {
-  const direction = build_direction(trend.deltaMs)
-  const percent_text = build_percent_text(trend)
+}: Readonly<ReportingTrendCardProps>) {
+  const direction = build_direction(trend.deltaMs);
+  const percent_text = build_percent_text(trend);
 
   return (
     <div className="flex flex-col gap-3 rounded-md border border-panel-border bg-panel p-4 shadow-sm">
@@ -55,36 +55,34 @@ export function ReportingTrendCard({
         {build_delta_summary(trend, duration_format)}
       </p>
     </div>
-  )
+  );
 }
 
 /**
  * Returns badge styling and a directional arrow for the trend's delta.
  */
 function build_direction(delta_ms: number): {
-  symbol: string
-  badge_class: string
+  symbol: string;
+  badge_class: string;
 } {
   if (delta_ms > 0) {
     return {
-      symbol: '▲',
-      badge_class:
-        'bg-accent-soft text-accent border border-accent-border',
-    }
+      symbol: "▲",
+      badge_class: "bg-accent-soft text-accent border border-accent-border",
+    };
   }
 
   if (delta_ms < 0) {
     return {
-      symbol: '▼',
-      badge_class:
-        'bg-danger-soft text-danger border border-danger-border',
-    }
+      symbol: "▼",
+      badge_class: "bg-danger-soft text-danger border border-danger-border",
+    };
   }
 
   return {
-    symbol: '—',
-    badge_class: 'bg-ghost-bg text-muted border border-panel-border',
-  }
+    symbol: "—",
+    badge_class: "bg-ghost-bg text-muted border border-panel-border",
+  };
 }
 
 /**
@@ -92,14 +90,14 @@ function build_direction(delta_ms: number): {
  */
 function build_percent_text(trend: PeriodTrendComparison): string {
   if (trend.previousMs === 0) {
-    return trend.currentMs === 0 ? '0%' : 'New'
+    return trend.currentMs === 0 ? "0%" : "New";
   }
 
-  const pct = Math.abs(trend.deltaRatio) * 100
+  const pct = Math.abs(trend.deltaRatio) * 100;
   if (pct < 0.5) {
-    return '~0%'
+    return "~0%";
   }
-  return `${pct >= 100 ? pct.toFixed(0) : pct.toFixed(1)}%`
+  return `${pct >= 100 ? pct.toFixed(0) : pct.toFixed(1)}%`;
 }
 
 /**
@@ -110,17 +108,17 @@ function build_delta_summary(
   duration_format: DurationFormat,
 ): string {
   if (trend.previousMs === 0 && trend.currentMs === 0) {
-    return 'No tracked time in either period.'
+    return "No tracked time in either period.";
   }
 
   if (trend.previousMs === 0) {
-    return `${format_duration(trend.currentMs, duration_format)} more than last period.`
+    return `${format_duration(trend.currentMs, duration_format)} more than last period.`;
   }
 
   if (trend.deltaMs === 0) {
-    return 'Identical to the previous period.'
+    return "Identical to the previous period.";
   }
 
-  const direction = trend.deltaMs > 0 ? 'more' : 'less'
-  return `${format_duration(Math.abs(trend.deltaMs), duration_format)} ${direction} than the previous period.`
+  const direction = trend.deltaMs > 0 ? "more" : "less";
+  return `${format_duration(Math.abs(trend.deltaMs), duration_format)} ${direction} than the previous period.`;
 }

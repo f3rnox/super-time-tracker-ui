@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { useMemo } from 'react'
+import { useMemo } from "react";
 
-import { format_duration } from '@/lib/format_duration'
-import { round_chart_percent } from '@/lib/round_chart_percent'
-import { type DailyTimeBucket } from '@/lib/types/reporting'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
+import { format_duration } from "@/lib/format_duration";
+import { round_chart_percent } from "@/lib/round_chart_percent";
+import { type DailyTimeBucket } from "@/lib/types/reporting";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
 
 interface ReportingDailyBarChartProps {
-  daily_buckets: DailyTimeBucket[]
-  duration_format: DurationFormat
-  title?: string
-  subtitle?: string
+  daily_buckets: DailyTimeBucket[];
+  duration_format: DurationFormat;
+  title?: string;
+  subtitle?: string;
 }
 
-const MAX_VISIBLE_DAYS = 60
+const MAX_VISIBLE_DAYS = 60;
 
 /**
  * Vertical bar chart showing time tracked per day with weekend highlighting.
@@ -22,37 +22,34 @@ const MAX_VISIBLE_DAYS = 60
 export function ReportingDailyBarChart({
   daily_buckets,
   duration_format,
-  title = 'Time over days',
+  title = "Time over days",
   subtitle,
-}: ReportingDailyBarChartProps) {
+}: Readonly<ReportingDailyBarChartProps>) {
   const visible_buckets = useMemo(
     () => daily_buckets.slice(-MAX_VISIBLE_DAYS),
     [daily_buckets],
-  )
+  );
   const max_ms = useMemo(
     () =>
-      visible_buckets.reduce(
-        (max, bucket) => Math.max(max, bucket.totalMs),
-        0,
-      ),
+      visible_buckets.reduce((max, bucket) => Math.max(max, bucket.totalMs), 0),
     [visible_buckets],
-  )
+  );
   const total_ms = useMemo(
     () => visible_buckets.reduce((total, bucket) => total + bucket.totalMs, 0),
     [visible_buckets],
-  )
+  );
   const average_ms = useMemo(() => {
     const days_with_time = visible_buckets.filter(
       (bucket) => bucket.totalMs > 0,
-    ).length
-    return days_with_time === 0 ? 0 : total_ms / days_with_time
-  }, [visible_buckets, total_ms])
+    ).length;
+    return days_with_time === 0 ? 0 : total_ms / days_with_time;
+  }, [visible_buckets, total_ms]);
 
   const subtitle_text =
     subtitle ??
     (visible_buckets.length === 0
-      ? 'No data in this period.'
-      : `${visible_buckets.length} day${visible_buckets.length === 1 ? '' : 's'} · avg ${format_duration(average_ms, duration_format)} on active days`)
+      ? "No data in this period."
+      : `${visible_buckets.length} day${visible_buckets.length === 1 ? "" : "s"} · avg ${format_duration(average_ms, duration_format)} on active days`);
 
   return (
     <section className="flex w-full flex-col gap-3 rounded-md border border-panel-border bg-panel p-4 shadow-sm">
@@ -70,15 +67,15 @@ export function ReportingDailyBarChart({
             const height_percent =
               max_ms > 0
                 ? round_chart_percent((bucket.totalMs / max_ms) * 100)
-                : 0
+                : 0;
             const is_weekend =
-              bucket.weekdayIndex === 0 || bucket.weekdayIndex === 6
-            const has_time = bucket.totalMs > 0
+              bucket.weekdayIndex === 0 || bucket.weekdayIndex === 6;
+            const has_time = bucket.totalMs > 0;
             const fill_class = !has_time
-              ? 'bg-surface-raised'
+              ? "bg-surface-raised"
               : is_weekend
-                ? 'bg-accent/60'
-                : 'bg-accent'
+                ? "bg-accent/60"
+                : "bg-accent";
 
             return (
               <div
@@ -91,11 +88,13 @@ export function ReportingDailyBarChart({
                 <div
                   className={`w-full rounded-t-sm transition-all ${fill_class}`}
                   style={{
-                    height: has_time ? `${Math.max(2, height_percent)}%` : '2px',
+                    height: has_time
+                      ? `${Math.max(2, height_percent)}%`
+                      : "2px",
                   }}
                 />
               </div>
-            )
+            );
           })}
         </div>
       )}
@@ -103,13 +102,13 @@ export function ReportingDailyBarChart({
         <span>
           {visible_buckets.length > 0
             ? `${visible_buckets[0].dateLabel} → ${visible_buckets[visible_buckets.length - 1].dateLabel}`
-            : ''}
+            : ""}
         </span>
         <span>
-          Total {format_duration(total_ms, duration_format)} · Peak{' '}
+          Total {format_duration(total_ms, duration_format)} · Peak{" "}
           {format_duration(max_ms, duration_format)}
         </span>
       </footer>
     </section>
-  )
+  );
 }

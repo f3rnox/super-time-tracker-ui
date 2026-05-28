@@ -1,23 +1,31 @@
-'use client'
+"use client";
 
-import { useMemo } from 'react'
+import { useMemo } from "react";
 
-import { format_duration } from '@/lib/format_duration'
-import { type HeatmapCell } from '@/lib/types/reporting'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
-import { type WeekStartsOn } from '@/lib/types/ui_preferences'
-import { week_starts_on_to_index } from '@/lib/week_starts_on_to_index'
+import { format_duration } from "@/lib/format_duration";
+import { type HeatmapCell } from "@/lib/types/reporting";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
+import { type WeekStartsOn } from "@/lib/types/ui_preferences";
+import { week_starts_on_to_index } from "@/lib/week_starts_on_to_index";
 
 interface ReportingActivityHeatmapProps {
-  heatmap: HeatmapCell[]
-  duration_format: DurationFormat
-  week_starts_on: WeekStartsOn
+  heatmap: HeatmapCell[];
+  duration_format: DurationFormat;
+  week_starts_on: WeekStartsOn;
 }
 
-const HOURS_IN_DAY = 24
-const DAYS_IN_WEEK = 7
-const WEEKDAY_LABELS_SUNDAY_FIRST = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const HOUR_LABEL_STEPS = [0, 6, 12, 18]
+const HOURS_IN_DAY = 24;
+const DAYS_IN_WEEK = 7;
+const WEEKDAY_LABELS_SUNDAY_FIRST = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+];
+const HOUR_LABEL_STEPS = [0, 6, 12, 18];
 
 /**
  * Renders a weekday × hour-of-day activity heatmap with intensity shading.
@@ -26,8 +34,8 @@ export function ReportingActivityHeatmap({
   heatmap,
   duration_format,
   week_starts_on,
-}: ReportingActivityHeatmapProps) {
-  const week_starts_index = week_starts_on_to_index(week_starts_on)
+}: Readonly<ReportingActivityHeatmapProps>) {
+  const week_starts_index = week_starts_on_to_index(week_starts_on);
   const ordered_weekday_indices = useMemo(
     () =>
       Array.from(
@@ -35,24 +43,24 @@ export function ReportingActivityHeatmap({
         (_, offset) => (week_starts_index + offset) % DAYS_IN_WEEK,
       ),
     [week_starts_index],
-  )
+  );
 
   const cell_lookup = useMemo(() => {
-    const lookup = new Map<string, number>()
+    const lookup = new Map<string, number>();
     for (const cell of heatmap) {
-      lookup.set(`${cell.weekdayIndex}-${cell.hourIndex}`, cell.totalMs)
+      lookup.set(`${cell.weekdayIndex}-${cell.hourIndex}`, cell.totalMs);
     }
-    return lookup
-  }, [heatmap])
+    return lookup;
+  }, [heatmap]);
 
   const max_cell_ms = useMemo(
     () => heatmap.reduce((max, cell) => Math.max(max, cell.totalMs), 0),
     [heatmap],
-  )
+  );
   const total_ms = useMemo(
     () => heatmap.reduce((total, cell) => total + cell.totalMs, 0),
     [heatmap],
-  )
+  );
 
   return (
     <section className="flex w-full flex-col gap-3 rounded-md border border-panel-border bg-panel p-4 shadow-sm">
@@ -111,7 +119,7 @@ export function ReportingActivityHeatmap({
         <span>More</span>
       </footer>
     </section>
-  )
+  );
 }
 
 /**
@@ -123,10 +131,10 @@ function Row({
   max_cell_ms,
   duration_format,
 }: {
-  weekday_index: number
-  cell_lookup: Map<string, number>
-  max_cell_ms: number
-  duration_format: DurationFormat
+  weekday_index: number;
+  cell_lookup: Map<string, number>;
+  max_cell_ms: number;
+  duration_format: DurationFormat;
 }) {
   return (
     <>
@@ -140,8 +148,8 @@ function Row({
         }}
       >
         {Array.from({ length: HOURS_IN_DAY }, (_, hour) => {
-          const total_ms = cell_lookup.get(`${weekday_index}-${hour}`) ?? 0
-          const intensity = max_cell_ms > 0 ? total_ms / max_cell_ms : 0
+          const total_ms = cell_lookup.get(`${weekday_index}-${hour}`) ?? 0;
+          const intensity = max_cell_ms > 0 ? total_ms / max_cell_ms : 0;
 
           return (
             <span
@@ -152,11 +160,11 @@ function Row({
               }}
               title={`${WEEKDAY_LABELS_SUNDAY_FIRST[weekday_index]} ${format_hour_label(hour)}: ${format_duration(total_ms, duration_format)}`}
             />
-          )
+          );
         })}
       </div>
     </>
-  )
+  );
 }
 
 /**
@@ -164,18 +172,18 @@ function Row({
  */
 function format_hour_label(hour: number): string {
   if (hour === 0) {
-    return '12a'
+    return "12a";
   }
 
   if (hour === 12) {
-    return '12p'
+    return "12p";
   }
 
   if (hour < 12) {
-    return `${hour}a`
+    return `${hour}a`;
   }
 
-  return `${hour - 12}p`
+  return `${hour - 12}p`;
 }
 
 /**
@@ -183,9 +191,9 @@ function format_hour_label(hour: number): string {
  */
 function build_cell_color(intensity: number): string {
   if (intensity <= 0) {
-    return 'color-mix(in srgb, var(--surface-raised) 80%, transparent)'
+    return "color-mix(in srgb, var(--surface-raised) 80%, transparent)";
   }
 
-  const opacity_pct = Math.min(100, Math.round(intensity * 90) + 10)
-  return `color-mix(in srgb, var(--accent) ${opacity_pct}%, transparent)`
+  const opacity_pct = Math.min(100, Math.round(intensity * 90) + 10);
+  return `color-mix(in srgb, var(--accent) ${opacity_pct}%, transparent)`;
 }

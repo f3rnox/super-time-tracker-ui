@@ -1,38 +1,39 @@
-'use client'
+"use client";
 
-import { useEffect, useSyncExternalStore } from 'react'
+import { useEffect, useSyncExternalStore } from "react";
 
-import { parse_focus_goals_by_name } from '@/lib/parse_focus_goals_by_name'
-import { set_focus_goal_minutes_for_name } from '@/lib/set_focus_goal_minutes_for_name'
-import { daily_focus_target_minutes_preference } from '@/lib/preferences/daily_focus_target_minutes_preference'
-import { focus_goal_scope_preference } from '@/lib/preferences/focus_goal_scope_preference'
-import { focus_goal_sheet_name_preference } from '@/lib/preferences/focus_goal_sheet_name_preference'
-import { focus_goal_tag_name_preference } from '@/lib/preferences/focus_goal_tag_name_preference'
-import { focus_goals_per_sheet_preference } from '@/lib/preferences/focus_goals_per_sheet_preference'
-import { focus_goals_per_tag_preference } from '@/lib/preferences/focus_goals_per_tag_preference'
-import { focus_nudges_enabled_preference } from '@/lib/preferences/focus_nudges_enabled_preference'
-import { no_log_reminder_minutes_preference } from '@/lib/preferences/no_log_reminder_minutes_preference'
-import { overwork_alert_hours_preference } from '@/lib/preferences/overwork_alert_hours_preference'
-import { work_hours_end_preference } from '@/lib/preferences/work_hours_end_preference'
-import { work_hours_start_preference } from '@/lib/preferences/work_hours_start_preference'
-import { weekly_focus_target_minutes_preference } from '@/lib/preferences/weekly_focus_target_minutes_preference'
-import { persist_ui_preference } from '@/lib/persist_ui_preference'
-import { type FocusGoalScope } from '@/lib/types/ui_preferences'
+import { format_focus_goal_display_name } from "@/lib/format_focus_goal_display_name";
+import { parse_focus_goals_by_name } from "@/lib/parse_focus_goals_by_name";
+import { set_focus_goal_minutes_for_name } from "@/lib/set_focus_goal_minutes_for_name";
+import { daily_focus_target_minutes_preference } from "@/lib/preferences/daily_focus_target_minutes_preference";
+import { focus_goal_scope_preference } from "@/lib/preferences/focus_goal_scope_preference";
+import { focus_goal_sheet_name_preference } from "@/lib/preferences/focus_goal_sheet_name_preference";
+import { focus_goal_tag_name_preference } from "@/lib/preferences/focus_goal_tag_name_preference";
+import { focus_goals_per_sheet_preference } from "@/lib/preferences/focus_goals_per_sheet_preference";
+import { focus_goals_per_tag_preference } from "@/lib/preferences/focus_goals_per_tag_preference";
+import { focus_nudges_enabled_preference } from "@/lib/preferences/focus_nudges_enabled_preference";
+import { no_log_reminder_minutes_preference } from "@/lib/preferences/no_log_reminder_minutes_preference";
+import { overwork_alert_hours_preference } from "@/lib/preferences/overwork_alert_hours_preference";
+import { work_hours_end_preference } from "@/lib/preferences/work_hours_end_preference";
+import { work_hours_start_preference } from "@/lib/preferences/work_hours_start_preference";
+import { weekly_focus_target_minutes_preference } from "@/lib/preferences/weekly_focus_target_minutes_preference";
+import { persist_ui_preference } from "@/lib/persist_ui_preference";
+import { type FocusGoalScope } from "@/lib/types/ui_preferences";
 
-const daily_target_minutes_options = [120, 180, 240, 300, 360, 420, 480]
-const weekly_target_minutes_options = [600, 900, 1200, 1500, 1800, 2100, 2400]
-const no_log_reminder_minutes_options = [15, 30, 45, 60, 90, 120]
-const overwork_alert_hours_options = [6, 8, 10, 12, 14]
+const daily_target_minutes_options = [120, 180, 240, 300, 360, 420, 480];
+const weekly_target_minutes_options = [600, 900, 1200, 1500, 1800, 2100, 2400];
+const no_log_reminder_minutes_options = [15, 30, 45, 60, 90, 120];
+const overwork_alert_hours_options = [6, 8, 10, 12, 14];
 
 const scope_options: { value: FocusGoalScope; label: string }[] = [
-  { value: 'global', label: 'Global' },
-  { value: 'sheet', label: 'Per-sheet' },
-  { value: 'tag', label: 'Per-tag' },
-]
+  { value: "global", label: "Global" },
+  { value: "sheet", label: "Per-sheet" },
+  { value: "tag", label: "Per-tag" },
+];
 
 interface FocusGoalsNudgesSettingProps {
-  sheet_names: string[]
-  tag_names: string[]
+  sheet_names: string[];
+  tag_names: string[];
 }
 
 /**
@@ -41,111 +42,115 @@ interface FocusGoalsNudgesSettingProps {
 export function FocusGoalsNudgesSetting({
   sheet_names,
   tag_names,
-}: FocusGoalsNudgesSettingProps) {
+}: Readonly<FocusGoalsNudgesSettingProps>) {
   const is_enabled = useSyncExternalStore(
     focus_nudges_enabled_preference.subscribe,
     focus_nudges_enabled_preference.get_snapshot,
     focus_nudges_enabled_preference.get_server_snapshot,
-  )
+  );
   const daily_target_minutes = useSyncExternalStore(
     daily_focus_target_minutes_preference.subscribe,
     daily_focus_target_minutes_preference.get_snapshot,
     daily_focus_target_minutes_preference.get_server_snapshot,
-  )
+  );
   const weekly_target_minutes = useSyncExternalStore(
     weekly_focus_target_minutes_preference.subscribe,
     weekly_focus_target_minutes_preference.get_snapshot,
     weekly_focus_target_minutes_preference.get_server_snapshot,
-  )
+  );
   const no_log_reminder_minutes = useSyncExternalStore(
     no_log_reminder_minutes_preference.subscribe,
     no_log_reminder_minutes_preference.get_snapshot,
     no_log_reminder_minutes_preference.get_server_snapshot,
-  )
+  );
   const overwork_alert_hours = useSyncExternalStore(
     overwork_alert_hours_preference.subscribe,
     overwork_alert_hours_preference.get_snapshot,
     overwork_alert_hours_preference.get_server_snapshot,
-  )
+  );
   const work_hours_start = useSyncExternalStore(
     work_hours_start_preference.subscribe,
     work_hours_start_preference.get_snapshot,
     work_hours_start_preference.get_server_snapshot,
-  )
+  );
   const work_hours_end = useSyncExternalStore(
     work_hours_end_preference.subscribe,
     work_hours_end_preference.get_snapshot,
     work_hours_end_preference.get_server_snapshot,
-  )
+  );
   const goal_scope = useSyncExternalStore(
     focus_goal_scope_preference.subscribe,
     focus_goal_scope_preference.get_snapshot,
     focus_goal_scope_preference.get_server_snapshot,
-  )
+  );
   const goal_sheet_name = useSyncExternalStore(
     focus_goal_sheet_name_preference.subscribe,
     focus_goal_sheet_name_preference.get_snapshot,
     focus_goal_sheet_name_preference.get_server_snapshot,
-  )
+  );
   const goal_tag_name = useSyncExternalStore(
     focus_goal_tag_name_preference.subscribe,
     focus_goal_tag_name_preference.get_snapshot,
     focus_goal_tag_name_preference.get_server_snapshot,
-  )
+  );
   const per_sheet_json = useSyncExternalStore(
     focus_goals_per_sheet_preference.subscribe,
     focus_goals_per_sheet_preference.get_snapshot,
     focus_goals_per_sheet_preference.get_server_snapshot,
-  )
+  );
   const per_tag_json = useSyncExternalStore(
     focus_goals_per_tag_preference.subscribe,
     focus_goals_per_tag_preference.get_snapshot,
     focus_goals_per_tag_preference.get_server_snapshot,
-  )
+  );
 
-  const per_sheet_map = parse_focus_goals_by_name(per_sheet_json)
-  const per_tag_map = parse_focus_goals_by_name(per_tag_json)
+  const per_sheet_map = parse_focus_goals_by_name(per_sheet_json);
+  const per_tag_map = parse_focus_goals_by_name(per_tag_json);
 
   useEffect(() => {
     if (
-      goal_scope === 'sheet' &&
+      goal_scope === "sheet" &&
       goal_sheet_name.length === 0 &&
       sheet_names.length > 0
     ) {
-      persist_ui_preference(focus_goal_sheet_name_preference, sheet_names[0])
+      persist_ui_preference(focus_goal_sheet_name_preference, sheet_names[0]);
     }
-  }, [goal_scope, goal_sheet_name, sheet_names])
+  }, [goal_scope, goal_sheet_name, sheet_names]);
 
   useEffect(() => {
     if (
-      goal_scope === 'tag' &&
+      goal_scope === "tag" &&
       goal_tag_name.length === 0 &&
       tag_names.length > 0
     ) {
-      persist_ui_preference(focus_goal_tag_name_preference, tag_names[0])
+      persist_ui_preference(focus_goal_tag_name_preference, tag_names[0]);
     }
-  }, [goal_scope, goal_tag_name, tag_names])
+  }, [goal_scope, goal_tag_name, tag_names]);
 
-  const disabled = is_enabled !== 'true'
+  const disabled = is_enabled !== "true";
 
   return (
     <div id="focus-goals-nudges" className="flex w-full flex-col gap-4">
-      <label className="flex w-full cursor-pointer items-center gap-2.5">
+      <label
+        aria-label="Focus goals and nudges"
+        className="flex w-full cursor-pointer items-center gap-2.5"
+      >
         <input
           type="checkbox"
           className="shrink-0"
-          checked={is_enabled === 'true'}
+          checked={is_enabled === "true"}
           onChange={(event) =>
             persist_ui_preference(
               focus_nudges_enabled_preference,
-              event.target.checked ? 'true' : 'false',
+              event.target.checked ? "true" : "false",
             )
           }
         />
         <span className="flex flex-col gap-0.5">
           <span className="text-[0.95rem] font-semibold">Goals + nudges</span>
           <span className="text-[0.8rem] leading-snug text-muted">
-            Track daily/weekly focus goals, overwork alerts, and no-log reminders.
+            Track daily/weekly focus goals, overwork alerts, and no-log
+            reminders.
           </span>
         </span>
       </label>
@@ -160,7 +165,7 @@ export function FocusGoalsNudgesSetting({
           className="inline-flex w-full flex-wrap gap-1 rounded-md border border-panel-border bg-panel p-0.5"
         >
           {scope_options.map((option) => {
-            const is_selected = goal_scope === option.value
+            const is_selected = goal_scope === option.value;
             return (
               <button
                 key={option.value}
@@ -170,21 +175,24 @@ export function FocusGoalsNudgesSetting({
                 disabled={disabled}
                 className={`flex-1 min-w-24 cursor-pointer rounded px-3 py-1.5 text-[0.85rem] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-55 ${
                   is_selected
-                    ? 'bg-accent-soft text-foreground'
-                    : 'bg-transparent text-muted hover:bg-surface-hover hover:text-foreground'
+                    ? "bg-accent-soft text-foreground"
+                    : "bg-transparent text-muted hover:bg-surface-hover hover:text-foreground"
                 }`}
                 onClick={() =>
-                  persist_ui_preference(focus_goal_scope_preference, option.value)
+                  persist_ui_preference(
+                    focus_goal_scope_preference,
+                    option.value,
+                  )
                 }
               >
                 {option.label}
               </button>
-            )
+            );
           })}
         </div>
       </div>
 
-      {goal_scope === 'global' ? (
+      {goal_scope === "global" ? (
         <GlobalGoalEditor
           disabled={disabled}
           daily_target_minutes={daily_target_minutes}
@@ -192,7 +200,7 @@ export function FocusGoalsNudgesSetting({
         />
       ) : null}
 
-      {goal_scope === 'sheet' ? (
+      {goal_scope === "sheet" ? (
         <PerNameGoalList
           kind="sheet"
           names={sheet_names}
@@ -203,7 +211,7 @@ export function FocusGoalsNudgesSetting({
         />
       ) : null}
 
-      {goal_scope === 'tag' ? (
+      {goal_scope === "tag" ? (
         <PerNameGoalList
           kind="tag"
           names={tag_names}
@@ -242,7 +250,10 @@ export function FocusGoalsNudgesSetting({
               value={work_hours_end}
               disabled={disabled}
               onChange={(event) =>
-                persist_ui_preference(work_hours_end_preference, event.target.value)
+                persist_ui_preference(
+                  work_hours_end_preference,
+                  event.target.value,
+                )
               }
             />
           </label>
@@ -291,18 +302,18 @@ export function FocusGoalsNudgesSetting({
           </label>
         </div>
         <p className="m-0 text-[0.78rem] leading-snug text-muted">
-          Rule reminders: notify when no active timer during work hours, and alert
-          when an active timer runs longer than the overwork threshold.
+          Rule reminders: notify when no active timer during work hours, and
+          alert when an active timer runs longer than the overwork threshold.
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 interface GlobalGoalEditorProps {
-  disabled: boolean
-  daily_target_minutes: string
-  weekly_target_minutes: string
+  disabled: boolean;
+  daily_target_minutes: string;
+  weekly_target_minutes: string;
 }
 
 /**
@@ -312,7 +323,7 @@ function GlobalGoalEditor({
   disabled,
   daily_target_minutes,
   weekly_target_minutes,
-}: GlobalGoalEditorProps) {
+}: Readonly<GlobalGoalEditorProps>) {
   return (
     <div className="flex flex-col gap-2">
       <span className="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted">
@@ -362,16 +373,16 @@ function GlobalGoalEditor({
         </label>
       </div>
     </div>
-  )
+  );
 }
 
 interface PerNameGoalListProps {
-  kind: 'sheet' | 'tag'
-  names: string[]
-  disabled: boolean
-  active_name: string
-  map: ReturnType<typeof parse_focus_goals_by_name>
-  json: string
+  kind: "sheet" | "tag";
+  names: string[];
+  disabled: boolean;
+  active_name: string;
+  map: ReturnType<typeof parse_focus_goals_by_name>;
+  json: string;
 }
 
 /**
@@ -384,12 +395,13 @@ function PerNameGoalList({
   active_name,
   map,
   json,
-}: PerNameGoalListProps) {
-  const heading_label = kind === 'sheet' ? 'Per-sheet targets' : 'Per-tag targets'
+}: Readonly<PerNameGoalListProps>) {
+  const heading_label =
+    kind === "sheet" ? "Per-sheet targets" : "Per-tag targets";
   const empty_label =
-    kind === 'sheet'
-      ? 'Create a sheet to configure per-sheet goals.'
-      : 'Add a tag to a time entry to configure per-tag goals.'
+    kind === "sheet"
+      ? "Create a sheet to configure per-sheet goals."
+      : "Add a tag to a time entry to configure per-tag goals.";
 
   if (names.length === 0) {
     return (
@@ -399,10 +411,10 @@ function PerNameGoalList({
         </span>
         <p className="m-0 text-[0.85rem] text-muted">{empty_label}</p>
       </div>
-    )
+    );
   }
 
-  const radio_group_name = `focus-goal-active-${kind}`
+  const radio_group_name = `focus-goal-active-${kind}`;
 
   return (
     <div className="flex flex-col gap-2">
@@ -416,31 +428,33 @@ function PerNameGoalList({
       </div>
       <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
         {names.map((name) => {
-          const entry = map[name] ?? {}
-          const daily_value = entry.daily ?? ''
-          const weekly_value = entry.weekly ?? ''
-          const is_active = active_name === name
+          const entry = map[name] ?? {};
+          const daily_value = entry.daily ?? "";
+          const weekly_value = entry.weekly ?? "";
+          const is_active = active_name === name;
 
           return (
             <li
               key={name}
               className={`grid items-center gap-2 rounded-md border bg-panel px-3 py-2.5 transition-colors md:grid-cols-[auto_minmax(0,1fr)_minmax(0,11rem)_minmax(0,11rem)] grid-cols-[auto_minmax(0,1fr)] ${
                 is_active
-                  ? 'border-accent-border bg-accent-soft'
-                  : 'border-panel-border'
+                  ? "border-accent-border bg-accent-soft"
+                  : "border-panel-border"
               }`}
             >
-              <label className="flex shrink-0 cursor-pointer items-center justify-center">
+              <label
+                className="flex shrink-0 cursor-pointer items-center justify-center"
+                aria-label={`Show ${name} in focus banner`}
+              >
                 <input
                   type="radio"
                   name={radio_group_name}
                   className="cursor-pointer"
                   checked={is_active}
                   disabled={disabled}
-                  aria-label={`Show ${name} in focus banner`}
                   onChange={() =>
                     persist_ui_preference(
-                      kind === 'sheet'
+                      kind === "sheet"
                         ? focus_goal_sheet_name_preference
                         : focus_goal_tag_name_preference,
                       name,
@@ -448,11 +462,8 @@ function PerNameGoalList({
                   }
                 />
               </label>
-              <span
-                className="truncate text-[0.9rem] font-medium"
-                title={name}
-              >
-                {kind === 'tag' && !name.startsWith('@') ? `@${name}` : name}
+              <span className="truncate text-[0.9rem] font-medium" title={name}>
+                {format_focus_goal_display_name(kind, name)}
               </span>
               <label className="flex items-center gap-2 md:col-start-3">
                 <span className="text-[0.75rem] text-muted">Daily</span>
@@ -462,13 +473,13 @@ function PerNameGoalList({
                   disabled={disabled}
                   onChange={(event) =>
                     persist_ui_preference(
-                      kind === 'sheet'
+                      kind === "sheet"
                         ? focus_goals_per_sheet_preference
                         : focus_goals_per_tag_preference,
                       set_focus_goal_minutes_for_name(
                         json,
                         name,
-                        'daily',
+                        "daily",
                         event.target.value,
                       ),
                     )
@@ -490,13 +501,13 @@ function PerNameGoalList({
                   disabled={disabled}
                   onChange={(event) =>
                     persist_ui_preference(
-                      kind === 'sheet'
+                      kind === "sheet"
                         ? focus_goals_per_sheet_preference
                         : focus_goals_per_tag_preference,
                       set_focus_goal_minutes_for_name(
                         json,
                         name,
-                        'weekly',
+                        "weekly",
                         event.target.value,
                       ),
                     )
@@ -511,9 +522,9 @@ function PerNameGoalList({
                 </select>
               </label>
             </li>
-          )
+          );
         })}
       </ul>
     </div>
-  )
+  );
 }

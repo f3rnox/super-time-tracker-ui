@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { format_duration } from '@/lib/format_duration'
-import { type MonthInReviewStats } from '@/lib/types/reporting'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
+import { format_duration } from "@/lib/format_duration";
+import { type MonthInReviewStats } from "@/lib/types/reporting";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
 
 interface ReportingMonthInReviewProps {
-  stats: MonthInReviewStats
-  duration_format: DurationFormat
+  stats: MonthInReviewStats;
+  duration_format: DurationFormat;
 }
 
 /**
@@ -15,10 +15,10 @@ interface ReportingMonthInReviewProps {
 export function ReportingMonthInReview({
   stats,
   duration_format,
-}: ReportingMonthInReviewProps) {
+}: Readonly<ReportingMonthInReviewProps>) {
   const tracked_ratio =
-    stats.daysInMonth > 0 ? stats.trackedDays / stats.daysInMonth : 0
-  const tracked_pct = Math.round(tracked_ratio * 100)
+    stats.daysInMonth > 0 ? stats.trackedDays / stats.daysInMonth : 0;
+  const tracked_pct = Math.round(tracked_ratio * 100);
 
   return (
     <section
@@ -26,7 +26,7 @@ export function ReportingMonthInReview({
       aria-label="Month in review"
       style={{
         backgroundImage:
-          'linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 60%, transparent) 0%, transparent 70%)',
+          "linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 60%, transparent) 0%, transparent 70%)",
       }}
     >
       <header className="flex flex-col gap-1">
@@ -38,7 +38,7 @@ export function ReportingMonthInReview({
         </h2>
         <p className="m-0 text-[0.85rem] text-muted">
           {stats.totalMs === 0
-            ? 'No time tracked this month yet — start a timer to fill this in.'
+            ? "No time tracked this month yet — start a timer to fill this in."
             : `Tracked on ${stats.trackedDays} of ${stats.daysInMonth} days (${tracked_pct}%).`}
         </p>
       </header>
@@ -49,7 +49,7 @@ export function ReportingMonthInReview({
           value={format_duration(stats.totalMs, duration_format)}
           detail={
             stats.totalMs === 0
-              ? '—'
+              ? "—"
               : `${format_duration(stats.averageActiveDayMs, duration_format)} per active day`
           }
         />
@@ -57,26 +57,26 @@ export function ReportingMonthInReview({
           label="Best day"
           value={
             stats.bestDayMs === 0
-              ? '—'
+              ? "—"
               : format_duration(stats.bestDayMs, duration_format)
           }
-          detail={stats.bestDayLabel ?? 'No tracked days yet'}
+          detail={stats.bestDayLabel ?? "No tracked days yet"}
         />
         <Highlight
           label="Top sheet"
-          value={stats.topSheetName ?? '—'}
+          value={stats.topSheetName ?? "—"}
           detail={
             stats.topSheetMs === 0
-              ? 'No tracked sheets'
+              ? "No tracked sheets"
               : format_duration(stats.topSheetMs, duration_format)
           }
         />
         <Highlight
           label="Top tag"
-          value={stats.topTag ?? '—'}
+          value={stats.topTag ?? "—"}
           detail={
             stats.topTagMs === 0
-              ? 'Tag entries to surface'
+              ? "Tag entries to surface"
               : format_duration(stats.topTagMs, duration_format)
           }
         />
@@ -85,17 +85,17 @@ export function ReportingMonthInReview({
       <ul className="m-0 grid grid-cols-1 gap-2 p-0 text-[0.85rem] sm:grid-cols-3">
         <FactRow
           label="Current streak"
-          value={`${stats.currentStreakDays} day${stats.currentStreakDays === 1 ? '' : 's'}`}
+          value={`${stats.currentStreakDays} day${stats.currentStreakDays === 1 ? "" : "s"}`}
         />
         <FactRow
           label="Longest streak"
-          value={`${stats.longestStreakDays} day${stats.longestStreakDays === 1 ? '' : 's'}`}
+          value={`${stats.longestStreakDays} day${stats.longestStreakDays === 1 ? "" : "s"}`}
         />
         <FactRow
           label="Longest entry"
           value={
             stats.longestEntryMs === 0
-              ? '—'
+              ? "—"
               : format_duration(stats.longestEntryMs, duration_format)
           }
         />
@@ -104,13 +104,10 @@ export function ReportingMonthInReview({
           label="Tracked days"
           value={`${stats.trackedDays} / ${stats.daysInMonth}`}
         />
-        <FactRow
-          label="Coverage"
-          value={`${tracked_pct}%`}
-        />
+        <FactRow label="Coverage" value={`${tracked_pct}%`} />
       </ul>
     </section>
-  )
+  );
 }
 
 /**
@@ -121,9 +118,9 @@ function Highlight({
   value,
   detail,
 }: {
-  label: string
-  value: string
-  detail: string
+  label: string;
+  value: string;
+  detail: string;
 }) {
   return (
     <div className="flex flex-col gap-1 rounded-md border border-panel-border bg-surface-raised/60 p-3.5">
@@ -135,7 +132,7 @@ function Highlight({
       </span>
       <span className="text-[0.78rem] text-muted">{detail}</span>
     </div>
-  )
+  );
 }
 
 /**
@@ -147,5 +144,5 @@ function FactRow({ label, value }: { label: string; value: string }) {
       <span className="text-[0.78rem] text-muted">{label}</span>
       <span className="font-mono font-semibold">{value}</span>
     </li>
-  )
+  );
 }

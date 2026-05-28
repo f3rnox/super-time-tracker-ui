@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react";
 
-import { debug_logging_preference } from '@/lib/preferences/debug_logging_preference'
-import { persist_ui_preference } from '@/lib/persist_ui_preference'
+import { debug_logging_preference } from "@/lib/preferences/debug_logging_preference";
+import { persist_ui_preference } from "@/lib/persist_ui_preference";
 
 const set_debug_logging = (enabled: boolean): void => {
-  persist_ui_preference(debug_logging_preference, enabled ? 'true' : 'false')
-}
+  persist_ui_preference(debug_logging_preference, enabled ? "true" : "false");
+};
 
 /**
  * Setting: enable debug console logs for troubleshooting.
@@ -17,11 +17,14 @@ export function DebugLoggingSetting() {
     debug_logging_preference.subscribe,
     debug_logging_preference.get_snapshot,
     debug_logging_preference.get_server_snapshot,
-  )
-  const is_enabled = value === 'true'
+  );
+  const is_enabled = value === "true";
 
   return (
-    <label className="flex w-full cursor-pointer items-center gap-2.5">
+    <label
+      aria-label="Debug logging"
+      className="flex w-full cursor-pointer items-center gap-2.5"
+    >
       <input
         type="checkbox"
         className="shrink-0"
@@ -35,5 +38,5 @@ export function DebugLoggingSetting() {
         </span>
       </span>
     </label>
-  )
+  );
 }

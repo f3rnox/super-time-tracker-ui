@@ -1,65 +1,62 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
+import { get_cloud_db_sync_progress_percent } from "@/lib/get_cloud_db_sync_progress_percent";
 import {
   type CloudDbSyncNotification,
   subscribe_cloud_db_sync,
-} from '@/lib/notify_cloud_db_sync'
+} from "@/lib/notify_cloud_db_sync";
 
-const toast_visible_ms = 2800
+const toast_visible_ms = 2800;
 
 /**
  * Toast with a progress bar for background cloud database sync.
  */
 export function CloudDbSyncToast() {
-  const [notification, set_notification] = useState<CloudDbSyncNotification | null>(
-    null,
-  )
+  const [notification, setNotification] =
+    useState<CloudDbSyncNotification | null>(null);
 
   useEffect(() => {
-    let hide_timer: ReturnType<typeof setTimeout> | null = null
+    let hide_timer: ReturnType<typeof setTimeout> | null = null;
 
     const unsubscribe = subscribe_cloud_db_sync((next_notification) => {
-      set_notification(next_notification)
+      setNotification(next_notification);
 
       if (hide_timer !== null) {
-        clearTimeout(hide_timer)
-        hide_timer = null
+        clearTimeout(hide_timer);
+        hide_timer = null;
       }
 
       if (
-        next_notification?.phase === 'success' ||
-        next_notification?.phase === 'error'
+        next_notification?.phase === "success" ||
+        next_notification?.phase === "error"
       ) {
         hide_timer = setTimeout(() => {
-          set_notification(null)
-          hide_timer = null
-        }, toast_visible_ms)
+          setNotification(null);
+          hide_timer = null;
+        }, toast_visible_ms);
       }
-    })
+    });
 
     return () => {
-      unsubscribe()
+      unsubscribe();
 
       if (hide_timer !== null) {
-        clearTimeout(hide_timer)
+        clearTimeout(hide_timer);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   if (notification === null) {
-    return null
+    return null;
   }
 
-  const is_syncing = notification.phase === 'syncing'
-  const is_error = notification.phase === 'error'
-  const progress_percent =
-    notification.phase === 'success'
-      ? 100
-      : notification.phase === 'error'
-        ? 0
-        : null
+  const is_syncing = notification.phase === "syncing";
+  const is_error = notification.phase === "error";
+  const progress_percent = get_cloud_db_sync_progress_percent(
+    notification.phase,
+  );
 
   return (
     <div
@@ -77,11 +74,11 @@ export function CloudDbSyncToast() {
           <div className="cloud-db-sync-progress-indeterminate h-full w-1/3 rounded-full bg-accent" />
         ) : (
           <div
-            className={`h-full rounded-full transition-[width] duration-300 ease-out ${is_error ? 'bg-danger' : 'bg-accent'}`}
+            className={`h-full rounded-full transition-[width] duration-300 ease-out ${is_error ? "bg-danger" : "bg-accent"}`}
             style={{ width: `${progress_percent ?? 0}%` }}
           />
         )}
       </div>
     </div>
-  )
+  );
 }

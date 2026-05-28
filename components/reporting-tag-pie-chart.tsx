@@ -1,30 +1,30 @@
-'use client'
+"use client";
 
-import { useMemo } from 'react'
+import { useMemo } from "react";
 
-import { format_duration } from '@/lib/format_duration'
-import { get_tag_chart_color } from '@/lib/get_tag_chart_color'
-import { round_svg_coord } from '@/lib/round_svg_coord'
-import { type DurationFormat } from '@/lib/types/ui_preferences'
-import { type TagTimeStat } from '@/lib/types/reporting'
+import { format_duration } from "@/lib/format_duration";
+import { get_tag_chart_color } from "@/lib/get_tag_chart_color";
+import { round_svg_coord } from "@/lib/round_svg_coord";
+import { type DurationFormat } from "@/lib/types/ui_preferences";
+import { type TagTimeStat } from "@/lib/types/reporting";
 
-const RADIUS = 70
-const INNER_RADIUS = 38
-const CENTER = 80
-const VIEWBOX_SIZE = CENTER * 2
-const MAX_LEGEND_ITEMS = 8
+const RADIUS = 70;
+const INNER_RADIUS = 38;
+const CENTER = 80;
+const VIEWBOX_SIZE = CENTER * 2;
+const MAX_LEGEND_ITEMS = 8;
 
 interface ReportingTagPieChartProps {
-  tag_breakdown: TagTimeStat[]
-  duration_format: DurationFormat
+  tag_breakdown: TagTimeStat[];
+  duration_format: DurationFormat;
 }
 
 interface PieSlice {
-  tag: string
-  color: string
-  path_data: string
-  ratio: number
-  total_ms: number
+  tag: string;
+  color: string;
+  path_data: string;
+  ratio: number;
+  total_ms: number;
 }
 
 /**
@@ -33,24 +33,21 @@ interface PieSlice {
 export function ReportingTagPieChart({
   tag_breakdown,
   duration_format,
-}: ReportingTagPieChartProps) {
-  const slices = useMemo(
-    () => build_slices(tag_breakdown),
-    [tag_breakdown],
-  )
+}: Readonly<ReportingTagPieChartProps>) {
+  const slices = useMemo(() => build_slices(tag_breakdown), [tag_breakdown]);
   const total_ms = useMemo(
     () => tag_breakdown.reduce((total, stat) => total + stat.totalMs, 0),
     [tag_breakdown],
-  )
-  const legend_items = slices.slice(0, MAX_LEGEND_ITEMS)
-  const remaining = Math.max(0, slices.length - MAX_LEGEND_ITEMS)
+  );
+  const legend_items = slices.slice(0, MAX_LEGEND_ITEMS);
+  const remaining = Math.max(0, slices.length - MAX_LEGEND_ITEMS);
 
   if (slices.length === 0 || total_ms === 0) {
     return (
       <ChartShell title="Time by tag" subtitle="No tagged time in this period.">
         <EmptyPieIllustration />
       </ChartShell>
-    )
+    );
   }
 
   return (
@@ -83,11 +80,7 @@ export function ReportingTagPieChart({
               </>
             ) : (
               slices.map((slice) => (
-                <path
-                  key={slice.tag}
-                  d={slice.path_data}
-                  fill={slice.color}
-                />
+                <path key={slice.tag} d={slice.path_data} fill={slice.color} />
               ))
             )}
           </svg>
@@ -124,13 +117,13 @@ export function ReportingTagPieChart({
           ))}
           {remaining > 0 ? (
             <li className="text-[0.78rem] text-muted">
-              + {remaining} more {remaining === 1 ? 'tag' : 'tags'}
+              + {remaining} more {remaining === 1 ? "tag" : "tags"}
             </li>
           ) : null}
         </ul>
       </div>
     </ChartShell>
-  )
+  );
 }
 
 /**
@@ -141,9 +134,9 @@ function ChartShell({
   subtitle,
   children,
 }: {
-  title: string
-  subtitle?: string
-  children: React.ReactNode
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
 }) {
   return (
     <section className="flex w-full flex-col gap-3 rounded-md border border-panel-border bg-panel p-4 shadow-sm">
@@ -155,7 +148,7 @@ function ChartShell({
       </header>
       {children}
     </section>
-  )
+  );
 }
 
 /**
@@ -182,7 +175,7 @@ function EmptyPieIllustration() {
         Tag your entries to see time distribution here.
       </p>
     </div>
-  )
+  );
 }
 
 /**
@@ -192,24 +185,24 @@ function build_slices(tag_breakdown: TagTimeStat[]): PieSlice[] {
   const total_ms = tag_breakdown.reduce(
     (total, stat) => total + stat.totalMs,
     0,
-  )
+  );
 
   if (total_ms === 0) {
-    return []
+    return [];
   }
 
-  const slices: PieSlice[] = []
-  let cumulative_ratio = 0
+  const slices: PieSlice[] = [];
+  let cumulative_ratio = 0;
 
   tag_breakdown.forEach((stat, index) => {
     if (stat.totalMs <= 0) {
-      return
+      return;
     }
 
-    const ratio = stat.totalMs / total_ms
-    const start_angle = cumulative_ratio * Math.PI * 2
-    const end_angle = (cumulative_ratio + ratio) * Math.PI * 2
-    cumulative_ratio += ratio
+    const ratio = stat.totalMs / total_ms;
+    const start_angle = cumulative_ratio * Math.PI * 2;
+    const end_angle = (cumulative_ratio + ratio) * Math.PI * 2;
+    cumulative_ratio += ratio;
 
     slices.push({
       tag: stat.tag,
@@ -217,10 +210,10 @@ function build_slices(tag_breakdown: TagTimeStat[]): PieSlice[] {
       ratio,
       total_ms: stat.totalMs,
       path_data: build_donut_slice_path(start_angle, end_angle),
-    })
-  })
+    });
+  });
 
-  return slices
+  return slices;
 }
 
 /**
@@ -230,19 +223,19 @@ function build_donut_slice_path(
   start_angle: number,
   end_angle: number,
 ): string {
-  const outer_start = polar_to_cartesian(start_angle, RADIUS)
-  const outer_end = polar_to_cartesian(end_angle, RADIUS)
-  const inner_end = polar_to_cartesian(end_angle, INNER_RADIUS)
-  const inner_start = polar_to_cartesian(start_angle, INNER_RADIUS)
-  const large_arc_flag = end_angle - start_angle > Math.PI ? 1 : 0
+  const outer_start = polar_to_cartesian(start_angle, RADIUS);
+  const outer_end = polar_to_cartesian(end_angle, RADIUS);
+  const inner_end = polar_to_cartesian(end_angle, INNER_RADIUS);
+  const inner_start = polar_to_cartesian(start_angle, INNER_RADIUS);
+  const large_arc_flag = end_angle - start_angle > Math.PI ? 1 : 0;
 
   return [
     `M ${outer_start.x} ${outer_start.y}`,
     `A ${RADIUS} ${RADIUS} 0 ${large_arc_flag} 1 ${outer_end.x} ${outer_end.y}`,
     `L ${inner_end.x} ${inner_end.y}`,
     `A ${INNER_RADIUS} ${INNER_RADIUS} 0 ${large_arc_flag} 0 ${inner_start.x} ${inner_start.y}`,
-    'Z',
-  ].join(' ')
+    "Z",
+  ].join(" ");
 }
 
 /**
@@ -255,5 +248,5 @@ function polar_to_cartesian(
   return {
     x: round_svg_coord(CENTER + radius * Math.sin(angle_radians)),
     y: round_svg_coord(CENTER - radius * Math.cos(angle_radians)),
-  }
+  };
 }

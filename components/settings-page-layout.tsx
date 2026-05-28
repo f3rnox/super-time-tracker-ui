@@ -1,16 +1,16 @@
-import { type ReactNode } from 'react'
+import { type ReactNode } from "react";
 
-import { SettingsNav } from '@/components/settings-nav'
+import { SettingsNav } from "@/components/settings-nav";
 import {
   TrackerTopbar,
   type TrackerTopbarBreadcrumb,
-} from '@/components/tracker-topbar'
+} from "@/components/tracker-topbar";
 
 interface SettingsPageLayoutProps {
-  breadcrumb: TrackerTopbarBreadcrumb
-  title: string
-  description?: string
-  children: ReactNode
+  breadcrumb: TrackerTopbarBreadcrumb;
+  title: string;
+  description?: string;
+  children: ReactNode;
 }
 
 /**
@@ -21,7 +21,7 @@ export function SettingsPageLayout({
   title,
   description,
   children,
-}: SettingsPageLayoutProps) {
+}: Readonly<SettingsPageLayoutProps>) {
   return (
     <>
       <TrackerTopbar breadcrumb={breadcrumb} />
@@ -47,5 +47,5 @@ export function SettingsPageLayout({
         </section>
       </main>
     </>
-  )
+  );
 }

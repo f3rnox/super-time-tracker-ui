@@ -1,47 +1,47 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 import {
   SETTINGS_SAVED_DEFAULT_MESSAGE,
   subscribe_settings_saved,
-} from '@/lib/notify_settings_saved'
+} from "@/lib/notify_settings_saved";
 
-const toast_visible_ms = 2800
+const toast_visible_ms = 2800;
 
 /**
  * Fixed toast shown when a settings preference is persisted.
  */
 export function SettingsSavedToast() {
-  const [message, set_message] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    let hide_timer: ReturnType<typeof setTimeout> | null = null
+    let hide_timer: ReturnType<typeof setTimeout> | null = null;
 
     const unsubscribe = subscribe_settings_saved((next_message) => {
-      set_message(next_message)
+      setMessage(next_message);
 
       if (hide_timer !== null) {
-        clearTimeout(hide_timer)
+        clearTimeout(hide_timer);
       }
 
       hide_timer = setTimeout(() => {
-        set_message(null)
-        hide_timer = null
-      }, toast_visible_ms)
-    })
+        setMessage(null);
+        hide_timer = null;
+      }, toast_visible_ms);
+    });
 
     return () => {
-      unsubscribe()
+      unsubscribe();
 
       if (hide_timer !== null) {
-        clearTimeout(hide_timer)
+        clearTimeout(hide_timer);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   if (message === null) {
-    return null
+    return null;
   }
 
   return (
@@ -53,5 +53,5 @@ export function SettingsSavedToast() {
     >
       {message || SETTINGS_SAVED_DEFAULT_MESSAGE}
     </div>
-  )
+  );
 }

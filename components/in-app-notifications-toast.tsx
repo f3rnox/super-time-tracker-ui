@@ -1,47 +1,49 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 import {
   type InAppNotification,
   subscribe_in_app_notifications,
-} from '@/lib/notify_in_app'
+} from "@/lib/notify_in_app";
 
-const toast_visible_ms = 3200
+const toast_visible_ms = 3200;
 
 /**
  * Bottom-right toast for app-triggered notification events.
  */
 export function InAppNotificationsToast() {
-  const [notification, set_notification] = useState<InAppNotification | null>(null)
+  const [notification, setNotification] = useState<InAppNotification | null>(
+    null,
+  );
 
   useEffect(() => {
-    let hide_timer: ReturnType<typeof setTimeout> | null = null
+    let hide_timer: ReturnType<typeof setTimeout> | null = null;
 
     const unsubscribe = subscribe_in_app_notifications((next_notification) => {
-      set_notification(next_notification)
+      setNotification(next_notification);
 
       if (hide_timer !== null) {
-        clearTimeout(hide_timer)
+        clearTimeout(hide_timer);
       }
 
       hide_timer = setTimeout(() => {
-        set_notification(null)
-        hide_timer = null
-      }, toast_visible_ms)
-    })
+        setNotification(null);
+        hide_timer = null;
+      }, toast_visible_ms);
+    });
 
     return () => {
-      unsubscribe()
+      unsubscribe();
 
       if (hide_timer !== null) {
-        clearTimeout(hide_timer)
+        clearTimeout(hide_timer);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   if (notification === null) {
-    return null
+    return null;
   }
 
   return (
@@ -56,5 +58,5 @@ export function InAppNotificationsToast() {
         {notification.body}
       </p>
     </div>
-  )
+  );
 }

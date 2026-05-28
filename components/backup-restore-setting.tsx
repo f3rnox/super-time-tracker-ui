@@ -1,124 +1,121 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
-import { push_tracker_db_cloud_after_change } from '@/lib/push_tracker_db_cloud_after_change'
+import { message_from_unknown_error } from "@/lib/message_from_unknown_error";
+import { push_tracker_db_cloud_after_change } from "@/lib/push_tracker_db_cloud_after_change";
 
-import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { get_restore_db_confirm_dialog } from '@/lib/get_restore_db_confirm_dialog'
+import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { get_restore_db_confirm_dialog } from "@/lib/get_restore_db_confirm_dialog";
 
 interface BackupRestoreSettingProps {
-  db_path: string
+  db_path: string;
 }
 
 /**
  * Downloads or restores the tracker database from Settings.
  */
-export function BackupRestoreSetting({ db_path }: BackupRestoreSettingProps) {
-  const router = useRouter()
-  const { confirm } = use_confirm_dialog()
-  const file_input_ref = useRef<HTMLInputElement>(null)
-  const [error, set_error] = useState<string | null>(null)
-  const [status_message, set_status_message] = useState<string | null>(null)
-  const [is_downloading, set_is_downloading] = useState(false)
-  const [is_restoring, set_is_restoring] = useState(false)
+export function BackupRestoreSetting({
+  db_path,
+}: Readonly<BackupRestoreSettingProps>) {
+  const router = useRouter();
+  const { confirm } = useConfirmDialog();
+  const file_input_ref = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [status_message, setStatus_message] = useState<string | null>(null);
+  const [is_downloading, setIs_downloading] = useState(false);
+  const [is_restoring, setIs_restoring] = useState(false);
 
   const handle_download = async (): Promise<void> => {
-    set_is_downloading(true)
-    set_error(null)
-    set_status_message(null)
+    setIs_downloading(true);
+    setError(null);
+    setStatus_message(null);
 
     try {
-      const response = await fetch('/api/backup')
+      const response = await fetch("/api/backup");
 
       if (!response.ok) {
-        const body = (await response.json()) as { error?: string }
-        throw new Error(body.error ?? 'Download failed')
+        const body = (await response.json()) as { error?: string };
+        throw new Error(body.error ?? "Download failed");
       }
 
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-      link.href = url
-      link.download = 'db.json'
-      link.click()
-      URL.revokeObjectURL(url)
-      set_status_message('Backup downloaded.')
+      link.href = url;
+      link.download = "db.json";
+      link.click();
+      URL.revokeObjectURL(url);
+      setStatus_message("Backup downloaded.");
     } catch (download_error: unknown) {
-      set_error(
-        download_error instanceof Error
-          ? download_error.message
-          : String(download_error),
-      )
+      setError(
+        message_from_unknown_error(download_error, "Backup download failed"),
+      );
     } finally {
-      set_is_downloading(false)
+      setIs_downloading(false);
     }
-  }
+  };
 
   const handle_restore_click = (): void => {
-    file_input_ref.current?.click()
-  }
+    file_input_ref.current?.click();
+  };
 
   const handle_file_change = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ): Promise<void> => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
 
-    event.target.value = ''
+    event.target.value = "";
 
     if (file === undefined) {
-      return
+      return;
     }
 
-    const confirmed = await confirm(get_restore_db_confirm_dialog())
+    const confirmed = await confirm(get_restore_db_confirm_dialog());
 
     if (!confirmed) {
-      return
+      return;
     }
 
-    set_is_restoring(true)
-    set_error(null)
-    set_status_message(null)
+    setIs_restoring(true);
+    setError(null);
+    setStatus_message(null);
 
     try {
-      const text = await file.text()
-      let uploaded: unknown
+      const text = await file.text();
+      let uploaded: unknown;
 
       try {
-        uploaded = JSON.parse(text)
+        uploaded = JSON.parse(text);
       } catch {
-        throw new Error('Invalid backup file: file is not valid JSON.')
+        throw new Error("Invalid backup file: file is not valid JSON.");
       }
-      const response = await fetch('/api/backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/backup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(uploaded),
-      })
+      });
 
       if (!response.ok) {
-        const body = (await response.json()) as { error?: string }
-        throw new Error(body.error ?? 'Restore failed')
+        const body = (await response.json()) as { error?: string };
+        throw new Error(body.error ?? "Restore failed");
       }
 
-      set_status_message('Backup restored. Opening tracker…')
-      push_tracker_db_cloud_after_change()
-      router.push('/')
-      router.refresh()
+      setStatus_message("Backup restored. Opening tracker…");
+      push_tracker_db_cloud_after_change();
+      router.push("/");
+      router.refresh();
     } catch (restore_error: unknown) {
-      set_error(
-        restore_error instanceof Error
-          ? restore_error.message
-          : String(restore_error),
-      )
+      setError(message_from_unknown_error(restore_error, "Restore failed"));
     } finally {
-      set_is_restoring(false)
+      setIs_restoring(false);
     }
-  }
+  };
 
-  const is_busy = is_downloading || is_restoring
+  const is_busy = is_downloading || is_restoring;
 
   return (
     <div className="flex w-full flex-col gap-3">
@@ -138,19 +135,19 @@ export function BackupRestoreSetting({ db_path }: BackupRestoreSettingProps) {
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          className={get_button_class_name('ghost', 'small')}
+          className={get_button_class_name("ghost", "small")}
           disabled={is_busy}
           onClick={() => void handle_download()}
         >
-          {is_downloading ? 'Downloading…' : 'Download backup'}
+          {is_downloading ? "Downloading…" : "Download backup"}
         </button>
         <button
           type="button"
-          className={get_button_class_name('danger', 'small')}
+          className={get_button_class_name("danger", "small")}
           disabled={is_busy}
           onClick={handle_restore_click}
         >
-          {is_restoring ? 'Restoring…' : 'Restore from file'}
+          {is_restoring ? "Restoring…" : "Restore from file"}
         </button>
         <input
           ref={file_input_ref}
@@ -160,12 +157,12 @@ export function BackupRestoreSetting({ db_path }: BackupRestoreSettingProps) {
           onChange={(event) => void handle_file_change(event)}
         />
       </div>
-      {status_message !== null ? (
+      {status_message === null ? null : (
         <p className="m-0 text-[0.82rem] text-accent">{status_message}</p>
-      ) : null}
-      {error !== null ? (
+      )}
+      {error === null ? null : (
         <p className="m-0 text-[0.82rem] text-danger">{error}</p>
-      ) : null}
+      )}
     </div>
-  )
+  );
 }

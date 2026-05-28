@@ -1,119 +1,117 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { type CloudSyncStatus } from '@/lib/get_cloud_sync_status'
-import { run_tracker_db_cloud_sync } from '@/lib/run_tracker_db_cloud_sync'
-import { use_supabase_auth_session } from '@/lib/use_supabase_auth_session'
+import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { message_from_unknown_error } from "@/lib/message_from_unknown_error";
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { type CloudSyncStatus } from "@/lib/get_cloud_sync_status";
+import { run_tracker_db_cloud_sync } from "@/lib/run_tracker_db_cloud_sync";
+import { use_supabase_auth_session } from "@/lib/use_supabase_auth_session";
 
-type SyncAction = 'push' | 'pull'
+type SyncAction = "push" | "pull";
 
 /**
  * Manual cloud sync controls and status display.
  */
 export function CloudSyncActions(): React.ReactElement | null {
-  const router = useRouter()
-  const { confirm } = use_confirm_dialog()
-  const { email, is_configured } = use_supabase_auth_session()
-  const [status, set_status] = useState<CloudSyncStatus | null>(null)
-  const [is_loading, set_is_loading] = useState(true)
-  const [pending_action, set_pending_action] = useState<SyncAction | null>(null)
-  const [message, set_message] = useState<string | null>(null)
-  const [error, set_error] = useState<string | null>(null)
+  const router = useRouter();
+  const { confirm } = useConfirmDialog();
+  const { email, is_configured } = use_supabase_auth_session();
+  const [status, setStatus] = useState<CloudSyncStatus | null>(null);
+  const [is_loading, setIs_loading] = useState(true);
+  const [pending_action, setPending_action] = useState<SyncAction | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const load_status = async (): Promise<void> => {
     try {
-      const response = await fetch('/api/sync/status')
+      const response = await fetch("/api/sync/status");
 
       if (!response.ok) {
-        throw new Error('Failed to load sync status')
+        throw new Error("Failed to load sync status");
       }
 
-      const next_status = (await response.json()) as CloudSyncStatus
+      const next_status = (await response.json()) as CloudSyncStatus;
 
-      set_status(next_status)
+      setStatus(next_status);
     } catch (load_error: unknown) {
-      set_error(
-        load_error instanceof Error ? load_error.message : String(load_error),
-      )
+      setError(
+        message_from_unknown_error(load_error, "Failed to load sync status"),
+      );
     } finally {
-      set_is_loading(false)
+      setIs_loading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (!is_configured) {
-      set_is_loading(false)
-      return
+      setIs_loading(false);
+      return;
     }
 
-    void load_status()
-  }, [is_configured, email])
+    void load_status();
+  }, [is_configured, email]);
 
   if (!is_configured || email === null) {
-    return null
+    return null;
   }
 
   const run_action = async (action: SyncAction): Promise<void> => {
     const confirmed = await confirm(
-      action === 'push'
+      action === "push"
         ? {
-            title: 'Push local to cloud?',
+            title: "Push local to cloud?",
             message:
-              'Merge your local db.json into the cloud database. Entries with the same id are combined; local data wins when they conflict.',
-            confirmLabel: 'Push to cloud',
-            variant: 'danger',
+              "Merge your local db.json into the cloud database. Entries with the same id are combined; local data wins when they conflict.",
+            confirmLabel: "Push to cloud",
+            variant: "danger",
           }
         : {
-            title: 'Pull cloud to local?',
+            title: "Pull cloud to local?",
             message:
-              'Merge the cloud database into your local db.json. Entries with the same id are combined; cloud data wins when they conflict.',
-            confirmLabel: 'Pull from cloud',
-            variant: 'danger',
+              "Merge the cloud database into your local db.json. Entries with the same id are combined; cloud data wins when they conflict.",
+            confirmLabel: "Pull from cloud",
+            variant: "danger",
           },
-    )
+    );
 
     if (!confirmed) {
-      return
+      return;
     }
 
-    set_pending_action(action)
-    set_message(null)
-    set_error(null)
+    setPending_action(action);
+    setMessage(null);
+    setError(null);
 
     try {
       await run_tracker_db_cloud_sync({
         action,
         on_complete: () => {
-          router.refresh()
+          router.refresh();
         },
-      })
+      });
 
-      set_message(
-        action === 'push'
-          ? 'Cloud database merged with local file.'
-          : 'Local db.json merged with cloud database.',
-      )
+      setMessage(
+        action === "push"
+          ? "Cloud database merged with local file."
+          : "Local db.json merged with cloud database.",
+      );
 
-      await load_status()
+      await load_status();
     } catch (action_error: unknown) {
-      set_error(
-        action_error instanceof Error
-          ? action_error.message
-          : String(action_error),
-      )
+      setError(message_from_unknown_error(action_error, "Sync action failed"));
     } finally {
-      set_pending_action(null)
+      setPending_action(null);
     }
-  }
+  };
 
   const imported_label =
-    status?.local_imported_at !== null && status?.local_imported_at !== undefined
+    status?.local_imported_at !== null &&
+    status?.local_imported_at !== undefined
       ? new Date(status.local_imported_at).toLocaleString()
-      : 'never'
+      : "never";
 
   return (
     <div className="flex w-full flex-col gap-3">
@@ -137,27 +135,27 @@ export function CloudSyncActions(): React.ReactElement | null {
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          className={get_button_class_name('ghost', 'small')}
+          className={get_button_class_name("ghost", "small")}
           disabled={pending_action !== null}
-          onClick={() => void run_action('push')}
+          onClick={() => void run_action("push")}
         >
-          {pending_action === 'push' ? 'Pushing…' : 'Push local → cloud'}
+          {pending_action === "push" ? "Pushing…" : "Push local → cloud"}
         </button>
         <button
           type="button"
-          className={get_button_class_name('ghost', 'small')}
+          className={get_button_class_name("ghost", "small")}
           disabled={pending_action !== null}
-          onClick={() => void run_action('pull')}
+          onClick={() => void run_action("pull")}
         >
-          {pending_action === 'pull' ? 'Pulling…' : 'Pull cloud → local'}
+          {pending_action === "pull" ? "Pulling…" : "Pull cloud → local"}
         </button>
       </div>
-      {message !== null ? (
+      {message === null ? null : (
         <p className="m-0 text-[0.82rem] text-accent">{message}</p>
-      ) : null}
-      {error !== null ? (
+      )}
+      {error === null ? null : (
         <p className="m-0 text-[0.82rem] text-danger">{error}</p>
-      ) : null}
+      )}
     </div>
-  )
+  );
 }

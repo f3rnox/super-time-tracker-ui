@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
+import Link from "next/link";
 
-import { build_entry_search_href } from '@/lib/build_entry_search_href'
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { get_input_class_name } from '@/lib/get_input_class_name'
-import { get_empty_entry_search_filters } from '@/lib/parse_entry_search_filters'
+import { build_entry_search_href } from "@/lib/build_entry_search_href";
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { get_input_class_name } from "@/lib/get_input_class_name";
+import { get_empty_entry_search_filters } from "@/lib/parse_entry_search_filters";
 
 interface TrackerEntrySearchBarProps {
-  query: string
-  active_sheet: string
-  is_pending?: boolean
-  on_query_change: (query: string) => void
+  query: string;
+  active_sheet: string;
+  is_pending?: boolean;
+  on_query_change: (query: string) => void;
 }
 
 /**
@@ -22,13 +22,13 @@ export function TrackerEntrySearchBar({
   active_sheet,
   is_pending = false,
   on_query_change,
-}: TrackerEntrySearchBarProps) {
-  const trimmed_query = query.trim()
+}: Readonly<TrackerEntrySearchBarProps>) {
+  const trimmed_query = query.trim();
   const full_search_href = build_entry_search_href({
     ...get_empty_entry_search_filters(),
     query: trimmed_query,
     sheetName: active_sheet,
-  })
+  });
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -39,7 +39,7 @@ export function TrackerEntrySearchBar({
         <div className="flex min-w-0 items-center gap-2">
           <input
             type="search"
-            className={get_input_class_name('compact')}
+            className={get_input_class_name("compact")}
             placeholder="Search description, tags, notes…"
             value={query}
             disabled={is_pending}
@@ -49,9 +49,9 @@ export function TrackerEntrySearchBar({
           {trimmed_query.length > 0 ? (
             <button
               type="button"
-              className={get_button_class_name('ghost', 'small')}
+              className={get_button_class_name("ghost", "small")}
               disabled={is_pending}
-              onClick={() => on_query_change('')}
+              onClick={() => on_query_change("")}
             >
               Clear
             </button>
@@ -74,5 +74,5 @@ export function TrackerEntrySearchBar({
         </Link>
       )}
     </div>
-  )
+  );
 }

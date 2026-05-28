@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useId, useRef } from "react";
 
-import { get_button_class_name } from '@/lib/get_button_class_name'
-import { type ConfirmDialogOptions } from '@/lib/types/confirm_dialog'
+import { get_button_class_name } from "@/lib/get_button_class_name";
+import { type ConfirmDialogOptions } from "@/lib/types/confirm_dialog";
 
 interface ConfirmDialogProps {
-  options: ConfirmDialogOptions
-  on_confirm: () => void
-  on_cancel: () => void
+  options: ConfirmDialogOptions;
+  on_confirm: () => void;
+  on_cancel: () => void;
 }
 
 /**
@@ -18,60 +18,76 @@ export function ConfirmDialog({
   options,
   on_confirm,
   on_cancel,
-}: ConfirmDialogProps) {
-  const title_id = useId()
-  const confirm_ref = useRef<HTMLButtonElement>(null)
+}: Readonly<ConfirmDialogProps>) {
+  const title_id = useId();
+  const dialog_ref = useRef<HTMLDialogElement>(null);
+  const confirm_ref = useRef<HTMLButtonElement>(null);
   const {
-    cancelLabel = 'Cancel',
-    confirmLabel = 'Confirm',
+    cancelLabel = "Cancel",
+    confirmLabel = "Confirm",
     message,
     title,
-    variant = 'default',
-  } = options
-  const confirm_variant = variant === 'danger' ? 'danger' : 'primary'
+    variant = "default",
+  } = options;
+  const confirm_variant = variant === "danger" ? "danger" : "primary";
 
   useEffect(() => {
-    confirm_ref.current?.focus()
+    const dialog = dialog_ref.current;
 
-    const handle_key_down = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        on_cancel()
-      }
+    if (dialog === null || dialog.open) {
+      return;
     }
 
-    document.addEventListener('keydown', handle_key_down)
+    dialog.showModal();
 
     return () => {
-      document.removeEventListener('keydown', handle_key_down)
-    }
-  }, [on_cancel])
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    confirm_ref.current?.focus();
+  }, []);
+
+  const handle_cancel = (): void => {
+    dialog_ref.current?.close();
+    on_cancel();
+  };
 
   return (
-    <div
-      className="fixed inset-0 z-100 flex items-center justify-center p-5"
-      role="presentation"
+    <dialog
+      ref={dialog_ref}
+      aria-labelledby={title_id}
+      className="fixed inset-0 z-100 m-0 flex max-h-none w-full max-w-none items-center justify-center border-0 bg-transparent p-5 backdrop:bg-overlay open:flex"
+      onCancel={(event) => {
+        event.preventDefault();
+        handle_cancel();
+      }}
     >
       <button
         type="button"
-        className="absolute inset-0 cursor-default border-0 bg-overlay p-0"
+        tabIndex={-1}
         aria-label="Dismiss dialog"
-        onClick={on_cancel}
+        className="absolute inset-0 z-0 cursor-default border-0 bg-transparent p-0"
+        onClick={handle_cancel}
       />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title_id}
-        className="relative z-1 w-full max-w-md rounded-lg border border-panel-border bg-panel p-5 shadow-md"
-      >
-        <h2 id={title_id} className="m-0 text-[1.1rem] font-[650] tracking-tight">
+      <div className="relative z-1 w-full max-w-md rounded-lg border border-panel-border bg-panel p-5 shadow-md">
+        <h2
+          id={title_id}
+          className="m-0 text-[1.1rem] font-[650] tracking-tight"
+        >
           {title}
         </h2>
-        <p className="m-0 mt-2 text-[0.9rem] leading-relaxed text-muted">{message}</p>
+        <p className="m-0 mt-2 text-[0.9rem] leading-relaxed text-muted">
+          {message}
+        </p>
         <div className="mt-5 flex flex-wrap justify-end gap-2">
           <button
             type="button"
-            className={get_button_class_name('ghost')}
-            onClick={on_cancel}
+            className={get_button_class_name("ghost")}
+            onClick={handle_cancel}
           >
             {cancelLabel}
           </button>
@@ -85,6 +101,6 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
-  )
+    </dialog>
+  );
 }
