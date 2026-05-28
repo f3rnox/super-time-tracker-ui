@@ -7,7 +7,7 @@ import {
   type ActiveEntryPanelHandle,
 } from "@/components/active-entry-panel";
 import { EntryActionsMenu } from "@/components/entry-actions-menu";
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { type EntryEditFormValues } from "@/components/entry-edit-form";
 import { get_delete_entry_confirm_dialog } from "@/lib/get_delete_entry_confirm_dialog";
 import { is_pomodoro_task_entry } from "@/lib/pomodoro_task_marker";
@@ -63,7 +63,7 @@ export const TrackerActiveBar = forwardRef<
   },
   ref,
 ) {
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const confirm_destructive_actions = use_confirm_destructive_actions();
   const panel_ref = useRef<ActiveEntryPanelHandle>(null);
 

@@ -26,6 +26,9 @@ export function CloudSyncProvider({
   const pathname = usePathname();
   const last_greedy_merged_pathname_ref = useRef<string | null>(null);
   const skip_next_greedy_pathname_sync_ref = useRef(true);
+  const initial_session_user_id_ref = useRef<string | null | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (!is_supabase_configured() || !is_cloud_sync_enabled()) {
@@ -61,29 +64,48 @@ export function CloudSyncProvider({
       run_merge_on_load(refresh_after);
     };
 
+    const handle_new_sign_in = (): void => {
+      clear_tracker_db_merged_this_browser_session();
+      last_greedy_merged_pathname_ref.current = null;
+      skip_next_greedy_pathname_sync_ref.current = true;
+      start_session_sync(true);
+    };
+
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
+        initial_session_user_id_ref.current = session?.user.id ?? null;
+
         if (session !== null) {
           start_session_sync(false);
         }
       })
       .catch(() => {
+        initial_session_user_id_ref.current = null;
         // Ignore; auth client unavailable offline.
       });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
-        clear_tracker_db_merged_this_browser_session();
-        last_greedy_merged_pathname_ref.current = null;
-        skip_next_greedy_pathname_sync_ref.current = true;
-        start_session_sync(true);
+        const user_id = session?.user.id ?? null;
+
+        if (initial_session_user_id_ref.current === undefined) {
+          return;
+        }
+
+        if (user_id === initial_session_user_id_ref.current) {
+          return;
+        }
+
+        initial_session_user_id_ref.current = user_id;
+        handle_new_sign_in();
         return;
       }
 
       if (event === "SIGNED_OUT") {
+        initial_session_user_id_ref.current = null;
         clear_tracker_db_merged_this_browser_session();
         last_greedy_merged_pathname_ref.current = null;
         skip_next_greedy_pathname_sync_ref.current = true;

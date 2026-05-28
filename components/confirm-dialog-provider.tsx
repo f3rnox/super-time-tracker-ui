@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  createContext,
   type ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -12,41 +10,15 @@ import {
 
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
-  get_registered_confirm_dialog,
-  register_confirm_dialog,
-} from "@/lib/confirm_dialog_registry";
+  ConfirmDialogContext,
+  type ConfirmDialogContextValue,
+} from "@/lib/confirm_dialog_context";
+import { register_confirm_dialog } from "@/lib/confirm_dialog_registry";
 import { type ConfirmDialogOptions } from "@/lib/types/confirm_dialog";
 
 interface ConfirmDialogRequest {
   options: ConfirmDialogOptions;
   resolve: (confirmed: boolean) => void;
-}
-
-interface ConfirmDialogContextValue {
-  confirm: (options: ConfirmDialogOptions) => Promise<boolean>;
-}
-
-const ConfirmDialogContext = createContext<ConfirmDialogContextValue | null>(
-  null,
-);
-
-/**
- * Returns the promise-based confirm dialog API from context.
- */
-export function useConfirmDialog(): ConfirmDialogContextValue {
-  const context = useContext(ConfirmDialogContext);
-
-  if (context !== null) {
-    return context;
-  }
-
-  const registered = get_registered_confirm_dialog();
-
-  if (registered !== null) {
-    return { confirm: registered };
-  }
-
-  throw new Error("useConfirmDialog must be used within ConfirmDialogProvider");
 }
 
 interface ConfirmDialogProviderProps {

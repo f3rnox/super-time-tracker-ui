@@ -2,7 +2,7 @@
 
 import { type ComponentProps, useState } from "react";
 
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { SheetActionsMenu } from "@/components/sheet-actions-menu";
 import { get_delete_sheet_confirm_dialog } from "@/lib/get_delete_sheet_confirm_dialog";
 import { use_confirm_destructive_actions } from "@/lib/use_confirm_destructive_actions";
@@ -33,7 +33,7 @@ export function SheetSidebar({
   on_delete,
   is_pending,
 }: Readonly<SheetSidebarProps>) {
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const confirm_destructive_actions = use_confirm_destructive_actions();
   const can_delete_sheet = sheets.length > 1;
   const [is_adding_sheet, setIs_adding_sheet] = useState(false);

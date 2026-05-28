@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { get_check_out_confirm_dialog } from "@/lib/get_check_out_confirm_dialog";
 import { type CheckOutOptions } from "@/lib/types/check_out_options";
 import { use_confirm_before_checkout } from "@/lib/use_confirm_before_checkout";
@@ -13,7 +13,7 @@ import { use_confirm_before_checkout } from "@/lib/use_confirm_before_checkout";
 export function useCheckOutAction(
   on_check_out: (options?: CheckOutOptions) => void,
 ): (options?: CheckOutOptions) => Promise<boolean> {
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const confirm_before_checkout = use_confirm_before_checkout();
 
   return useCallback(

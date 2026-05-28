@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { Checkbox } from "@/components/checkbox";
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { EntryListItem } from "@/components/entry-list-item";
 import { type EntryEditFormValues } from "@/components/entry-edit-form";
 import { EntryListBulkBar } from "@/components/entry-list-bulk-bar";
@@ -85,7 +85,7 @@ export function EntryList({
   on_split,
   on_merge,
 }: Readonly<EntryListProps>) {
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const confirm_destructive_actions = use_confirm_destructive_actions();
   const time_format = use_time_format();
   const duration_format = use_duration_format();

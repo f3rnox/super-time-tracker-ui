@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { message_from_unknown_error } from "@/lib/message_from_unknown_error";
 import { get_button_class_name } from "@/lib/get_button_class_name";
 import { type CloudSyncStatus } from "@/lib/get_cloud_sync_status";
@@ -17,7 +17,7 @@ type SyncAction = "push" | "pull";
  */
 export function CloudSyncActions(): React.ReactElement | null {
   const router = useRouter();
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const { email, is_configured } = use_supabase_auth_session();
   const [status, setStatus] = useState<CloudSyncStatus | null>(null);
   const [is_loading, setIs_loading] = useState(true);

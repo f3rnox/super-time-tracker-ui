@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { message_from_unknown_error } from "@/lib/message_from_unknown_error";
 import { SettingsPageLayout } from "@/components/settings-page-layout";
 import { TagAutocompleteInput } from "@/components/tag-autocomplete-input";
@@ -23,7 +23,7 @@ interface TagManagementViewProps {
 export function TagManagementView({
   initial_tags,
 }: Readonly<TagManagementViewProps>) {
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const [tags, setTags] = useState<TagStat[]>(initial_tags);
   const [selected_tags, setSelected_tags] = useState<Set<string>>(
     () => new Set(),

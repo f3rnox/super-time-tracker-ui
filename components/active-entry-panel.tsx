@@ -5,7 +5,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { ActiveEntryCheckoutForm } from "@/components/active-entry-checkout-form";
 import { ActiveEntryDescriptionInline } from "@/components/active-entry-description-inline";
 import { CheckoutButtonGroup } from "@/components/checkout-button-group";
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { EntryActionsMenu } from "@/components/entry-actions-menu";
 import {
   EntryEditForm,
@@ -80,7 +80,7 @@ export const ActiveEntryPanel = forwardRef<
   },
   ref,
 ) {
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const confirm_destructive_actions = use_confirm_destructive_actions();
   const confirm_before_checkout = use_confirm_before_checkout();
   const duration_format = use_duration_format();

@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { message_from_unknown_error } from "@/lib/message_from_unknown_error";
 import { push_tracker_db_cloud_after_change } from "@/lib/push_tracker_db_cloud_after_change";
 
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { use_confirm_dialog } from "@/lib/use_confirm_dialog";
 import { get_button_class_name } from "@/lib/get_button_class_name";
 import { get_restore_db_confirm_dialog } from "@/lib/get_restore_db_confirm_dialog";
 
@@ -21,7 +21,7 @@ export function BackupRestoreSetting({
   db_path,
 }: Readonly<BackupRestoreSettingProps>) {
   const router = useRouter();
-  const { confirm } = useConfirmDialog();
+  const { confirm } = use_confirm_dialog();
   const file_input_ref = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [status_message, setStatus_message] = useState<string | null>(null);
