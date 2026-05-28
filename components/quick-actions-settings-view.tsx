@@ -37,7 +37,7 @@ const shortcut_action_labels: Record<TrackerShortcutActionId, string> = {
 
 const topbar_action_labels: Record<TopbarQuickActionId, string> = {
   today: "Today",
-  review: "End-of-day review",
+  review: "Review",
   templates: "Template library",
   search: "Search entries",
   sheets: "Sheets",

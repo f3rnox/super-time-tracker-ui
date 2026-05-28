@@ -2,6 +2,7 @@ import { addDays, startOfDay, subDays } from "date-fns";
 
 import { get_activity_heatmap } from "@/lib/get_activity_heatmap";
 import { get_daily_time_buckets } from "@/lib/get_daily_time_buckets";
+import { get_focus_pattern_insights } from "@/lib/get_focus_pattern_insights";
 import { get_month_in_review_stats } from "@/lib/get_month_in_review_stats";
 import { get_period_trend_comparison } from "@/lib/get_period_trend_comparison";
 import { get_tag_time_breakdown } from "@/lib/get_tag_time_breakdown";
@@ -74,5 +75,10 @@ export function build_reporting_analytics(
       week_starts_on,
     ),
     monthInReview: get_month_in_review_stats(sheets, reference_now, now),
+    focusInsights: get_focus_pattern_insights(
+      sheets,
+      { startMs: daily_range_start, endMs: daily_range_end },
+      now,
+    ),
   };
 }

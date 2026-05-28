@@ -101,6 +101,56 @@ export interface MonthInReviewStats {
 }
 
 /**
+ * Hour-of-day bucket where focused work commonly lands.
+ */
+export interface FocusHourInsight {
+  hourIndex: number;
+  hourLabel: string;
+  totalMs: number;
+  entryCount: number;
+}
+
+/**
+ * Repeated idle window detected between tracked blocks.
+ */
+export interface RecurringIdleWindowInsight {
+  hourIndex: number;
+  hourLabel: string;
+  dayCount: number;
+  totalIdleMs: number;
+}
+
+/**
+ * Common project start time suggestion derived from sheet start history.
+ */
+export interface SheetStartSuggestionInsight {
+  sheetName: string;
+  hourIndex: number;
+  hourLabel: string;
+  startCount: number;
+  confidence: number;
+}
+
+/**
+ * Interpretive focus-pattern metrics for the active reporting range.
+ */
+export interface FocusPatternInsights {
+  activeDayCount: number;
+  bestFocusHours: FocusHourInsight[];
+  interruptionCount: number;
+  interruptionFrequencyPerDay: number;
+  contextSwitchCount: number;
+  contextSwitchesPerDay: number;
+  longestDeepWorkStreakMs: number;
+  longestDeepWorkStreakEntryCount: number;
+  recurringIdleWindows: RecurringIdleWindowInsight[];
+  sheetStartSuggestions: SheetStartSuggestionInsight[];
+  deepWorkThresholdMs: number;
+  interruptionGapThresholdMs: number;
+  idleWindowThresholdMs: number;
+}
+
+/**
  * Bundle of analytics derived from the reporting source sheets.
  */
 export interface ReportingAnalytics {
@@ -111,6 +161,7 @@ export interface ReportingAnalytics {
   weekTrend: PeriodTrendComparison;
   monthTrend: PeriodTrendComparison;
   monthInReview: MonthInReviewStats;
+  focusInsights: FocusPatternInsights;
 }
 
 /**

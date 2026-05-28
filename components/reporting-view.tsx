@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { ReportingActivityHeatmap } from "@/components/reporting-activity-heatmap";
 import { ReportingDailyBarChart } from "@/components/reporting-daily-bar-chart";
 import { ReportingDateRangePicker } from "@/components/reporting-date-range-picker";
+import { ReportingFocusInsights } from "@/components/reporting-focus-insights";
 import { ReportingMonthInReview } from "@/components/reporting-month-in-review";
 import { ReportingSortControls } from "@/components/reporting-sort-controls";
 import { ReportingTagPieChart } from "@/components/reporting-tag-pie-chart";
@@ -256,6 +257,11 @@ export function ReportingView({
               daily_buckets={analytics.dailyBuckets}
               duration_format={duration_format}
               subtitle={bar_chart_subtitle}
+            />
+
+            <ReportingFocusInsights
+              insights={analytics.focusInsights}
+              duration_format={duration_format}
             />
 
             <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2">
