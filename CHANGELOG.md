@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.25](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.22...v0.1.25) (2026-05-28)
+
+
+### Features
+
+* added support for checkout notes ([e453618](https://github.com/f3rnox/super-time-tracker-ui/commit/e4536183657d39103267105f3c4d64dc202347f5))
+* desktop notifications and pomodoro tweaks ([7c2c841](https://github.com/f3rnox/super-time-tracker-ui/commit/7c2c841bcc8668d2cd3861e31d0cd9befbc0be04))
+
+
+### Bug Fixes
+
+* build ([93dbd96](https://github.com/f3rnox/super-time-tracker-ui/commit/93dbd96ee06aad073b40d40d2b30a2d096f1b1c7))
+
 ### [0.1.24](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.23...v0.1.24) (2026-05-28)
 
 ### [0.1.23](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.22...v0.1.23) (2026-05-28)
