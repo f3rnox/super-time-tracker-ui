@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.20](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.19...v0.1.20) (2026-05-19)
+
+
+### Features
+
+* add more color palette options and tweak settings ([c7a4182](https://github.com/f3rnox/super-time-tracker-ui/commit/c7a4182af65ffe5c17608bd6991749878d364d34))
+* add today and sheets pages ([a4e23e2](https://github.com/f3rnox/super-time-tracker-ui/commit/a4e23e29921ac3ab075ec1df65d95a0d65c48be9))
+* cloud sync notification ([badd63f](https://github.com/f3rnox/super-time-tracker-ui/commit/badd63f289ad8a3ee2a8d0e02589da083a7dfb5f))
+* full settings cloud sync ([8c24e0b](https://github.com/f3rnox/super-time-tracker-ui/commit/8c24e0b535ffa1b3b5823cfa42e909022b192d18))
+* greedy sync setting ([7bfa34d](https://github.com/f3rnox/super-time-tracker-ui/commit/7bfa34da58d4dc3b47e98a00ecf74a3bbcb061b7))
+* improve cloud sync ([3512102](https://github.com/f3rnox/super-time-tracker-ui/commit/3512102fcb1cea52d437fe6d66efa3b62270572b))
+* rework reporting view ([dc22bc3](https://github.com/f3rnox/super-time-tracker-ui/commit/dc22bc3b1373a1b104cbd6a604bd6be41249e17c))
+* sync settings on page load ([c4a62fc](https://github.com/f3rnox/super-time-tracker-ui/commit/c4a62fc1c019ad807750fea9e8fbeb3527a30d87))
+
+
+### Bug Fixes
+
+* cloud sync bug ([afa55c9](https://github.com/f3rnox/super-time-tracker-ui/commit/afa55c90c6c60d31eb3b03371a4b4ad37b960e14))
+* hide tag suggestions when tag is entered ([427fddb](https://github.com/f3rnox/super-time-tracker-ui/commit/427fddb8c8e96086191a4a7e739c490dfbe0f87b))
+* on page load settings sync ([00262a3](https://github.com/f3rnox/super-time-tracker-ui/commit/00262a3a03d3b2674d44dc2480bcf1e40bb42afb))
+* reporting page nextjs error ([e03dcfb](https://github.com/f3rnox/super-time-tracker-ui/commit/e03dcfb0d57237e1c5a2a3ab2c8f3cc08b3f46d4))
+* reporting page nextjs errors ([bb08e2c](https://github.com/f3rnox/super-time-tracker-ui/commit/bb08e2ceb863c1404917fb8315e03bd925682ad1))
+* reporting page streak figure ([b3334d6](https://github.com/f3rnox/super-time-tracker-ui/commit/b3334d6a60ed178f8baed5b26eac6bcb5d42cbae))
+* settings sync on save ([7ffd657](https://github.com/f3rnox/super-time-tracker-ui/commit/7ffd6577d74a01fd0d4024c84bf337c0caeab270))
+* sync logic ([dda4986](https://github.com/f3rnox/super-time-tracker-ui/commit/dda4986f5ea45ff36c35d3cdaa8ed663c6f9dca1))
+
 ### [0.1.19](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.18...v0.1.19) (2026-05-19)
 
 
