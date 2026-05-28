@@ -13,6 +13,7 @@ import { delete_tracker_action } from '@/lib/delete_tracker_action'
 import { filter_today_focus_by_sheet_names } from '@/lib/filter_today_focus_by_sheet_names'
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
+import { finish_running_pomodoro_timer } from '@/lib/finish_running_pomodoro_timer'
 import { navigate_to_tracker_sheet } from '@/lib/navigate_to_tracker_sheet'
 import { patch_tracker_action } from '@/lib/patch_tracker_action'
 import { post_tracker_action } from '@/lib/post_tracker_action'
@@ -184,12 +185,13 @@ export function TodayFocusView({ initial_data }: TodayFocusViewProps) {
                   in_bar
                   is_pending={is_pending}
                   on_check_out={(at) =>
-                    void run_action(() =>
-                      post_tracker_action('/api/out', {
+                    void run_action(async () => {
+                      await post_tracker_action('/api/out', {
                         sheetName: entry.sheetName,
                         ...(at !== undefined ? { at } : {}),
-                      }),
-                    )
+                      })
+                      finish_running_pomodoro_timer()
+                    })
                   }
                   on_delete={() =>
                     void run_action(() =>

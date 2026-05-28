@@ -14,6 +14,8 @@ export interface PomodoroSettings {
   long_break_minutes: number
   rounds_before_long_break: number
   auto_start_next_phase: boolean
+  check_in_on_work_start: boolean
+  work_entry_description: string
 }
 
 export interface PomodoroTimerState {
@@ -35,6 +37,8 @@ export const POMODORO_DEFAULT_SETTINGS: PomodoroSettings = {
   long_break_minutes: POMODORO_DEFAULT_LONG_BREAK_MINUTES,
   rounds_before_long_break: POMODORO_DEFAULT_ROUNDS_BEFORE_LONG_BREAK,
   auto_start_next_phase: true,
+  check_in_on_work_start: true,
+  work_entry_description: 'Pomodoro focus',
 }
 
 export const POMODORO_DEFAULT_STATE: PomodoroTimerState = {

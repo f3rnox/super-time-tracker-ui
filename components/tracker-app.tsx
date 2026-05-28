@@ -19,6 +19,7 @@ import { TrackerTopbar } from '@/components/tracker-topbar'
 import { build_resume_description } from '@/lib/build_resume_description'
 import { collect_tags_from_entries } from '@/lib/collect_tags_from_entries'
 import { filter_entries_by_tags } from '@/lib/filter_entries_by_tags'
+import { finish_running_pomodoro_timer } from '@/lib/finish_running_pomodoro_timer'
 import {
   get_sheet_tag_filter_server_snapshot,
   get_sheet_tag_filter_snapshot,
@@ -65,8 +66,15 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
 
     try {
       const next_state = await action()
+      const should_finish_pomodoro =
+        state.activeEntry !== null && next_state.activeEntry === null
+
       sync_active_sheet_preference(next_state)
       set_state(next_state)
+
+      if (should_finish_pomodoro) {
+        finish_running_pomodoro_timer()
+      }
     } catch (action_error: unknown) {
       set_error(
         action_error instanceof Error

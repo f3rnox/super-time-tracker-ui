@@ -10,6 +10,7 @@ import { EntryActionsMenu } from '@/components/entry-actions-menu'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
 import { type EntryEditFormValues } from '@/components/entry-edit-form'
 import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_dialog'
+import { is_pomodoro_task_entry } from '@/lib/pomodoro_task_marker'
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import {
   type SerializedEntry,
@@ -35,6 +36,9 @@ const section_label_class =
 
 const tracking_pill_class =
   'shrink-0 rounded-full bg-accent px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-accent-text-on'
+
+const pomodoro_pill_class =
+  'shrink-0 rounded-full border border-panel-border bg-surface-raised px-2 py-0.5 text-[0.68rem] font-bold uppercase leading-none tracking-wider text-foreground'
 
 /**
  * Active entry display for the tracker content column.
@@ -82,6 +86,9 @@ export const TrackerActiveBar = forwardRef<
           Sheet {active_entry.sheetName}
         </span>
         <span className={tracking_pill_class}>Tracking</span>
+        {is_pomodoro_task_entry(active_entry) ? (
+          <span className={pomodoro_pill_class}>Pomodoro</span>
+        ) : null}
         <div className="ml-auto">
           <EntryActionsMenu
             current_sheet_name={active_entry.sheetName}

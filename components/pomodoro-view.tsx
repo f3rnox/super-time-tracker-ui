@@ -1,9 +1,12 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { TagAutocompleteInput } from '@/components/tag-autocomplete-input'
 import { TrackerTopbar } from '@/components/tracker-topbar'
 import { get_button_class_name } from '@/lib/get_button_class_name'
+import { read_stored_active_sheet } from '@/lib/read_stored_active_sheet'
 import {
   POMODORO_DEFAULT_SETTINGS,
   POMODORO_DEFAULT_STATE,
@@ -17,7 +20,7 @@ import {
 /**
  * Client Pomodoro timer with configurable work and break cycles.
  */
-export function PomodoroView() {
+export function PomodoroView({ known_tags }: { known_tags: string[] }) {
   const [settings, set_settings] = useState<PomodoroSettings>(
     POMODORO_DEFAULT_SETTINGS,
   )
@@ -26,6 +29,7 @@ export function PomodoroView() {
   )
   const [now_ms, set_now_ms] = useState<number>(() => Date.now())
   const [is_hydrated, set_is_hydrated] = useState(false)
+  const [sync_error, set_sync_error] = useState<string | null>(null)
   const original_title_ref = useRef<string | null>(null)
 
   useEffect(() => {
@@ -74,6 +78,15 @@ export function PomodoroView() {
                 typeof stored_settings.auto_start_next_phase === 'boolean'
                   ? stored_settings.auto_start_next_phase
                   : POMODORO_DEFAULT_SETTINGS.auto_start_next_phase,
+              check_in_on_work_start:
+                typeof stored_settings.check_in_on_work_start === 'boolean'
+                  ? stored_settings.check_in_on_work_start
+                  : POMODORO_DEFAULT_SETTINGS.check_in_on_work_start,
+              work_entry_description:
+                typeof stored_settings.work_entry_description === 'string' &&
+                stored_settings.work_entry_description.trim().length > 0
+                  ? stored_settings.work_entry_description.trim()
+                  : POMODORO_DEFAULT_SETTINGS.work_entry_description,
             })
           }
 
@@ -175,7 +188,56 @@ export function PomodoroView() {
     ],
   )
 
+  const build_pomodoro_entry_description = (): string =>
+    settings.work_entry_description.trim()
+
+  const start_tracker_entry_for_pomodoro = async (): Promise<void> => {
+    const description = build_pomodoro_entry_description()
+
+    if (description.length === 0) {
+      return
+    }
+
+    const response = await fetch('/api/in', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        description,
+        sheetName: read_stored_active_sheet() ?? undefined,
+      }),
+    })
+
+    if (response.ok) {
+      return
+    }
+
+    const body = (await response.json().catch(() => ({}))) as { error?: string }
+    throw new Error(body.error ?? 'Failed to start tracker entry for Pomodoro')
+  }
+
+  const stop_active_tracker_entry_for_pomodoro = async (): Promise<void> => {
+    const response = await fetch('/api/out', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+
+    if (response.ok) {
+      return
+    }
+
+    const body = (await response.json().catch(() => ({}))) as { error?: string }
+    const message = body.error ?? 'Failed to check out active tracker entry'
+
+    if (message.includes('No active entry')) {
+      return
+    }
+
+    throw new Error(message)
+  }
+
   const start_timer = (): void => {
+    set_sync_error(null)
     set_timer_state((current) => {
       const duration_ms =
         current.status === 'paused' && current.paused_remaining_ms !== null
@@ -189,9 +251,25 @@ export function PomodoroView() {
         paused_remaining_ms: null,
       }
     })
+
+    const is_resuming = timer_state.status === 'paused'
+    const should_check_in =
+      is_resuming ||
+      (timer_state.status !== 'running' &&
+        timer_state.phase === 'work' &&
+        settings.check_in_on_work_start)
+
+    if (!should_check_in) {
+      return
+    }
+
+    void start_tracker_entry_for_pomodoro().catch((error: unknown) => {
+      set_sync_error(error instanceof Error ? error.message : String(error))
+    })
   }
 
   const pause_timer = (): void => {
+    set_sync_error(null)
     set_timer_state((current) => {
       if (current.status !== 'running' || current.deadline_at_ms === null) {
         return current
@@ -203,6 +281,10 @@ export function PomodoroView() {
         deadline_at_ms: null,
         paused_remaining_ms: Math.max(0, current.deadline_at_ms - Date.now()),
       }
+    })
+
+    void stop_active_tracker_entry_for_pomodoro().catch((error: unknown) => {
+        set_sync_error(error instanceof Error ? error.message : String(error))
     })
   }
 
@@ -430,111 +512,38 @@ export function PomodoroView() {
               >
                 Reset
               </button>
+              <Link
+                href="/settings/pomodoro"
+                className={`${get_button_class_name('ghost')} inline-flex items-center no-underline`}
+              >
+                Pomodoro settings
+              </Link>
             </div>
+            {sync_error !== null ? (
+              <p className="m-0 text-[0.82rem] text-danger">{sync_error}</p>
+            ) : null}
+            {settings.check_in_on_work_start ? (
+              <div className="grid gap-2 rounded-md border border-panel-border bg-background p-3 md:grid-cols-2">
+                <label className="flex flex-col gap-1.5 md:col-span-2">
+                  <span className="text-[0.8rem] font-semibold text-muted">
+                    New entry description (supports @tags)
+                  </span>
+                  <TagAutocompleteInput
+                    id="pomodoro-work-entry-description"
+                    value={settings.work_entry_description}
+                    known_tags={known_tags}
+                    placeholder="Pomodoro focus @pomodoro @focus"
+                    on_change={(value) => {
+                      set_settings((current) => ({
+                        ...current,
+                        work_entry_description: value,
+                      }))
+                    }}
+                  />
+                </label>
+              </div>
+            ) : null}
           </div>
-        </section>
-
-        <section className="grid gap-4 rounded-md border border-panel-border bg-panel p-5 shadow-sm md:grid-cols-2">
-          <label className="flex flex-col gap-2">
-            <span className="text-[0.85rem] font-semibold">Work minutes</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              className="rounded-md border border-panel-border bg-background px-3 py-2"
-              value={settings.work_minutes}
-                disabled={timer_state.status === 'running'}
-              onChange={(event) => {
-                set_settings((current) => ({
-                  ...current,
-                  work_minutes: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
-                }))
-              }}
-            />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-[0.85rem] font-semibold">Short break minutes</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              className="rounded-md border border-panel-border bg-background px-3 py-2"
-              value={settings.short_break_minutes}
-                disabled={timer_state.status === 'running'}
-              onChange={(event) => {
-                set_settings((current) => ({
-                  ...current,
-                  short_break_minutes: Math.max(
-                    1,
-                    Number.parseInt(event.target.value, 10) || 1,
-                  ),
-                }))
-              }}
-            />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-[0.85rem] font-semibold">Long break minutes</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              className="rounded-md border border-panel-border bg-background px-3 py-2"
-              value={settings.long_break_minutes}
-                disabled={timer_state.status === 'running'}
-              onChange={(event) => {
-                set_settings((current) => ({
-                  ...current,
-                  long_break_minutes: Math.max(
-                    1,
-                    Number.parseInt(event.target.value, 10) || 1,
-                  ),
-                }))
-              }}
-            />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-[0.85rem] font-semibold">Rounds before long break</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              className="rounded-md border border-panel-border bg-background px-3 py-2"
-              value={settings.rounds_before_long_break}
-                disabled={timer_state.status === 'running'}
-              onChange={(event) => {
-                set_settings((current) => ({
-                  ...current,
-                  rounds_before_long_break: Math.max(
-                    1,
-                    Number.parseInt(event.target.value, 10) || 1,
-                  ),
-                }))
-              }}
-            />
-          </label>
-
-          <label className="flex items-center gap-2 md:col-span-2">
-            <input
-              type="checkbox"
-              checked={settings.auto_start_next_phase}
-              disabled={timer_state.status === 'running'}
-              onChange={(event) => {
-                set_settings((current) => ({
-                  ...current,
-                  auto_start_next_phase: event.target.checked,
-                }))
-              }}
-            />
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[0.85rem] font-semibold">Auto-start the next phase</span>
-              <span className="text-[0.8rem] leading-snug text-muted">
-                Keep the timer moving without requiring a click after every phase change.
-              </span>
-            </span>
-          </label>
         </section>
       </main>
     </>

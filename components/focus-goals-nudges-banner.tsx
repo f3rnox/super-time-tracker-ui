@@ -16,6 +16,10 @@ import { focus_nudges_enabled_preference } from '@/lib/preferences/focus_nudges_
 import { no_log_reminder_minutes_preference } from '@/lib/preferences/no_log_reminder_minutes_preference'
 import { overwork_alert_hours_preference } from '@/lib/preferences/overwork_alert_hours_preference'
 import { weekly_focus_target_minutes_preference } from '@/lib/preferences/weekly_focus_target_minutes_preference'
+import {
+  POMODORO_STORAGE_KEY,
+  type PomodoroStorageRecord,
+} from '@/lib/types/pomodoro'
 import { use_duration_format } from '@/lib/use_duration_format'
 import { type DurationFormat, type FocusGoalScope } from '@/lib/types/ui_preferences'
 import { type FocusNudgesStatus } from '@/lib/types/focus_nudges_status'
@@ -23,6 +27,7 @@ import { type FocusNudgesStatus } from '@/lib/types/focus_nudges_status'
 const one_minute_ms = 60000
 const one_hour_ms = 3600000
 const refresh_interval_ms = 60000
+const pomodoro_refresh_interval_ms = 1000
 
 type BannerContent =
   | {
@@ -43,6 +48,11 @@ type BannerContent =
 interface FocusGoalsNudgesBannerProps {
   on_check_in_shortcut?: () => void
   has_running_timer?: boolean
+}
+
+interface ActivePomodoroDetails {
+  phase_label: string
+  remaining_label: string
 }
 
 /**
@@ -104,6 +114,59 @@ export function FocusGoalsNudgesBanner({
     focus_goals_per_tag_preference.get_server_snapshot,
   )
   const [status, set_status] = useState<FocusNudgesStatus | null>(null)
+  const [active_pomodoro, set_active_pomodoro] =
+    useState<ActivePomodoroDetails | null>(null)
+
+  useEffect(() => {
+    const read_active_pomodoro = (): ActivePomodoroDetails | null => {
+      try {
+        const raw_value = window.localStorage.getItem(POMODORO_STORAGE_KEY)
+
+        if (raw_value === null) {
+          return null
+        }
+
+        const parsed = JSON.parse(raw_value) as Partial<PomodoroStorageRecord>
+        const timer_state = parsed.state
+
+        if (
+          timer_state === undefined ||
+          timer_state.status !== 'running' ||
+          timer_state.deadline_at_ms === null
+        ) {
+          return null
+        }
+
+        const remaining_ms = Math.max(0, timer_state.deadline_at_ms - Date.now())
+        const minutes = Math.floor(remaining_ms / one_minute_ms)
+        const seconds = Math.floor((remaining_ms % one_minute_ms) / 1000)
+        const phase_label =
+          timer_state.phase === 'work'
+            ? 'Focus'
+            : timer_state.phase === 'short_break'
+              ? 'Short break'
+              : 'Long break'
+
+        return {
+          phase_label,
+          remaining_label: `${minutes.toString().padStart(2, '0')}:${seconds
+            .toString()
+            .padStart(2, '0')}`,
+        }
+      } catch {
+        return null
+      }
+    }
+
+    set_active_pomodoro(read_active_pomodoro())
+    const interval_id = window.setInterval(() => {
+      set_active_pomodoro(read_active_pomodoro())
+    }, pomodoro_refresh_interval_ms)
+
+    return () => {
+      window.clearInterval(interval_id)
+    }
+  }, [])
 
   useEffect(() => {
     if (nudges_enabled !== 'true') {
@@ -256,6 +319,7 @@ export function FocusGoalsNudgesBanner({
         tracked_ms={content.tracked_ms}
         target_ms={content.target_ms}
         duration_format={duration_format}
+        active_pomodoro={active_pomodoro}
       />
     )
   }
@@ -386,6 +450,7 @@ interface FocusProgressCardProps {
   tracked_ms: number
   target_ms: number
   duration_format: DurationFormat
+  active_pomodoro: ActivePomodoroDetails | null
 }
 
 /**
@@ -397,6 +462,7 @@ function FocusProgressCard({
   tracked_ms,
   target_ms,
   duration_format,
+  active_pomodoro,
 }: FocusProgressCardProps) {
   const percent = target_ms > 0 ? Math.min(100, (tracked_ms / target_ms) * 100) : 0
   const remaining_ms = Math.max(0, target_ms - tracked_ms)
@@ -413,6 +479,11 @@ function FocusProgressCard({
           {title}
         </p>
         <div className="flex items-center gap-3">
+          {active_pomodoro !== null ? (
+            <p className="m-0 rounded border border-panel-border bg-surface-raised px-2 py-1 font-mono text-[0.72rem] font-semibold text-accent">
+              Pomodoro {active_pomodoro.phase_label} · {active_pomodoro.remaining_label}
+            </p>
+          ) : null}
           {scope === 'daily' ? (
             <Link
               href="/settings/goals#focus-goals-nudges"
