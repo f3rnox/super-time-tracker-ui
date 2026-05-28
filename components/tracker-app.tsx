@@ -16,6 +16,7 @@ import { SheetSidebar } from '@/components/sheet-sidebar'
 import { TrackerActiveBar } from '@/components/tracker-active-bar'
 import { TrackerDocumentTitle } from '@/components/tracker-document-title'
 import { TrackerTopbar } from '@/components/tracker-topbar'
+import { build_check_out_request_payload } from '@/lib/build_check_out_request_payload'
 import { build_resume_description } from '@/lib/build_resume_description'
 import { collect_tags_from_entries } from '@/lib/collect_tags_from_entries'
 import { filter_entries_by_tags } from '@/lib/filter_entries_by_tags'
@@ -204,12 +205,12 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
         check_in_form_ref={check_in_form_ref}
         active_entry_panel_ref={active_entry_panel_ref}
         on_select_sheet={select_sheet}
-        on_check_out={(at) =>
+        on_check_out={(options) =>
           run_action(() =>
-            post_tracker_action('/api/out', {
-              sheetName: active_sheet,
-              ...(at !== undefined ? { at } : {}),
-            }),
+            post_tracker_action(
+              '/api/out',
+              build_check_out_request_payload(active_sheet, options),
+            ),
           )
         }
       />
@@ -284,12 +285,12 @@ export function TrackerApp({ initial_state }: TrackerAppProps) {
                 sheets={state.sheets}
                 known_tags={state.knownTags}
                 is_pending={is_pending}
-                on_check_out={(at) =>
+                on_check_out={(options) =>
                   run_action(() =>
-                    post_tracker_action('/api/out', {
-                      sheetName: active_sheet,
-                      ...(at !== undefined ? { at } : {}),
-                    }),
+                    post_tracker_action(
+                      '/api/out',
+                      build_check_out_request_payload(active_sheet, options),
+                    ),
                   )
                 }
                 on_delete={() =>

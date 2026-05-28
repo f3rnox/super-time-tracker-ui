@@ -2,26 +2,23 @@
 
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { prompt_check_out_at } from '@/lib/prompt_check_out_at'
-import { use_check_out_action } from '@/lib/use_check_out_action'
 
 interface CheckoutButtonGroupProps {
   in_bar?: boolean
   is_pending: boolean
-  on_check_out: (at?: string) => void
+  on_start_checkout: (at?: string) => void
 }
 
 const group_button_class = `${get_button_class_name('danger-solid')} rounded-none first:rounded-l-[0.65rem] last:rounded-r-[0.65rem] not-first:-ml-px not-first:min-w-12 not-first:border-l not-first:border-l-[color-mix(in_srgb,#ffffff_30%,var(--danger-solid))] min-[561px]:px-2.5 min-[561px]:py-2 min-[561px]:text-[0.9rem] max-[560px]:flex-1 max-[560px]:basis-1/2`
 
 /**
- * Check out now or at a natural-language time in a joined button group.
+ * Triggers checkout now or at a natural-language time, opening the checkout form.
  */
 export function CheckoutButtonGroup({
   in_bar = false,
   is_pending,
-  on_check_out,
+  on_start_checkout,
 }: CheckoutButtonGroupProps) {
-  const check_out_with_confirm = use_check_out_action(on_check_out)
-
   const handle_at = (): void => {
     const at = prompt_check_out_at()
 
@@ -29,7 +26,7 @@ export function CheckoutButtonGroup({
       return
     }
 
-    void check_out_with_confirm(at)
+    on_start_checkout(at)
   }
 
   return (
@@ -40,7 +37,7 @@ export function CheckoutButtonGroup({
         type="button"
         className={group_button_class}
         disabled={is_pending}
-        onClick={() => void check_out_with_confirm()}
+        onClick={() => on_start_checkout()}
       >
         Check out
       </button>
