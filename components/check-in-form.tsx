@@ -1,10 +1,14 @@
 'use client'
 
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useState, useSyncExternalStore } from 'react'
 
 import { TagAutocompleteInput } from '@/components/tag-autocomplete-input'
 import { get_button_class_name } from '@/lib/get_button_class_name'
 import { get_input_class_name } from '@/lib/get_input_class_name'
+import { claude_api_key_preference } from '@/lib/preferences/claude_api_key_preference'
+import { entry_suggestion_provider_preference } from '@/lib/preferences/entry_suggestion_provider_preference'
+import { google_ai_api_key_preference } from '@/lib/preferences/google_ai_api_key_preference'
+import { openai_api_key_preference } from '@/lib/preferences/openai_api_key_preference'
 
 export interface CheckInFormValues {
   description: string
@@ -27,6 +31,38 @@ export function CheckInForm({
 }: CheckInFormProps) {
   const [description, set_description] = useState('')
   const [at, set_at] = useState('')
+  const [suggestion_error, set_suggestion_error] = useState<string | null>(null)
+  const [is_suggestion_pending, set_is_suggestion_pending] = useState(false)
+  const suggestion_provider = useSyncExternalStore(
+    entry_suggestion_provider_preference.subscribe,
+    entry_suggestion_provider_preference.get_snapshot,
+    entry_suggestion_provider_preference.get_server_snapshot,
+  )
+  const openai_api_key = useSyncExternalStore(
+    openai_api_key_preference.subscribe,
+    openai_api_key_preference.get_snapshot,
+    openai_api_key_preference.get_server_snapshot,
+  )
+  const claude_api_key = useSyncExternalStore(
+    claude_api_key_preference.subscribe,
+    claude_api_key_preference.get_snapshot,
+    claude_api_key_preference.get_server_snapshot,
+  )
+  const google_ai_api_key = useSyncExternalStore(
+    google_ai_api_key_preference.subscribe,
+    google_ai_api_key_preference.get_snapshot,
+    google_ai_api_key_preference.get_server_snapshot,
+  )
+  const selected_api_key =
+    suggestion_provider === 'openai'
+      ? openai_api_key
+      : suggestion_provider === 'claude'
+        ? claude_api_key
+        : suggestion_provider === 'google_ai'
+          ? google_ai_api_key
+        : ''
+  const can_suggest =
+    suggestion_provider !== 'none' && selected_api_key.trim().length > 0
 
   const handle_submit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
@@ -46,6 +82,45 @@ export function CheckInForm({
     set_at('')
   }
 
+  const suggest_description = async (): Promise<void> => {
+    if (!can_suggest) {
+      return
+    }
+
+    set_is_suggestion_pending(true)
+    set_suggestion_error(null)
+
+    try {
+      const response = await fetch('/api/entry/suggest-description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: suggestion_provider,
+          api_key: selected_api_key,
+          context: description,
+        }),
+      })
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string }
+        throw new Error(body.error ?? 'Failed to suggest description')
+      }
+
+      const body = (await response.json()) as { description?: string }
+      const next_description = body.description?.trim() ?? ''
+
+      if (next_description.length === 0) {
+        throw new Error('Suggestion was empty')
+      }
+
+      set_description(next_description)
+    } catch (error: unknown) {
+      set_suggestion_error(error instanceof Error ? error.message : String(error))
+    } finally {
+      set_is_suggestion_pending(false)
+    }
+  }
+
   return (
     <form
       className="flex flex-col gap-2 border border-panel-border bg-panel p-[1.1rem] shadow-sm"
@@ -54,7 +129,13 @@ export function CheckInForm({
       <label className="text-[0.85rem] text-muted" htmlFor="check-in-description">
         What are you working on?
       </label>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 max-[860px]:grid-cols-1">
+      <div
+        className={`grid gap-2 max-[860px]:grid-cols-1 ${
+          can_suggest
+            ? 'grid-cols-[minmax(0,1fr)_auto_auto]'
+            : 'grid-cols-[minmax(0,1fr)_auto]'
+        }`}
+      >
         <TagAutocompleteInput
           id="check-in-description"
           value={description}
@@ -64,6 +145,17 @@ export function CheckInForm({
           autoFocus
           on_change={set_description}
         />
+        {can_suggest ? (
+          <button
+            type="button"
+            className={get_button_class_name('ghost')}
+            disabled={is_pending || is_suggestion_pending}
+            onClick={() => void suggest_description()}
+            title="Suggest description with AI"
+          >
+            {is_suggestion_pending ? 'Suggesting…' : 'Suggest'}
+          </button>
+        ) : null}
         <button
           type="submit"
           className={get_button_class_name('primary')}
@@ -72,6 +164,9 @@ export function CheckInForm({
           Check in
         </button>
       </div>
+      {suggestion_error !== null ? (
+        <p className="m-0 text-[0.8rem] text-danger">{suggestion_error}</p>
+      ) : null}
       <label className="text-[0.85rem] text-muted" htmlFor="check-in-at">
         Start time{' '}
         <span className="font-normal opacity-85">(optional, natural language)</span>

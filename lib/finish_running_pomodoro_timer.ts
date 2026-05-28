@@ -6,6 +6,7 @@ import {
   POMODORO_STORAGE_KEY,
   type PomodoroStorageRecord,
 } from '@/lib/types/pomodoro'
+import { clear_pomodoro_task_entry_marker } from '@/lib/pomodoro_task_marker'
 
 /**
  * Stops a running Pomodoro timer and resets it to idle.
@@ -35,6 +36,7 @@ export function finish_running_pomodoro_timer(): void {
     }
 
     window.localStorage.setItem(POMODORO_STORAGE_KEY, JSON.stringify(next_record))
+    clear_pomodoro_task_entry_marker()
   } catch {
     // Ignore malformed or unavailable localStorage.
   }

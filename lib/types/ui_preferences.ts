@@ -171,3 +171,20 @@ export type FocusGoalsPerTagJson = string
 export const FOCUS_GOALS_PER_TAG_STORAGE_KEY =
   'super-time-tracker-focus-goals-per-tag'
 export const FOCUS_GOALS_PER_TAG_DEFAULT: FocusGoalsPerTagJson = '{}'
+
+export type EntrySuggestionProvider = 'none' | 'openai' | 'claude' | 'google_ai'
+export const ENTRY_SUGGESTION_PROVIDER_STORAGE_KEY =
+  'super-time-tracker-entry-suggestion-provider'
+export const ENTRY_SUGGESTION_PROVIDER_DEFAULT: EntrySuggestionProvider = 'none'
+
+export type OpenAiApiKey = string
+export const OPENAI_API_KEY_STORAGE_KEY = 'super-time-tracker-openai-api-key'
+export const OPENAI_API_KEY_DEFAULT: OpenAiApiKey = ''
+
+export type ClaudeApiKey = string
+export const CLAUDE_API_KEY_STORAGE_KEY = 'super-time-tracker-claude-api-key'
+export const CLAUDE_API_KEY_DEFAULT: ClaudeApiKey = ''
+
+export type GoogleAiApiKey = string
+export const GOOGLE_AI_API_KEY_STORAGE_KEY = 'super-time-tracker-google-ai-api-key'
+export const GOOGLE_AI_API_KEY_DEFAULT: GoogleAiApiKey = ''

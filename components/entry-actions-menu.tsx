@@ -14,6 +14,8 @@ interface EntryActionsMenuProps {
   on_edit: () => void
   on_add_note?: (text: string) => void
   on_show_add_note_form?: () => void
+  on_revise_description_ai?: () => void
+  can_revise_description_ai?: boolean
   on_resume?: () => void
   entry_is_active?: boolean
   on_delete: () => void
@@ -33,6 +35,8 @@ export function EntryActionsMenu({
   on_edit,
   on_add_note,
   on_show_add_note_form,
+  on_revise_description_ai,
+  can_revise_description_ai = false,
   on_resume,
   entry_is_active = false,
   on_delete,
@@ -133,6 +137,27 @@ export function EntryActionsMenu({
                 }}
               >
                 Add note
+              </button>
+            </li>
+          ) : null}
+          {on_revise_description_ai !== undefined ? (
+            <li role="none">
+              <button
+                type="button"
+                className={menu_item_class}
+                role="menuitem"
+                disabled={is_pending || !can_revise_description_ai}
+                title={
+                  can_revise_description_ai
+                    ? 'Revise with AI'
+                    : 'Configure provider and key in Settings → AI suggestions'
+                }
+                onClick={() => {
+                  close_menu()
+                  on_revise_description_ai()
+                }}
+              >
+                Revise description with AI
               </button>
             </li>
           ) : null}

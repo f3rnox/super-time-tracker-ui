@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 
 import { Checkbox } from '@/components/checkbox'
 import { use_confirm_dialog } from '@/components/confirm-dialog-provider'
@@ -15,6 +15,11 @@ import { get_delete_entry_confirm_dialog } from '@/lib/get_delete_entry_confirm_
 import { format_display_tag } from '@/lib/format_display_tag'
 import { format_duration } from '@/lib/format_duration'
 import { get_entry_row_key } from '@/lib/get_entry_row_key'
+import { claude_api_key_preference } from '@/lib/preferences/claude_api_key_preference'
+import { entry_suggestion_provider_preference } from '@/lib/preferences/entry_suggestion_provider_preference'
+import { google_ai_api_key_preference } from '@/lib/preferences/google_ai_api_key_preference'
+import { openai_api_key_preference } from '@/lib/preferences/openai_api_key_preference'
+import { request_ai_entry_description_suggestion } from '@/lib/request_ai_entry_description_suggestion'
 import { use_confirm_destructive_actions } from '@/lib/use_confirm_destructive_actions'
 import { use_escape_to_cancel } from '@/lib/use_escape_to_cancel'
 import { use_duration_format } from '@/lib/use_duration_format'
@@ -82,6 +87,40 @@ export function EntryList({
   const duration_format = use_duration_format()
   const [editing_key, set_editing_key] = useState<string | null>(null)
   const [selected_keys, set_selected_keys] = useState<Set<string>>(() => new Set())
+  const [ai_revise_pending_key, set_ai_revise_pending_key] = useState<string | null>(
+    null,
+  )
+  const [ai_revise_error, set_ai_revise_error] = useState<string | null>(null)
+  const suggestion_provider = useSyncExternalStore(
+    entry_suggestion_provider_preference.subscribe,
+    entry_suggestion_provider_preference.get_snapshot,
+    entry_suggestion_provider_preference.get_server_snapshot,
+  )
+  const openai_api_key = useSyncExternalStore(
+    openai_api_key_preference.subscribe,
+    openai_api_key_preference.get_snapshot,
+    openai_api_key_preference.get_server_snapshot,
+  )
+  const claude_api_key = useSyncExternalStore(
+    claude_api_key_preference.subscribe,
+    claude_api_key_preference.get_snapshot,
+    claude_api_key_preference.get_server_snapshot,
+  )
+  const google_ai_api_key = useSyncExternalStore(
+    google_ai_api_key_preference.subscribe,
+    google_ai_api_key_preference.get_snapshot,
+    google_ai_api_key_preference.get_server_snapshot,
+  )
+  const selected_api_key =
+    suggestion_provider === 'openai'
+      ? openai_api_key
+      : suggestion_provider === 'claude'
+        ? claude_api_key
+        : suggestion_provider === 'google_ai'
+          ? google_ai_api_key
+        : ''
+  const can_revise_description_ai =
+    suggestion_provider !== 'none' && selected_api_key.trim().length > 0
 
   const entry_keys = entries.map((entry) => get_entry_row_key(entry))
   const selected_entries = entries.filter((entry) =>
@@ -154,6 +193,33 @@ export function EntryList({
 
   const has_selection = selected_entries.length > 0
 
+  const revise_entry_description_with_ai = async (
+    entry: SerializedEntry,
+  ): Promise<void> => {
+    if (!can_revise_description_ai) {
+      return
+    }
+
+    const row_key = get_entry_row_key(entry)
+    set_ai_revise_pending_key(row_key)
+    set_ai_revise_error(null)
+
+    try {
+      const notes_context = entry.notes.map((note) => note.text).join('\n')
+      const description = await request_ai_entry_description_suggestion({
+        provider: suggestion_provider,
+        api_key: selected_api_key,
+        context: entry.description,
+        notes: notes_context,
+      })
+      on_edit(entry, { description })
+    } catch (error: unknown) {
+      set_ai_revise_error(error instanceof Error ? error.message : String(error))
+    } finally {
+      set_ai_revise_pending_key(null)
+    }
+  }
+
   use_escape_to_cancel(clear_selection, has_selection && editing_key === null)
 
   return (
@@ -204,6 +270,9 @@ export function EntryList({
               </p>
             </div>
             <EntryListSortControls is_pending={is_pending} />
+            {ai_revise_error !== null ? (
+              <p className="m-0 text-[0.8rem] text-danger">{ai_revise_error}</p>
+            ) : null}
           </>
         )}
       </header>
@@ -304,8 +373,14 @@ export function EntryList({
                       <EntryActionsMenu
                         current_sheet_name={entry.sheetName}
                         sheets={sheets}
-                        is_pending={is_pending}
+                        is_pending={is_pending || ai_revise_pending_key === row_key}
                         on_edit={() => set_editing_key(row_key)}
+                        on_revise_description_ai={
+                          can_revise_description_ai
+                            ? () => void revise_entry_description_with_ai(entry)
+                            : undefined
+                        }
+                        can_revise_description_ai={can_revise_description_ai}
                         on_add_note={(text) => on_add_note(entry, text)}
                         on_resume={() => on_resume(entry)}
                         entry_is_active={entry.isActive}

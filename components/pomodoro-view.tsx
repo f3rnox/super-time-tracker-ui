@@ -6,6 +6,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { TagAutocompleteInput } from '@/components/tag-autocomplete-input'
 import { TrackerTopbar } from '@/components/tracker-topbar'
 import { get_button_class_name } from '@/lib/get_button_class_name'
+import {
+  clear_pomodoro_task_entry_marker,
+  mark_pomodoro_task_entry,
+} from '@/lib/pomodoro_task_marker'
 import { read_stored_active_sheet } from '@/lib/read_stored_active_sheet'
 import {
   POMODORO_DEFAULT_SETTINGS,
@@ -208,6 +212,17 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     })
 
     if (response.ok) {
+      const payload = (await response.json().catch(() => null)) as
+        | { activeEntry?: { id: number; sheetName: string } | null }
+        | null
+      const active_entry = payload?.activeEntry
+
+      if (active_entry !== null && active_entry !== undefined) {
+        mark_pomodoro_task_entry({
+          id: active_entry.id,
+          sheetName: active_entry.sheetName,
+        })
+      }
       return
     }
 
@@ -223,6 +238,7 @@ export function PomodoroView({ known_tags }: { known_tags: string[] }) {
     })
 
     if (response.ok) {
+      clear_pomodoro_task_entry_marker()
       return
     }
 
