@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.22](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.21...v0.1.22) (2026-05-28)
+
+
+### Features
+
+* update favicon and pwa icon ([ca61759](https://github.com/f3rnox/super-time-tracker-ui/commit/ca617597a38c9deea867784bc30700159cf93345))
+
 ### [0.1.21](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.20...v0.1.21) (2026-05-28)
 
 
