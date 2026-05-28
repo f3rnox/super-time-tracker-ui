@@ -1,4 +1,5 @@
 import { find_entry_note_index } from "@/lib/find_entry_note_index";
+import { find_sheet_entry_by_id } from "@/lib/find_sheet_entry_by_id";
 import { get_sheet } from "@/lib/get_sheet";
 import { read_db } from "@/lib/read_db";
 import { write_db } from "@/lib/write_db";
@@ -19,7 +20,7 @@ export async function delete_note_on_entry(
   const { entry_id, note_timestamp, sheet_name, text } = args;
   const db = await read_db();
   const sheet = get_sheet(db, sheet_name);
-  const entry = sheet.entries.find(({ id }) => id === entry_id);
+  const entry = find_sheet_entry_by_id(sheet, entry_id);
 
   if (entry === undefined) {
     throw new Error(`Entry ${entry_id} not found in sheet ${sheet_name}`);

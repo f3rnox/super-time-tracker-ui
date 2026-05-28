@@ -1,3 +1,4 @@
+import { merge_entry_notes_arrays } from "@/lib/merge_entry_notes_arrays";
 import { type TimeSheetEntry } from "@/lib/types";
 
 /**
@@ -17,8 +18,25 @@ export function dedupe_sheet_entries_by_id(
     }
 
     if (entry.end === null && existing.end !== null) {
-      by_id.set(entry.id, entry);
+      by_id.set(entry.id, {
+        ...entry,
+        notes: merge_entry_notes_arrays(entry.notes, existing.notes),
+      });
+      continue;
     }
+
+    if (existing.end === null && entry.end !== null) {
+      by_id.set(entry.id, {
+        ...existing,
+        notes: merge_entry_notes_arrays(existing.notes, entry.notes),
+      });
+      continue;
+    }
+
+    by_id.set(entry.id, {
+      ...existing,
+      notes: merge_entry_notes_arrays(existing.notes, entry.notes),
+    });
   }
 
   return [...by_id.values()].sort((left, right) => left.id - right.id);

@@ -1,3 +1,4 @@
+import { find_running_entry_on_sheet } from "@/lib/find_running_entry_on_sheet";
 import { find_sheet_with_active_entry } from "@/lib/find_sheet_with_active_entry";
 import { get_sheet } from "@/lib/get_sheet";
 import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
@@ -21,16 +22,11 @@ export async function check_out_entry(
   const { at, note, sheet_name: input_sheet_name } = args;
   const db = await read_db();
   const sheet = resolve_check_out_sheet(db, input_sheet_name);
-  const { activeEntryID, name: sheet_name } = sheet;
+  const { name: sheet_name } = sheet;
+  const entry = find_running_entry_on_sheet(sheet);
 
-  if (activeEntryID === null) {
+  if (entry === null) {
     throw new Error(`No active entry for sheet ${sheet_name}`);
-  }
-
-  const entry = sheet.entries.find(({ id }) => id === activeEntryID);
-
-  if (entry === undefined) {
-    throw new Error(`No entry found with ID ${activeEntryID}`);
   }
 
   const end_date =

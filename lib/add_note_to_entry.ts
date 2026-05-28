@@ -1,3 +1,5 @@
+import { find_running_entry_on_sheet } from "@/lib/find_running_entry_on_sheet";
+import { find_sheet_entry_by_id } from "@/lib/find_sheet_entry_by_id";
 import { find_sheet_with_active_entry } from "@/lib/find_sheet_with_active_entry";
 import { get_sheet } from "@/lib/get_sheet";
 import { parse_natural_language_date } from "@/lib/parse_natural_language_date";
@@ -38,24 +40,22 @@ export async function add_note_to_entry(
   if (resolved_sheet === null) {
     throw new Error("No active sheet");
   }
-  const { entries, name: sheet_name } = resolved_sheet;
-  const entry_id = has_target ? input_entry_id! : resolved_sheet.activeEntryID;
+  const { name: sheet_name } = resolved_sheet;
+  const entry = has_target
+    ? find_sheet_entry_by_id(resolved_sheet, input_entry_id!)
+    : find_running_entry_on_sheet(resolved_sheet);
 
-  if (entry_id === null) {
-    throw new Error(`Sheet ${sheet_name} has no active entry`);
-  }
-
-  const entry = entries.find(({ id }) => id === entry_id);
-
-  if (entry === undefined) {
+  if (entry === undefined || entry === null) {
+    const entry_id = has_target ? input_entry_id : resolved_sheet.activeEntryID;
     throw new Error(`Entry ${entry_id} not found in sheet ${sheet_name}`);
   }
 
+  const now = new Date();
   const note_timestamp =
     at === undefined || at.trim().length === 0
-      ? resolve_default_note_timestamp(entry)
+      ? resolve_default_note_timestamp(entry, now)
       : parse_natural_language_date(at);
-  const latest_allowed = entry.end ?? new Date();
+  const latest_allowed = entry.end ?? now;
 
   if (+note_timestamp < +entry.start) {
     throw new Error("Note time must be on or after entry start");
