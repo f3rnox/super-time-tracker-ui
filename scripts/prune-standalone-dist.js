@@ -7,6 +7,37 @@ const { dirname, join, relative, resolve } = require('path')
 const root = join(__dirname, '..')
 const dist_standalone = join(root, 'dist', 'standalone')
 
+const DOC_FILENAMES = new Set([
+  'README.md',
+  'readme.md',
+  'CHANGELOG.md',
+  'CHANGELOG',
+  'HISTORY.md',
+  'CONTRIBUTING.md',
+])
+
+const NEXT_DEV_RELATIVE_PATHS = [
+  'node_modules/next/dist/docs',
+  'node_modules/next/dist/bundle-analyzer',
+  'node_modules/next/dist/next-devtools',
+  'node_modules/next/dist/cli',
+  'node_modules/next/dist/compiled/next-devtools',
+  'node_modules/next/dist/compiled/react-dom-experimental',
+  'node_modules/next/dist/compiled/react-dom',
+  'node_modules/next/dist/compiled/webpack',
+  'node_modules/next/dist/compiled/babel',
+  'node_modules/next/dist/compiled/babel-packages',
+  'node_modules/next/dist/compiled/terser',
+  'node_modules/next/dist/compiled/@modelcontextprotocol',
+  'node_modules/next/types',
+  'node_modules/next/font',
+  'node_modules/next/navigation-types',
+  'node_modules/next/image-types',
+  'node_modules/next/legacy',
+  'node_modules/next/experimental',
+  'node_modules/next/compat',
+]
+
 /**
  * Removes paths under standalone_dir when they exist.
  * @param {string} standalone_dir
@@ -43,6 +74,55 @@ function remove_files_with_suffix(dir, suffix, max_depth) {
 
     if (entry.isFile() && entry.name.endsWith(suffix)) {
       rmSync(entry_path, { force: true })
+    }
+  }
+}
+
+/**
+ * Deletes files with exact names under dir (depth-limited walk).
+ * @param {string} dir
+ * @param {Set<string>} filenames
+ * @param {number} max_depth
+ */
+function remove_named_files(dir, filenames, max_depth) {
+  if (max_depth < 0 || !existsSync(dir)) {
+    return
+  }
+
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const entry_path = join(dir, entry.name)
+
+    if (entry.isDirectory()) {
+      remove_named_files(entry_path, filenames, max_depth - 1)
+      continue
+    }
+
+    if (entry.isFile() && filenames.has(entry.name)) {
+      rmSync(entry_path, { force: true })
+    }
+  }
+}
+
+/**
+ * Removes experimental bundles from next/dist/compiled.
+ * @param {string} standalone_dir
+ */
+function remove_compiled_experimental(standalone_dir) {
+  const compiled = join(
+    standalone_dir,
+    'node_modules',
+    'next',
+    'dist',
+    'compiled',
+  )
+
+  if (!existsSync(compiled)) {
+    return
+  }
+
+  for (const entry of readdirSync(compiled)) {
+    if (entry.includes('experimental')) {
+      rmSync(join(compiled, entry), { recursive: true, force: true })
     }
   }
 }
@@ -108,9 +188,18 @@ function prune_standalone_dist(standalone_dir) {
   remove_paths(standalone_dir, [
     'node_modules/sharp',
     'node_modules/@img',
+    ...NEXT_DEV_RELATIVE_PATHS,
   ])
 
+  remove_compiled_experimental(standalone_dir)
   remove_files_with_suffix(standalone_dir, '.map', 12)
+  remove_files_with_suffix(standalone_dir, '.d.ts', 16)
+
+  const node_modules = join(standalone_dir, 'node_modules')
+
+  if (existsSync(node_modules)) {
+    remove_named_files(node_modules, DOC_FILENAMES, 16)
+  }
 
   const compiled_server = join(
     standalone_dir,
