@@ -1,6 +1,7 @@
 import { ClearTagFiltersOnSheetChangeSetting } from '@/components/clear-tag-filters-on-sheet-change-setting'
 import { ConfirmBeforeCheckoutSetting } from '@/components/confirm-before-checkout-setting'
 import { ConfirmDestructiveActionsSetting } from '@/components/confirm-destructive-actions-setting'
+import { DebugLoggingSetting } from '@/components/debug-logging-setting'
 import { DefaultSheetSessionSetting } from '@/components/default-sheet-session-setting'
 import { SettingsPageLayout } from '@/components/settings-page-layout'
 
@@ -35,6 +36,9 @@ export function GeneralSettingsView({
         </li>
         <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
           <ClearTagFiltersOnSheetChangeSetting />
+        </li>
+        <li className="rounded-md border border-panel-border bg-panel p-3.5 shadow-sm">
+          <DebugLoggingSetting />
         </li>
       </ul>
     </SettingsPageLayout>

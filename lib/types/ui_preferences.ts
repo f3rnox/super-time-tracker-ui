@@ -115,6 +115,10 @@ export const CLEAR_TAG_FILTERS_ON_SHEET_CHANGE_STORAGE_KEY =
 export const CLEAR_TAG_FILTERS_ON_SHEET_CHANGE_DEFAULT: ClearTagFiltersOnSheetChange =
   'false'
 
+export type DebugLogging = 'true' | 'false'
+export const DEBUG_LOGGING_STORAGE_KEY = 'super-time-tracker-debug-logging'
+export const DEBUG_LOGGING_DEFAULT: DebugLogging = 'false'
+
 export type GreedyCloudSync = 'true' | 'false'
 export const GREEDY_CLOUD_SYNC_STORAGE_KEY =
   'super-time-tracker-greedy-cloud-sync'

@@ -9,6 +9,7 @@ import { claude_api_key_preference } from '@/lib/preferences/claude_api_key_pref
 import { entry_suggestion_provider_preference } from '@/lib/preferences/entry_suggestion_provider_preference'
 import { google_ai_api_key_preference } from '@/lib/preferences/google_ai_api_key_preference'
 import { openai_api_key_preference } from '@/lib/preferences/openai_api_key_preference'
+import { request_ai_entry_description_suggestion } from '@/lib/request_ai_entry_description_suggestion'
 
 export interface CheckInFormValues {
   description: string
@@ -91,27 +92,12 @@ export function CheckInForm({
     set_suggestion_error(null)
 
     try {
-      const response = await fetch('/api/entry/suggest-description', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          provider: suggestion_provider,
-          api_key: selected_api_key,
-          context: description,
-        }),
+      const next_description = await request_ai_entry_description_suggestion({
+        provider: suggestion_provider,
+        api_key: selected_api_key,
+        context: description,
+        notes: '',
       })
-
-      if (!response.ok) {
-        const body = (await response.json().catch(() => ({}))) as { error?: string }
-        throw new Error(body.error ?? 'Failed to suggest description')
-      }
-
-      const body = (await response.json()) as { description?: string }
-      const next_description = body.description?.trim() ?? ''
-
-      if (next_description.length === 0) {
-        throw new Error('Suggestion was empty')
-      }
 
       set_description(next_description)
     } catch (error: unknown) {

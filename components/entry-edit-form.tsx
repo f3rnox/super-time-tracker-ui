@@ -20,6 +20,7 @@ interface EntryEditFormProps {
   entry: SerializedEntry
   known_tags: string[]
   is_pending: boolean
+  initial_description_override?: string
   in_active_panel?: boolean
   times_only?: boolean
   on_save: (values: EntryEditFormValues) => void
@@ -33,24 +34,36 @@ export function EntryEditForm({
   entry,
   known_tags,
   is_pending,
+  initial_description_override,
   in_active_panel = false,
   times_only = false,
   on_save,
   on_cancel,
 }: EntryEditFormProps) {
   const initial_description = useMemo(
-    () => build_resume_description(entry.description, entry.tags),
-    [entry.description, entry.id, entry.tags],
+    () =>
+      initial_description_override ??
+      build_resume_description(entry.description, entry.tags),
+    [entry.description, entry.id, entry.tags, initial_description_override],
   )
   const [description, set_description] = useState(initial_description)
   const [start, set_start] = useState('')
   const [end, set_end] = useState('')
 
   useEffect(() => {
-    set_description(build_resume_description(entry.description, entry.tags))
+    set_description(
+      initial_description_override ??
+        build_resume_description(entry.description, entry.tags),
+    )
     set_start('')
     set_end('')
-  }, [entry.description, entry.id, entry.sheetName, entry.tags])
+  }, [
+    entry.description,
+    entry.id,
+    entry.sheetName,
+    entry.tags,
+    initial_description_override,
+  ])
 
   use_escape_to_cancel(on_cancel)
 

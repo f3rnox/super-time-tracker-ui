@@ -91,6 +91,9 @@ export function EntryList({
     null,
   )
   const [ai_revise_error, set_ai_revise_error] = useState<string | null>(null)
+  const [ai_revise_draft_by_key, set_ai_revise_draft_by_key] = useState<
+    Record<string, string>
+  >({})
   const suggestion_provider = useSyncExternalStore(
     entry_suggestion_provider_preference.subscribe,
     entry_suggestion_provider_preference.get_snapshot,
@@ -212,7 +215,11 @@ export function EntryList({
         context: entry.description,
         notes: notes_context,
       })
-      on_edit(entry, { description })
+      set_ai_revise_draft_by_key((previous) => ({
+        ...previous,
+        [row_key]: description,
+      }))
+      set_editing_key(row_key)
     } catch (error: unknown) {
       set_ai_revise_error(error instanceof Error ? error.message : String(error))
     } finally {
@@ -296,10 +303,29 @@ export function EntryList({
                       entry={entry}
                       known_tags={known_tags}
                       is_pending={is_pending}
-                      on_cancel={() => set_editing_key(null)}
+                      initial_description_override={ai_revise_draft_by_key[row_key]}
+                      on_cancel={() => {
+                        set_editing_key(null)
+                        set_ai_revise_draft_by_key((previous) => {
+                          if (!(row_key in previous)) {
+                            return previous
+                          }
+                          const next = { ...previous }
+                          delete next[row_key]
+                          return next
+                        })
+                      }}
                       on_save={(values) => {
                         on_edit(entry, values)
                         set_editing_key(null)
+                        set_ai_revise_draft_by_key((previous) => {
+                          if (!(row_key in previous)) {
+                            return previous
+                          }
+                          const next = { ...previous }
+                          delete next[row_key]
+                          return next
+                        })
                       }}
                     />
                   </li>
@@ -374,7 +400,17 @@ export function EntryList({
                         current_sheet_name={entry.sheetName}
                         sheets={sheets}
                         is_pending={is_pending || ai_revise_pending_key === row_key}
-                        on_edit={() => set_editing_key(row_key)}
+                        on_edit={() => {
+                          set_editing_key(row_key)
+                          set_ai_revise_draft_by_key((previous) => {
+                            if (!(row_key in previous)) {
+                              return previous
+                            }
+                            const next = { ...previous }
+                            delete next[row_key]
+                            return next
+                          })
+                        }}
                         on_revise_description_ai={
                           can_revise_description_ai
                             ? () => void revise_entry_description_with_ai(entry)
