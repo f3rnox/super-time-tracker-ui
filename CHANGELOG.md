@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.35](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.34...v0.1.35) (2026-05-28)
+
+
+### Bug Fixes
+
+* speed up nextjs rendering ([7f536a6](https://github.com/f3rnox/super-time-tracker-ui/commit/7f536a6313e8a2b65f16072df494b335bc89ba54))
+
 ### [0.1.34](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.33...v0.1.34) (2026-05-28)
 
 
