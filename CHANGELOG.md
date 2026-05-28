@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.44](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.43...v0.1.44) (2026-05-28)
+
+
+### Bug Fixes
+
+* sonarqube ([c150772](https://github.com/f3rnox/super-time-tracker-ui/commit/c150772e951ccda95551d7f5bd0c11e7bfca7d0d))
+
 ### [0.1.43](https://github.com/f3rnox/super-time-tracker-ui/compare/v0.1.42...v0.1.43) (2026-05-28)
 
 
