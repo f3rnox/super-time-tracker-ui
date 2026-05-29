@@ -8,7 +8,7 @@ import { is_supabase_configured } from "@/lib/is_supabase_configured";
  */
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   if (!is_supabase_configured()) {
-    return NextResponse.next({ request });
+    return NextResponse.next();
   }
 
   const { supabase, response } = create_proxy_supabase_client(request);

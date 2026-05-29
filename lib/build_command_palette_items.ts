@@ -56,6 +56,14 @@ const navigation_items: CommandPaletteItem[] = [
     href: "/sheets",
   },
   {
+    id: "nav-tasks",
+    kind: "navigate",
+    group: "Pages",
+    title: "Open Tasks",
+    keywords: ["tasks", "todo", "projects"],
+    href: "/tasks",
+  },
+  {
     id: "nav-reporting",
     kind: "navigate",
     group: "Pages",

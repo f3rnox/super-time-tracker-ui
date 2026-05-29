@@ -20,6 +20,7 @@ const topbar_quick_action_items: TopbarQuickActionItem[] = [
   { id: "templates", href: "/templates", label: "Templates" },
   { id: "search", href: "/search", label: "Search" },
   { id: "sheets", href: "/sheets", label: "Sheets" },
+  { id: "tasks", href: "/tasks", label: "Tasks" },
   { id: "reporting", href: "/reporting", label: "Reporting" },
   { id: "pomodoro", href: "/pomodoro", label: "Pomodoro" },
   { id: "manage-tags", href: "/settings/tags", label: "Tags" },

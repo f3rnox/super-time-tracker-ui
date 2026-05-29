@@ -41,6 +41,7 @@ const topbar_action_labels: Record<TopbarQuickActionId, string> = {
   templates: "Template library",
   search: "Search entries",
   sheets: "Sheets",
+  tasks: "Tasks",
   reporting: "Reporting",
   pomodoro: "Pomodoro",
   "manage-tags": "Tag management",

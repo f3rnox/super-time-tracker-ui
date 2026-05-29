@@ -1,4 +1,5 @@
 import { DB_VERSION } from "@/lib/config";
+import { migrate_json_db_to_version_five } from "@/lib/migrate_json_db_to_version_five";
 import { migrate_json_db_to_version_four } from "@/lib/migrate_json_db_to_version_four";
 import { migrate_json_db_to_version_three } from "@/lib/migrate_json_db_to_version_three";
 import { migrate_json_db_to_version_two } from "@/lib/migrate_json_db_to_version_two";
@@ -11,6 +12,7 @@ const MIGRATIONS_BY_TARGET_VERSION: Record<
   2: migrate_json_db_to_version_two,
   3: migrate_json_db_to_version_three,
   4: migrate_json_db_to_version_four,
+  5: migrate_json_db_to_version_five,
 };
 
 export interface MigrateJsonDbResult {

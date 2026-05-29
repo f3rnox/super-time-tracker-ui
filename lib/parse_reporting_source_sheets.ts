@@ -10,6 +10,7 @@ export function parse_reporting_source_sheets(
   return source_sheets.map((sheet) => ({
     name: sheet.name,
     activeEntryID: sheet.activeEntryID,
+    tasks: [],
     entries: sheet.entries.map((entry) => ({
       id: entry.id,
       start: new Date(entry.start),

@@ -38,6 +38,7 @@ const topbar_shortcut_menu_items: Record<
   templates: { href: "/templates", label: "Templates" },
   search: { href: "/search", label: "Search" },
   sheets: { href: "/sheets", label: "Sheets" },
+  tasks: { href: "/tasks", label: "Tasks" },
   reporting: { href: "/reporting", label: "Reporting" },
   pomodoro: { href: "/pomodoro", label: "Pomodoro" },
   "manage-tags": { href: "/settings/tags", label: "Manage tags" },

@@ -2,6 +2,7 @@ import {
   type JSONTimeTrackerDB,
   type JSONTimeSheet,
   type JSONTimeSheetEntry,
+  type JSONTimeSheetTask,
   type TimeTrackerDB,
 } from "@/lib/types";
 
@@ -13,6 +14,16 @@ export function convert_db_to_json(db: TimeTrackerDB): JSONTimeTrackerDB {
     name: sheet.name,
     activeEntryID: sheet.activeEntryID,
     ...(sheet.archived === true ? { archived: true } : {}),
+    tasks: sheet.tasks.map(
+      (task): JSONTimeSheetTask => ({
+        id: task.id,
+        title: task.title,
+        createdAt: task.createdAt.getTime(),
+        updatedAt: task.updatedAt.getTime(),
+        completedAt:
+          task.completedAt === null ? null : task.completedAt.getTime(),
+      }),
+    ),
     entries: sheet.entries.map(
       (entry): JSONTimeSheetEntry => ({
         id: entry.id,

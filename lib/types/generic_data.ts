@@ -14,9 +14,18 @@ export interface ITimeSheetEntry<T> {
   archived?: boolean;
 }
 
+export interface ITimeSheetTask<T> {
+  id: string;
+  title: string;
+  createdAt: T;
+  updatedAt: T;
+  completedAt: T | null;
+}
+
 export interface ITimeSheet<T> {
   name: string;
   entries: ITimeSheetEntry<T>[];
+  tasks: ITimeSheetTask<T>[];
   activeEntryID: number | null;
   /** When true, hidden from hub and sheet sidebar. */
   archived?: boolean;

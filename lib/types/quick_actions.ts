@@ -33,6 +33,7 @@ export const topbar_quick_action_ids = [
   "templates",
   "search",
   "sheets",
+  "tasks",
   "reporting",
   "pomodoro",
   "manage-tags",

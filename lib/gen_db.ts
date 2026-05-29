@@ -2,6 +2,7 @@ import { DB_VERSION, DEFAULT_SHEET_NAME } from "@/lib/config";
 import {
   type TimeSheet,
   type TimeSheetEntry,
+  type TimeSheetTask,
   type TimeTrackerDB,
 } from "@/lib/types";
 
@@ -12,6 +13,7 @@ export function gen_sheet(
   name: string,
   entries: TimeSheetEntry[] = [],
   active_entry_id: number | null = null,
+  tasks: TimeSheetTask[] = [],
 ): TimeSheet {
   if (name.length === 0) {
     throw new Error("New sheet name must not be empty");
@@ -27,6 +29,7 @@ export function gen_sheet(
   return {
     name,
     entries,
+    tasks,
     activeEntryID: active_entry_id,
   };
 }

@@ -3,14 +3,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { DB_VERSION } from "@/lib/config";
 import { create_server_supabase_client } from "@/lib/create_server_supabase_client";
 import { is_missing_archived_column_error } from "@/lib/is_missing_archived_column_error";
+import { is_missing_tasks_table_error } from "@/lib/is_missing_tasks_table_error";
 import { dedupe_sheet_entries_by_id } from "@/lib/dedupe_sheet_entries_by_id";
 import { reconcile_stale_active_entry_ids } from "@/lib/reconcile_stale_active_entry_ids";
 import { supports_supabase_archive_columns } from "@/lib/supports_supabase_archive_columns";
+import { supports_supabase_tasks } from "@/lib/supports_supabase_tasks";
 import { gen_db, gen_sheet } from "@/lib/gen_db";
 import {
   type TimeSheet,
   type TimeSheetEntry,
   type TimeSheetEntryNote,
+  type TimeSheetTask,
   type TimeTrackerDB,
 } from "@/lib/types";
 
@@ -44,6 +47,15 @@ interface EntryNoteRow {
   text: string;
 }
 
+interface TaskRow {
+  sheet_id: string;
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+}
+
 /**
  * Loads the tracker database from Supabase for the signed-in user.
  */
@@ -71,6 +83,7 @@ export async function read_supabase_db(
   let include_archived = supports_supabase_archive_columns(
     account_row.db_version,
   );
+  let include_tasks = supports_supabase_tasks(account_row.db_version);
 
   const sheet_load = await load_supabase_sheets(
     supabase,
@@ -90,6 +103,14 @@ export async function read_supabase_db(
   }
 
   const sheet_ids = sheets_list.map((sheet) => sheet.id);
+  const task_load = await load_supabase_tasks(
+    supabase,
+    user_id,
+    sheet_ids,
+    include_tasks,
+  );
+
+  include_tasks = task_load.include_tasks;
 
   const entries_list = await load_supabase_entries(
     supabase,
@@ -123,6 +144,21 @@ export async function read_supabase_db(
   }
 
   const entries_by_sheet = new Map<string, TimeSheetEntry[]>();
+  const tasks_by_sheet = new Map<string, TimeSheetTask[]>();
+
+  for (const task of task_load.tasks) {
+    const sheet_tasks = tasks_by_sheet.get(task.sheet_id) ?? [];
+
+    sheet_tasks.push({
+      id: task.id,
+      title: task.title,
+      createdAt: new Date(task.created_at),
+      updatedAt: new Date(task.updated_at),
+      completedAt:
+        task.completed_at === null ? null : new Date(task.completed_at),
+    });
+    tasks_by_sheet.set(task.sheet_id, sheet_tasks);
+  }
 
   for (const entry of entries_list) {
     const key = `${entry.sheet_id}:${entry.id}`;
@@ -145,6 +181,7 @@ export async function read_supabase_db(
       sheet.name,
       dedupe_sheet_entries_by_id(entries_by_sheet.get(sheet.id) ?? []),
       sheet.active_entry_id,
+      tasks_by_sheet.get(sheet.id) ?? [],
     );
 
     if (sheet.archived === true) {
@@ -156,7 +193,9 @@ export async function read_supabase_db(
 
   const db: TimeTrackerDB = {
     version: include_archived
-      ? (account_row.db_version ?? DB_VERSION)
+      ? include_tasks
+        ? (account_row.db_version ?? DB_VERSION)
+        : Math.min(account_row.db_version ?? DB_VERSION, 4)
       : Math.min(account_row.db_version ?? DB_VERSION, 3),
     activeSheetName: account_row.active_sheet_name,
     sheets,
@@ -165,6 +204,38 @@ export async function read_supabase_db(
   reconcile_stale_active_entry_ids(db);
 
   return db;
+}
+
+async function load_supabase_tasks(
+  supabase: SupabaseClient,
+  user_id: string,
+  sheet_ids: string[],
+  include_tasks: boolean,
+): Promise<{ include_tasks: boolean; tasks: TaskRow[] }> {
+  if (!include_tasks || sheet_ids.length === 0) {
+    return { include_tasks: false, tasks: [] };
+  }
+
+  const { data, error } = await supabase
+    .from("sheet_tasks")
+    .select("sheet_id, id, title, created_at, updated_at, completed_at")
+    .in("sheet_id", sheet_ids)
+    .order("created_at", { ascending: false });
+
+  if (error !== null && is_missing_tasks_table_error(error.message)) {
+    await supabase
+      .from("tracker_accounts")
+      .update({ db_version: 4 })
+      .eq("user_id", user_id);
+
+    return { include_tasks: false, tasks: [] };
+  }
+
+  if (error !== null) {
+    throw new Error(`Failed to load tasks: ${error.message}`);
+  }
+
+  return { include_tasks: true, tasks: (data ?? []) as TaskRow[] };
 }
 
 async function load_supabase_sheets(

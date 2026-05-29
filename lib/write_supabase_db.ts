@@ -1,8 +1,11 @@
 import { create_server_supabase_client } from "@/lib/create_server_supabase_client";
 import { get_supabase_persisted_db_version } from "@/lib/get_supabase_persisted_db_version";
 import { is_missing_archived_column_error } from "@/lib/is_missing_archived_column_error";
+import { is_missing_tasks_table_error } from "@/lib/is_missing_tasks_table_error";
 import { sync_supabase_sheet_entries } from "@/lib/sync_supabase_sheet_entries";
+import { sync_supabase_sheet_tasks } from "@/lib/sync_supabase_sheet_tasks";
 import { supports_supabase_archive_columns } from "@/lib/supports_supabase_archive_columns";
+import { supports_supabase_tasks } from "@/lib/supports_supabase_tasks";
 import { type TimeTrackerDB } from "@/lib/types";
 
 interface SheetUpsertRow {
@@ -41,6 +44,7 @@ export async function write_supabase_db(
   const cloud_db_version = (account_row as { db_version?: number } | null)
     ?.db_version;
   let include_archived = supports_supabase_archive_columns(cloud_db_version);
+  let include_tasks = supports_supabase_tasks(cloud_db_version);
   let persisted_db_version = get_supabase_persisted_db_version(
     db.version,
     cloud_db_version,
@@ -145,6 +149,28 @@ export async function write_supabase_db(
         sheet,
         include_archived,
       );
+      if (include_tasks) {
+        try {
+          await sync_supabase_sheet_tasks(supabase, sheet_id, sheet);
+        } catch (tasks_error: unknown) {
+          if (
+            tasks_error instanceof Error &&
+            is_missing_tasks_table_error(tasks_error.message)
+          ) {
+            include_tasks = false;
+            persisted_db_version = get_supabase_persisted_db_version(
+              db.version,
+              4,
+            );
+            await supabase
+              .from("tracker_accounts")
+              .update({ db_version: persisted_db_version })
+              .eq("user_id", user_id);
+          } else {
+            throw tasks_error;
+          }
+        }
+      }
       continue;
     }
 
@@ -162,5 +188,28 @@ export async function write_supabase_db(
       sheet,
       include_archived,
     );
+
+    if (!include_tasks) {
+      continue;
+    }
+
+    try {
+      await sync_supabase_sheet_tasks(supabase, sheet_id, sheet);
+    } catch (tasks_error: unknown) {
+      if (
+        tasks_error instanceof Error &&
+        is_missing_tasks_table_error(tasks_error.message)
+      ) {
+        include_tasks = false;
+        persisted_db_version = get_supabase_persisted_db_version(db.version, 4);
+        await supabase
+          .from("tracker_accounts")
+          .update({ db_version: persisted_db_version })
+          .eq("user_id", user_id);
+        continue;
+      }
+
+      throw tasks_error;
+    }
   }
 }

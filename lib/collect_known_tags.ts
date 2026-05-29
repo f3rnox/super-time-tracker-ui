@@ -16,6 +16,12 @@ export function collect_known_tags(db: TimeTrackerDB): string[] {
         }
       }
     }
+
+    for (const task of sheet.tasks) {
+      for (const tag of task.title.match(/@\w+/g) ?? []) {
+        tags.add(tag);
+      }
+    }
   }
 
   return [...tags].sort((left, right) => left.localeCompare(right));

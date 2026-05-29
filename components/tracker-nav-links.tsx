@@ -11,6 +11,11 @@ interface NavItem {
 
 const base_nav_items: NavItem[] = [
   { href: "/", label: "Tracker", match: (pathname) => pathname === "/" },
+  {
+    href: "/tasks",
+    label: "Tasks",
+    match: (pathname) => pathname === "/tasks",
+  },
 ];
 
 const link_base_class =

@@ -14,12 +14,31 @@ export function convert_json_db(json_db: JSONTimeTrackerDB): TimeTrackerDB {
     ({
       name: json_name,
       entries: json_entries,
+      tasks: json_tasks,
       activeEntryID: json_active_entry_id,
       archived: json_archived,
     }) => ({
       name: json_name,
       activeEntryID: json_active_entry_id,
       ...(json_archived === true ? { archived: true } : {}),
+      tasks: (json_tasks ?? []).map(
+        ({
+          id: json_task_id,
+          title: json_task_title,
+          createdAt: json_task_created_at,
+          updatedAt: json_task_updated_at,
+          completedAt: json_task_completed_at,
+        }) => ({
+          id: json_task_id,
+          title: json_task_title,
+          createdAt: new Date(json_task_created_at),
+          updatedAt: new Date(json_task_updated_at),
+          completedAt:
+            json_task_completed_at === null
+              ? null
+              : new Date(json_task_completed_at),
+        }),
+      ),
       entries: json_entries.map(
         ({
           id: json_id,

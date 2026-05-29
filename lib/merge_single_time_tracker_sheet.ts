@@ -9,6 +9,7 @@ import {
 import {
   type TimeSheet,
   type TimeSheetEntry,
+  type TimeSheetTask,
   type TimeTrackerDB,
 } from "@/lib/types";
 
@@ -84,6 +85,42 @@ export function merge_single_time_tracker_sheet(
     entries,
     prefer,
   );
+  const task_ids = new Set<string>();
+
+  for (const task of base_sheet.tasks) {
+    task_ids.add(task.id);
+  }
+
+  for (const task of incoming_sheet.tasks) {
+    task_ids.add(task.id);
+  }
+
+  const tasks: TimeSheetTask[] = [...task_ids]
+    .map((id) => {
+      const base_task = base_sheet.tasks.find((task) => task.id === id);
+      const incoming_task = incoming_sheet.tasks.find((task) => task.id === id);
+
+      if (base_task === undefined) {
+        return incoming_task!;
+      }
+
+      if (incoming_task === undefined) {
+        return base_task;
+      }
+
+      return prefer === "incoming" ? incoming_task : base_task;
+    })
+    .sort((left, right) => {
+      if (left.completedAt === null && right.completedAt !== null) {
+        return -1;
+      }
+
+      if (left.completedAt !== null && right.completedAt === null) {
+        return 1;
+      }
+
+      return right.createdAt.getTime() - left.createdAt.getTime();
+    });
 
   const sheet_archived = pick_merged_archived(
     base_sheet.archived,
@@ -94,6 +131,7 @@ export function merge_single_time_tracker_sheet(
   return {
     name,
     entries: dedupe_sheet_entries_by_id(entries),
+    tasks,
     activeEntryID: active_entry_id,
     ...(sheet_archived === true ? { archived: true } : {}),
   };

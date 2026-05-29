@@ -29,6 +29,7 @@ export function migrate_json_db_to_version_two(
       }) => ({
         name: json_name,
         activeEntryID: json_active_entry_id,
+        tasks: [],
         entries: json_entries.map(
           ({
             id: json_id,

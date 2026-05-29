@@ -15,7 +15,7 @@ export interface ProxySupabaseClients {
 export function create_proxy_supabase_client(
   request: NextRequest,
 ): ProxySupabaseClients {
-  let response = NextResponse.next({ request });
+  let response = NextResponse.next();
   const { anon_key, url } = get_supabase_env();
 
   const supabase = createServerClient(url, anon_key, {
@@ -27,7 +27,7 @@ export function create_proxy_supabase_client(
         cookies_to_set.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
-        response = NextResponse.next({ request });
+        response = NextResponse.next();
         cookies_to_set.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
