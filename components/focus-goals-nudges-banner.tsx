@@ -41,6 +41,8 @@ type BannerContent =
       title: string;
       detail: string;
       show_check_in_shortcut?: boolean;
+      show_overwork_dismiss?: boolean;
+      show_targets_met_dismiss?: boolean;
     }
   | {
       kind: "progress";
@@ -126,6 +128,9 @@ export function FocusGoalsNudgesBanner({
   );
   const [activePomodoro, setActivePomodoro] =
     useState<ActivePomodoroDetails | null>(null);
+  const [is_overwork_alert_dismissed, setIsOverworkAlertDismissed] =
+    useState(false);
+  const [is_targets_met_dismissed, setIsTargetsMetDismissed] = useState(false);
 
   useEffect(() => {
     const read_activePomodoro = (): ActivePomodoroDetails | null => {
@@ -243,6 +248,86 @@ export function FocusGoalsNudgesBanner({
     initial_focus_nudges_status,
   ]);
 
+  const overwork_alert_ms =
+    Math.max(1, Number.parseInt(overwork_hours, 10) || 1) * one_hour_ms;
+  const is_overwork_alert_active =
+    nudges_enabled === "true" &&
+    status !== null &&
+    status.activeTimerDurationMs !== null &&
+    status.activeTimerDurationMs >= overwork_alert_ms;
+  const is_targets_met_active = useMemo(() => {
+    if (nudges_enabled !== "true" || status === null) {
+      return false;
+    }
+
+    const { daily_minutes: resolved_daily, weekly_minutes: resolved_weekly } =
+      resolve_target_minutes({
+        scope: goal_scope,
+        sheet_name: goal_sheet_name,
+        tag_name: goal_tag_name,
+        per_sheet_json,
+        per_tag_json,
+        global_daily: daily_target_minutes,
+        global_weekly: weekly_target_minutes,
+      });
+
+    if (resolved_daily === null || resolved_weekly === null) {
+      return false;
+    }
+
+    const daily_target_ms = Number.parseInt(resolved_daily, 10) * one_minute_ms;
+    const weekly_target_ms =
+      Number.parseInt(resolved_weekly, 10) * one_minute_ms;
+    const no_log_reminder_threshold = Number.parseInt(reminder_minutes, 10);
+
+    if (status.activeTimerDurationMs !== null && is_overwork_alert_active) {
+      return false;
+    }
+
+    if (
+      !has_running_timer &&
+      status.minutesSinceLastLog !== null &&
+      status.minutesSinceLastLog >= no_log_reminder_threshold
+    ) {
+      return false;
+    }
+
+    if (status.todayTrackedMs < daily_target_ms) {
+      return false;
+    }
+
+    if (status.weekTrackedMs < weekly_target_ms) {
+      return false;
+    }
+
+    return true;
+  }, [
+    daily_target_minutes,
+    has_running_timer,
+    nudges_enabled,
+    goal_scope,
+    goal_sheet_name,
+    goal_tag_name,
+    per_sheet_json,
+    per_tag_json,
+    reminder_minutes,
+    status,
+    weekly_target_minutes,
+    is_overwork_alert_active,
+  ]);
+
+  useEffect(() => {
+    if (!is_overwork_alert_active) {
+      setIsOverworkAlertDismissed(false);
+    }
+  }, [is_overwork_alert_active]);
+
+  useEffect(() => {
+    if (!is_targets_met_active) {
+      setIsTargetsMetDismissed(false);
+    }
+  }, [is_targets_met_active]);
+
   const content = useMemo<BannerContent | null>(() => {
     if (nudges_enabled !== "true" || status === null) {
       return null;
@@ -275,18 +360,19 @@ export function FocusGoalsNudgesBanner({
     const daily_target_ms = Number.parseInt(resolved_daily, 10) * one_minute_ms;
     const weekly_target_ms =
       Number.parseInt(resolved_weekly, 10) * one_minute_ms;
-    const overwork_alert_ms = Number.parseInt(overwork_hours, 10) * one_hour_ms;
     const no_log_reminder_threshold = Number.parseInt(reminder_minutes, 10);
 
     if (
       status.activeTimerDurationMs !== null &&
-      status.activeTimerDurationMs >= overwork_alert_ms
+      status.activeTimerDurationMs >= overwork_alert_ms &&
+      !is_overwork_alert_dismissed
     ) {
       return {
         kind: "alert",
         tone: "warning",
         title: "Overwork alert",
         detail: `Current session is ${format_duration(status.activeTimerDurationMs, duration_format)}. Consider a short break.`,
+        show_overwork_dismiss: true,
       };
     }
 
@@ -334,17 +420,21 @@ export function FocusGoalsNudgesBanner({
       };
     }
 
+    if (is_targets_met_dismissed) {
+      return null;
+    }
+
     return {
       kind: "alert",
       tone: "success",
       title: "Targets met",
       detail: "Daily and weekly focus goals are on track.",
+      show_targets_met_dismiss: true,
     };
   }, [
     daily_target_minutes,
     duration_format,
     nudges_enabled,
-    overwork_hours,
     has_running_timer,
     goal_scope,
     goal_sheet_name,
@@ -354,6 +444,9 @@ export function FocusGoalsNudgesBanner({
     reminder_minutes,
     status,
     weekly_target_minutes,
+    is_overwork_alert_dismissed,
+    is_targets_met_dismissed,
+    overwork_alert_ms,
   ]);
 
   if (content === null) {
@@ -374,9 +467,49 @@ export function FocusGoalsNudgesBanner({
   }
 
   const alert_class = get_focus_nudge_alert_class(content.tone);
+  const show_dismiss_button =
+    content.show_overwork_dismiss || content.show_targets_met_dismiss;
+  const dismiss_aria_label = content.show_overwork_dismiss
+    ? "Dismiss overwork alert"
+    : "Dismiss targets met alert";
 
   return (
-    <section className={alert_class} aria-live="polite" aria-atomic="true">
+    <section
+      className={`${alert_class} relative pr-10`}
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      {show_dismiss_button ? (
+        <button
+          type="button"
+          className="absolute right-2 top-2 inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-current bg-transparent p-0 text-current hover:bg-black/5"
+          aria-label={dismiss_aria_label}
+          onClick={() => {
+            if (content.show_overwork_dismiss) {
+              setIsOverworkAlertDismissed(true);
+              return;
+            }
+
+            if (content.show_targets_met_dismiss) {
+              setIsTargetsMetDismissed(true);
+            }
+          }}
+        >
+          <svg
+            viewBox="0 0 16 16"
+            className="h-3.5 w-3.5"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M4 4 L12 12 M12 4 L4 12"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      ) : null}
       <p className="m-0 text-[0.85rem] font-semibold">{content.title}</p>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         <p className="m-0 text-[0.82rem] leading-relaxed">{content.detail}</p>
